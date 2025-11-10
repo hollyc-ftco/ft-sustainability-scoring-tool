@@ -11,8 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Info } from "lucide-react";
 
-export default function CategoryAssessment({ category, scores, onScoreChange, categoryScore }) {
+export default function CategoryAssessment({ category, scores, onScoreChange, categoryScore, isReadOnly = false }) {
   const getColorClass = (weight) => {
     if (weight >= 20) return "from-emerald-500 to-teal-600";
     if (weight >= 15) return "from-blue-500 to-cyan-600";
@@ -27,7 +28,15 @@ export default function CategoryAssessment({ category, scores, onScoreChange, ca
             <div className={`w-12 h-12 bg-gradient-to-br ${getColorClass(category.weight)} rounded-xl flex items-center justify-center shadow-md`}>
               <span className="text-white font-bold">{category.weight}%</span>
             </div>
-            <CardTitle className="text-xl">{category.name}</CardTitle>
+            <div>
+              <CardTitle className="text-xl">{category.name}</CardTitle>
+              {isReadOnly && (
+                <div className="flex items-center gap-2 mt-1">
+                  <Info className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm text-blue-600 font-medium">Auto-populated from Management and Governance tab</span>
+                </div>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-200 text-base py-1 px-3">
@@ -63,16 +72,22 @@ export default function CategoryAssessment({ category, scores, onScoreChange, ca
                       </Badge>
                     </TableCell>
                     <TableCell className="text-center">
-                      <Input
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="0.1"
-                        value={score || ""}
-                        onChange={(e) => onScoreChange(sub.id, e.target.value)}
-                        className="w-24 mx-auto text-center border-emerald-200 focus:border-emerald-500"
-                        placeholder="0"
-                      />
+                      {isReadOnly ? (
+                        <Badge className="bg-blue-50 text-blue-700 border border-blue-200">
+                          {score.toFixed(2)}%
+                        </Badge>
+                      ) : (
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          value={score || ""}
+                          onChange={(e) => onScoreChange(sub.id, e.target.value)}
+                          className="w-24 mx-auto text-center border-emerald-200 focus:border-emerald-500"
+                          placeholder="0"
+                        />
+                      )}
                     </TableCell>
                     <TableCell className="text-center">
                       <Badge className="bg-blue-50 text-blue-700 border border-blue-200">

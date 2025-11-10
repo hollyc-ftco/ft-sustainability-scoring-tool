@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -25,7 +25,7 @@ const priorityScores = {
   3: { label: "Stretch Goal", score: 0.3, color: "bg-green-100 text-green-800 border-green-200" }
 };
 
-const assessmentSections = {
+export const assessmentSections = {
   sdg_alignment: {
     title: "Sustainable Development Goals (SDGs) Alignment",
     items: [
@@ -244,15 +244,38 @@ const assessmentSections = {
   }
 };
 
-function AssessmentSection({ section, sectionId }) {
-  const [responses, setResponses] = useState({});
+function AssessmentSection({ section, sectionId, data, onDataChange }) {
+  const [responses, setResponses] = useState(data.responses[sectionId] || {});
   const [priorities, setPriorities] = useState(() => {
+    if (data.priorities[sectionId]) {
+      return data.priorities[sectionId];
+    }
     const initial = {};
     section.items.forEach(item => {
       initial[item.id] = item.defaultPriority;
     });
     return initial;
   });
+
+  useEffect(() => {
+    const sumActualScores = section.items.reduce((total, item) => {
+      const score = responses[item.id] ? priorityScores[priorities[item.id]].score : 0;
+      return total + score;
+    }, 0);
+    
+    const sumPriorityScores = section.items.reduce((total, item) => {
+      return total + priorityScores[priorities[item.id]].score;
+    }, 0);
+    
+    const totalScore = sumPriorityScores === 0 ? 0 : (sumActualScores / sumPriorityScores) * 100;
+
+    onDataChange(prev => ({
+      ...prev,
+      responses: { ...prev.responses, [sectionId]: responses },
+      priorities: { ...prev.priorities, [sectionId]: priorities },
+      scores: { ...prev.scores, [sectionId]: totalScore }
+    }));
+  }, [responses, priorities]);
 
   const handleCheckboxChange = (itemId, checked) => {
     setResponses(prev => ({
@@ -431,11 +454,17 @@ function AssessmentSection({ section, sectionId }) {
   );
 }
 
-export default function ManagementGovernance() {
+export default function ManagementGovernance({ data, onDataChange }) {
   return (
     <div className="space-y-6">
       {Object.entries(assessmentSections).map(([sectionId, section]) => (
-        <AssessmentSection key={sectionId} section={section} sectionId={sectionId} />
+        <AssessmentSection 
+          key={sectionId} 
+          section={section} 
+          sectionId={sectionId}
+          data={data}
+          onDataChange={onDataChange}
+        />
       ))}
     </div>
   );

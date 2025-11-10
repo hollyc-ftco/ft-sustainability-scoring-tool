@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -120,23 +119,42 @@ const assessmentCategories = [
   }
 ];
 
-export default function AssessmentForm() {
+export default function AssessmentForm({ managementGovernanceData }) {
   const queryClient = useQueryClient();
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
   const [scores, setScores] = useState({});
   const [showSummary, setShowSummary] = useState(false);
 
+  // Auto-populate scores from Management and Governance tab
+  useEffect(() => {
+    if (managementGovernanceData && managementGovernanceData.scores) {
+      setScores(prev => ({
+        ...prev,
+        management_governance: {
+          sdg_alignment: managementGovernanceData.scores.sdg_alignment || 0,
+          environmental_systems: managementGovernanceData.scores.environmental_systems || 0,
+          stakeholder_engagement: managementGovernanceData.scores.stakeholder_engagement || 0,
+          policy_planning: managementGovernanceData.scores.policy_planning || 0
+        }
+      }));
+    }
+  }, [managementGovernanceData]);
+
   const saveProjectMutation = useMutation({
     mutationFn: (projectData) => base44.entities.Project.create(projectData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       alert("Project assessment saved successfully!");
-      // Removed state reset from here as it's now handled by `handleCreateNew` for explicit user action
     }
   });
 
   const handleScoreChange = (categoryId, subCategoryId, value) => {
+    // Don't allow manual changes to management_governance scores
+    if (categoryId === 'management_governance') {
+      return;
+    }
+    
     setScores(prev => ({
       ...prev,
       [categoryId]: {
@@ -270,6 +288,7 @@ export default function AssessmentForm() {
             handleScoreChange(category.id, subCategoryId, value)
           }
           categoryScore={calculateCategoryScore(category)}
+          isReadOnly={category.id === 'management_governance'}
         />
       ))}
 
