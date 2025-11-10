@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RatingScale from "../components/scoring/RatingScale";
 import CategoryBreakdown from "../components/scoring/CategoryBreakdown";
+import AssessmentForm from "../components/scoring/AssessmentForm";
 
 export default function ScoringTool() {
   return (
@@ -45,16 +45,7 @@ export default function ScoringTool() {
           </TabsContent>
 
           <TabsContent value="assessment">
-            <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-2xl">Project Assessment</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">Assessment functionality coming soon</p>
-                </div>
-              </CardContent>
-            </Card>
+            <AssessmentForm />
           </TabsContent>
         </Tabs>
       </div>
