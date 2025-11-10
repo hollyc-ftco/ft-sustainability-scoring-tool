@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RatingScale from "../components/scoring/RatingScale";
 import CategoryBreakdown from "../components/scoring/CategoryBreakdown";
-import AssessmentForm from "../components/scoring/AssessmentForm";
+import AssessmentMain from "../components/scoring/AssessmentMain";
+import ManagementGovernance from "../components/scoring/ManagementGovernance";
 
 export default function ScoringTool() {
   return (
@@ -45,7 +46,24 @@ export default function ScoringTool() {
           </TabsContent>
 
           <TabsContent value="assessment">
-            <AssessmentForm />
+            <Tabs defaultValue="main" className="space-y-6">
+              <TabsList className="bg-white border border-emerald-100">
+                <TabsTrigger value="main" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                  Main
+                </TabsTrigger>
+                <TabsTrigger value="management-governance" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                  Management and Governance
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="main">
+                <AssessmentMain />
+              </TabsContent>
+
+              <TabsContent value="management-governance">
+                <ManagementGovernance />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
       </div>
