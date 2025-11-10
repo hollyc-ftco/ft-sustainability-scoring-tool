@@ -67,9 +67,17 @@ export default function ManagementGovernance() {
   };
 
   const calculateTotal = () => {
-    return sdgItems.reduce((total, item) => {
+    const sumActualScores = sdgItems.reduce((total, item) => {
       return total + calculateScore(item.id, item.priority);
-    }, 0).toFixed(2);
+    }, 0);
+    
+    const sumPriorityScores = sdgItems.reduce((total, item) => {
+      return total + priorityScores[item.priority].score;
+    }, 0);
+    
+    if (sumPriorityScores === 0) return "0.00";
+    
+    return ((sumActualScores / sumPriorityScores) * 100).toFixed(2);
   };
 
   return (
@@ -79,7 +87,7 @@ export default function ManagementGovernance() {
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl">Sustainable Development Goals (SDGs) Alignment</CardTitle>
             <Badge className="bg-emerald-600 text-white text-lg py-2 px-4">
-              Total: {calculateTotal()}
+              Total: {calculateTotal()}%
             </Badge>
           </div>
         </CardHeader>
@@ -172,7 +180,7 @@ export default function ManagementGovernance() {
                   </TableCell>
                   <TableCell className="text-center">
                     <Badge className="bg-emerald-600 text-white text-lg py-1 px-3">
-                      {calculateTotal()}
+                      {calculateTotal()}%
                     </Badge>
                   </TableCell>
                 </TableRow>
