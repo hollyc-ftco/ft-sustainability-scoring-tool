@@ -45,7 +45,33 @@ export default function ScoringTool() {
           </TabsContent>
 
           <TabsContent value="assessment">
-            <AssessmentForm />
+            <Tabs defaultValue="summary" className="space-y-6">
+              <TabsList className="bg-white border border-emerald-100">
+                <TabsTrigger value="summary" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                  Summary
+                </TabsTrigger>
+                <TabsTrigger value="management" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                  Management and Governance
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="summary">
+                <AssessmentForm />
+              </TabsContent>
+
+              <TabsContent value="management">
+                <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-2xl">Management and Governance</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-12">
+                      <p className="text-gray-500 text-lg">Content coming soon</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
       </div>
