@@ -7,8 +7,6 @@ import AssessmentForm from "../components/scoring/AssessmentForm";
 import ManagementGovernance from "../components/scoring/ManagementGovernance";
 
 export default function ScoringTool() {
-  const [managementGovernanceScore, setManagementGovernanceScore] = useState(0);
-
   return (
     <div className="p-6 md:p-10">
       <div className="max-w-7xl mx-auto">
@@ -59,11 +57,11 @@ export default function ScoringTool() {
               </TabsList>
 
               <TabsContent value="summary">
-                <AssessmentForm managementGovernanceScore={managementGovernanceScore} />
+                <AssessmentForm />
               </TabsContent>
 
               <TabsContent value="management">
-                <ManagementGovernance onScoreChange={setManagementGovernanceScore} />
+                <ManagementGovernance />
               </TabsContent>
             </Tabs>
           </TabsContent>

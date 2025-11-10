@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -15,8 +16,32 @@ const assessmentCategories = [
     id: "management_governance",
     name: "Management and Governance",
     weight: 10,
-    isAutoCalculated: true,
-    subCategories: []
+    subCategories: [
+      { 
+        id: "sdg_alignment",
+        name: "Sustainable Development Goals (SDGs) Alignment",
+        description: "Alignment with UN SDGs, especially in areas like climate action (SDG 13), sustainable cities (SDG 11), and responsible consumption (SDG 12).",
+        weight: 20
+      },
+      {
+        id: "environmental_systems",
+        name: "Environmental Management Systems",
+        description: "Demonstrating a commitment to sustainability through certified environmental management systems (e.g., ISO 14001).",
+        weight: 30
+      },
+      {
+        id: "stakeholder_engagement",
+        name: "Stakeholder Engagement",
+        description: "Involvement of local communities, indigenous populations, and affected stakeholders in decision-making.",
+        weight: 30
+      },
+      {
+        id: "policy_planning",
+        name: "Policy and Planning",
+        description: "Integration of sustainability goals into the project's governance, including policies for waste management, emissions reduction, and resource efficiency.",
+        weight: 20
+      }
+    ]
   },
   {
     id: "energy_carbon",
@@ -95,7 +120,7 @@ const assessmentCategories = [
   }
 ];
 
-export default function AssessmentForm({ managementGovernanceScore = 0 }) {
+export default function AssessmentForm() {
   const queryClient = useQueryClient();
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
@@ -107,6 +132,7 @@ export default function AssessmentForm({ managementGovernanceScore = 0 }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       alert("Project assessment saved successfully!");
+      // Removed state reset from here as it's now handled by `handleCreateNew` for explicit user action
     }
   });
 
@@ -121,11 +147,6 @@ export default function AssessmentForm({ managementGovernanceScore = 0 }) {
   };
 
   const calculateCategoryScore = (category) => {
-    // If it's management & governance, use the score from the dedicated tab
-    if (category.id === "management_governance") {
-      return managementGovernanceScore;
-    }
-
     const categoryScores = scores[category.id] || {};
     let totalScore = 0;
     
@@ -162,7 +183,7 @@ export default function AssessmentForm({ managementGovernanceScore = 0 }) {
       project_owner: projectOwner,
       status: "completed",
       total_score: parseFloat(calculateTotalScore()),
-      management_governance: { auto_calculated_score: managementGovernanceScore },
+      management_governance: scores.management_governance || {},
       energy_carbon: scores.energy_carbon || {},
       water_management: scores.water_management || {},
       materials_resources: scores.materials_resources || {},
@@ -240,51 +261,17 @@ export default function AssessmentForm({ managementGovernanceScore = 0 }) {
         </CardContent>
       </Card>
 
-      {assessmentCategories.map((category) => {
-        if (category.isAutoCalculated) {
-          // Display Management & Governance as read-only
-          return (
-            <Card key={category.id} className="border-emerald-100 bg-white/60 backdrop-blur-sm">
-              <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-md">
-                      <span className="text-white font-bold">{category.weight}%</span>
-                    </div>
-                    <CardTitle className="text-xl">{category.name}</CardTitle>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Badge className="bg-blue-100 text-blue-800 border border-blue-200">
-                      Auto-calculated from Management & Governance tab
-                    </Badge>
-                    <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-200 text-base py-1 px-3">
-                      Category Score: {managementGovernanceScore.toFixed(2)}%
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <p className="text-gray-600">
-                  This category score is automatically calculated from the "Management and Governance" tab. 
-                  Please switch to that tab to input the detailed assessment data.
-                </p>
-              </CardContent>
-            </Card>
-          );
-        }
-
-        return (
-          <CategoryAssessment
-            key={category.id}
-            category={category}
-            scores={scores[category.id] || {}}
-            onScoreChange={(subCategoryId, value) => 
-              handleScoreChange(category.id, subCategoryId, value)
-            }
-            categoryScore={calculateCategoryScore(category)}
-          />
-        );
-      })}
+      {assessmentCategories.map((category) => (
+        <CategoryAssessment
+          key={category.id}
+          category={category}
+          scores={scores[category.id] || {}}
+          onScoreChange={(subCategoryId, value) => 
+            handleScoreChange(category.id, subCategoryId, value)
+          }
+          categoryScore={calculateCategoryScore(category)}
+        />
+      ))}
 
       <div className="flex gap-4 justify-end sticky bottom-6 z-10">
         <Button
