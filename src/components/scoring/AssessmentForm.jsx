@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Save, Calculator } from "lucide-react";
 import CategoryAssessment from "./CategoryAssessment";
 import AssessmentSummary from "./AssessmentSummary";
@@ -230,17 +230,46 @@ export default function AssessmentForm() {
         </CardContent>
       </Card>
 
-      {assessmentCategories.map((category) => (
-        <CategoryAssessment
-          key={category.id}
-          category={category}
-          scores={scores[category.id] || {}}
-          onScoreChange={(subCategoryId, value) => 
-            handleScoreChange(category.id, subCategoryId, value)
-          }
-          categoryScore={calculateCategoryScore(category)}
-        />
-      ))}
+      <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-2xl">Assessment Categories</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Tabs defaultValue={assessmentCategories[0].id} orientation="vertical" className="flex">
+            <TabsList className="flex-col h-auto w-80 bg-gradient-to-b from-emerald-50 to-teal-50 p-2 border-r border-emerald-100 rounded-none rounded-l-lg">
+              {assessmentCategories.map((category) => (
+                <TabsTrigger
+                  key={category.id}
+                  value={category.id}
+                  className="w-full justify-start text-left py-3 px-4 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm hover:bg-white/50 transition-all"
+                >
+                  <div className="flex items-center gap-3 w-full">
+                    <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-xs">{category.weight}%</span>
+                    </div>
+                    <span className="text-sm font-medium">{category.name}</span>
+                  </div>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            <div className="flex-1">
+              {assessmentCategories.map((category) => (
+                <TabsContent key={category.id} value={category.id} className="m-0 p-6">
+                  <CategoryAssessment
+                    category={category}
+                    scores={scores[category.id] || {}}
+                    onScoreChange={(subCategoryId, value) => 
+                      handleScoreChange(category.id, subCategoryId, value)
+                    }
+                    categoryScore={calculateCategoryScore(category)}
+                  />
+                </TabsContent>
+              ))}
+            </div>
+          </Tabs>
+        </CardContent>
+      </Card>
 
       <div className="flex gap-4 justify-end sticky bottom-6 z-10">
         <Button

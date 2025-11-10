@@ -20,23 +20,25 @@ export default function CategoryAssessment({ category, scores, onScoreChange, ca
   };
 
   return (
-    <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
-      <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
+    <div className="space-y-4">
+      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-100">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
             <div className={`w-12 h-12 bg-gradient-to-br ${getColorClass(category.weight)} rounded-xl flex items-center justify-center shadow-md`}>
               <span className="text-white font-bold">{category.weight}%</span>
             </div>
-            <CardTitle className="text-xl">{category.name}</CardTitle>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">{category.name}</h2>
+              <p className="text-sm text-gray-600">Category Weight: {category.weight}%</p>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-200 text-base py-1 px-3">
-              Category Score: {categoryScore.toFixed(2)}%
-            </Badge>
-          </div>
+          <Badge className="bg-emerald-600 text-white hover:bg-emerald-700 text-lg py-2 px-4">
+            Score: {categoryScore.toFixed(2)}%
+          </Badge>
         </div>
-      </CardHeader>
-      <CardContent className="p-0">
+      </div>
+
+      <div className="bg-white rounded-xl border border-emerald-100 overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -93,7 +95,7 @@ export default function CategoryAssessment({ category, scores, onScoreChange, ca
             </TableBody>
           </Table>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
