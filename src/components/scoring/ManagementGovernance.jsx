@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -28,6 +28,7 @@ const priorityScores = {
 const assessmentSections = {
   sdg_alignment: {
     title: "Sustainable Development Goals (SDGs) Alignment",
+    weight: 20,
     items: [
       {
         id: "consider_sdgs",
@@ -61,6 +62,7 @@ const assessmentSections = {
   },
   environmental_systems: {
     title: "Environmental Management Systems",
+    weight: 30,
     items: [
       {
         id: "env_impacts_assessment",
@@ -150,6 +152,7 @@ const assessmentSections = {
   },
   stakeholder_engagement: {
     title: "Stakeholder Engagement",
+    weight: 30,
     items: [
       {
         id: "identify_prioritise",
@@ -190,6 +193,7 @@ const assessmentSections = {
   },
   policy_planning: {
     title: "Policy and Planning",
+    weight: 20,
     items: [
       {
         id: "npf_requirements",
@@ -284,159 +288,196 @@ function AssessmentSection({ section, sectionId }) {
       return total + priorityScores[priorities[item.id]].score;
     }, 0);
     
-    if (sumPriorityScores === 0) return "0.00";
+    if (sumPriorityScores === 0) return 0;
     
-    return ((sumActualScores / sumPriorityScores) * 100).toFixed(2);
+    return (sumActualScores / sumPriorityScores) * 100;
   };
 
-  return (
-    <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
-      <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-2xl">{section.title}</CardTitle>
-          <Badge className="bg-emerald-600 text-white text-lg py-2 px-4">
-            Total: {calculateTotal()}%
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="p-6">
-        {sectionId === 'sdg_alignment' && (
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="space-y-2">
-                <h4 className="font-semibold text-blue-900">Priority Scoring System</h4>
-                <div className="grid md:grid-cols-3 gap-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-red-100 text-red-800 border border-red-200">
-                      Mandatory (Priority 1)
-                    </Badge>
-                    <span className="text-gray-700">Score: 1</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-blue-100 text-blue-800 border border-blue-200">
-                      Best Practice (Priority 2)
-                    </Badge>
-                    <span className="text-gray-700">Score: 0.6</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-green-100 text-green-800 border border-green-200">
-                      Stretch Goal (Priority 3)
-                    </Badge>
-                    <span className="text-gray-700">Score: 0.3</span>
+  return {
+    component: (
+      <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
+        <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl">{section.title}</CardTitle>
+            <Badge className="bg-emerald-600 text-white text-lg py-2 px-4">
+              Total: {calculateTotal().toFixed(2)}%
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="p-6">
+          {sectionId === 'sdg_alignment' && (
+            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-blue-900">Priority Scoring System</h4>
+                  <div className="grid md:grid-cols-3 gap-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-red-100 text-red-800 border border-red-200">
+                        Mandatory (Priority 1)
+                      </Badge>
+                      <span className="text-gray-700">Score: 1</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-blue-100 text-blue-800 border border-blue-200">
+                        Best Practice (Priority 2)
+                      </Badge>
+                      <span className="text-gray-700">Score: 0.6</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-green-100 text-green-800 border border-green-200">
+                        Stretch Goal (Priority 3)
+                      </Badge>
+                      <span className="text-gray-700">Score: 0.3</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50">
-                <TableHead className="w-32">Item</TableHead>
-                <TableHead className="w-1/4">Description</TableHead>
-                <TableHead className="w-1/3">Actions</TableHead>
-                <TableHead className="text-center w-40">Priority</TableHead>
-                <TableHead className="text-center w-24">Yes/No</TableHead>
-                <TableHead className="text-center w-24">Score</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {section.items.map((item) => {
-                const score = calculateScore(item.id);
-                const priority = priorities[item.id];
-                const priorityInfo = priorityScores[priority];
-                
-                return (
-                  <TableRow key={item.id} className="hover:bg-emerald-50/30">
-                    <TableCell className="font-semibold text-emerald-700">
-                      {item.item}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-700">
-                      {item.description}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-600">
-                      {item.actions}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Select
-                        value={priority.toString()}
-                        onValueChange={(value) => handlePriorityChange(item.id, value)}
-                      >
-                        <SelectTrigger className="w-full border-emerald-200">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-red-100 text-red-800 border border-red-200 text-xs">
-                                1 - Mandatory
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="2">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-blue-100 text-blue-800 border border-blue-200 text-xs">
-                                2 - Best Practice
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="3">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-green-100 text-green-800 border border-green-200 text-xs">
-                                3 - Stretch Goal
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex justify-center">
-                        <Checkbox
-                          checked={responses[item.id] || false}
-                          onCheckedChange={(checked) => handleCheckboxChange(item.id, checked)}
-                          className="border-emerald-300 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
-                        />
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Badge 
-                        variant={score > 0 ? "default" : "outline"}
-                        className={score > 0 ? "bg-emerald-600 text-white" : "border-gray-300 text-gray-500"}
-                      >
-                        {score.toFixed(1)}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-              <TableRow className="bg-emerald-50 font-semibold">
-                <TableCell colSpan={5} className="text-right text-lg">
-                  TOTAL
-                </TableCell>
-                <TableCell className="text-center">
-                  <Badge className="bg-emerald-600 text-white text-lg py-1 px-3">
-                    {calculateTotal()}%
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
-  );
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="w-32">Item</TableHead>
+                  <TableHead className="w-1/4">Description</TableHead>
+                  <TableHead className="w-1/3">Actions</TableHead>
+                  <TableHead className="text-center w-40">Priority</TableHead>
+                  <TableHead className="text-center w-24">Yes/No</TableHead>
+                  <TableHead className="text-center w-24">Score</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {section.items.map((item) => {
+                  const score = calculateScore(item.id);
+                  const priority = priorities[item.id];
+                  const priorityInfo = priorityScores[priority];
+                  
+                  return (
+                    <TableRow key={item.id} className="hover:bg-emerald-50/30">
+                      <TableCell className="font-semibold text-emerald-700">
+                        {item.item}
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-700">
+                        {item.description}
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-600">
+                        {item.actions}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Select
+                          value={priority.toString()}
+                          onValueChange={(value) => handlePriorityChange(item.id, value)}
+                        >
+                          <SelectTrigger className="w-full border-emerald-200">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">
+                              <div className="flex items-center gap-2">
+                                <Badge className="bg-red-100 text-red-800 border border-red-200 text-xs">
+                                  1 - Mandatory
+                                </Badge>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="2">
+                              <div className="flex items-center gap-2">
+                                <Badge className="bg-blue-100 text-blue-800 border border-blue-200 text-xs">
+                                  2 - Best Practice
+                                </Badge>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="3">
+                              <div className="flex items-center gap-2">
+                                <Badge className="bg-green-100 text-green-800 border border-green-200 text-xs">
+                                  3 - Stretch Goal
+                                </Badge>
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex justify-center">
+                          <Checkbox
+                            checked={responses[item.id] || false}
+                            onCheckedChange={(checked) => handleCheckboxChange(item.id, checked)}
+                            className="border-emerald-300 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                          />
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge 
+                          variant={score > 0 ? "default" : "outline"}
+                          className={score > 0 ? "bg-emerald-600 text-white" : "border-gray-300 text-gray-500"}
+                        >
+                          {score.toFixed(1)}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                <TableRow className="bg-emerald-50 font-semibold">
+                  <TableCell colSpan={5} className="text-right text-lg">
+                    TOTAL
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge className="bg-emerald-600 text-white text-lg py-1 px-3">
+                      {calculateTotal().toFixed(2)}%
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    ),
+    score: calculateTotal()
+  };
 }
 
-export default function ManagementGovernance() {
+export default function ManagementGovernance({ onScoreChange }) {
+  const [sectionData, setSectionData] = useState({});
+
+  useEffect(() => {
+    // Calculate overall Management & Governance score
+    let totalWeightedScore = 0;
+    let totalWeight = 0;
+
+    Object.entries(assessmentSections).forEach(([sectionId, section]) => {
+      const sectionScore = sectionData[sectionId] || 0;
+      totalWeightedScore += (sectionScore * section.weight) / 100;
+      totalWeight += section.weight;
+    });
+
+    const overallScore = totalWeight > 0 ? totalWeightedScore : 0;
+    onScoreChange(overallScore);
+  }, [sectionData, onScoreChange]);
+
+  const handleSectionScoreUpdate = (sectionId, score) => {
+    setSectionData(prev => ({
+      ...prev,
+      [sectionId]: score
+    }));
+  };
+
   return (
     <div className="space-y-6">
-      {Object.entries(assessmentSections).map(([sectionId, section]) => (
-        <AssessmentSection key={sectionId} section={section} sectionId={sectionId} />
-      ))}
+      {Object.entries(assessmentSections).map(([sectionId, section]) => {
+        const SectionWrapper = () => {
+          const result = AssessmentSection({ section, sectionId });
+          
+          useEffect(() => {
+            handleSectionScoreUpdate(sectionId, result.score);
+          }, [result.score]);
+
+          return result.component;
+        };
+
+        return <SectionWrapper key={sectionId} />;
+      })}
     </div>
   );
 }
