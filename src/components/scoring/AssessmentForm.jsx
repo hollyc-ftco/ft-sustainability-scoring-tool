@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Save, Calculator } from "lucide-react";
+import { Save, Calculator, Printer, Plus } from "lucide-react";
 import CategoryAssessment from "./CategoryAssessment";
 import AssessmentSummary from "./AssessmentSummary";
 
@@ -131,10 +132,7 @@ export default function AssessmentForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       alert("Project assessment saved successfully!");
-      setProjectName("");
-      setProjectOwner("");
-      setScores({});
-      setShowSummary(false);
+      // Removed state reset from here as it's now handled by `handleCreateNew` for explicit user action
     }
   });
 
@@ -198,11 +196,44 @@ export default function AssessmentForm() {
     saveProjectMutation.mutate(projectData);
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleCreateNew = () => {
+    if (confirm("Are you sure you want to create a new assessment? All current data will be cleared.")) {
+      setProjectName("");
+      setProjectOwner("");
+      setScores({});
+      setShowSummary(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-2xl">Project Information</CardTitle>
+          <div className="flex gap-3">
+            <Button
+              onClick={handleCreateNew}
+              variant="outline"
+              className="border-emerald-200 hover:bg-emerald-50"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create New
+            </Button>
+            {showSummary && (
+              <Button
+                onClick={handlePrint}
+                variant="outline"
+                className="border-blue-200 hover:bg-blue-50"
+              >
+                <Printer className="w-4 h-4 mr-2" />
+                Print Summary
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-6">
@@ -268,6 +299,8 @@ export default function AssessmentForm() {
           scores={scores}
           calculateCategoryScore={calculateCategoryScore}
           totalScore={calculateTotalScore()}
+          projectName={projectName}
+          projectOwner={projectOwner}
         />
       )}
     </div>

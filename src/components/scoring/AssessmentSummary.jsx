@@ -12,14 +12,20 @@ const getRating = (score) => {
   return { name: "Unclassified", color: "from-red-500 to-red-600", bgColor: "bg-red-50", textColor: "text-red-800", icon: XCircle };
 };
 
-export default function AssessmentSummary({ categories, scores, calculateCategoryScore, totalScore }) {
+export default function AssessmentSummary({ categories, scores, calculateCategoryScore, totalScore, projectName, projectOwner }) {
   const rating = getRating(totalScore);
   const RatingIcon = rating.icon;
 
   return (
-    <Card className="border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl">
+    <Card className="border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl print:shadow-none">
       <CardHeader className="border-b border-emerald-200">
         <CardTitle className="text-3xl text-center">Assessment Summary</CardTitle>
+        {(projectName || projectOwner) && (
+          <div className="text-center mt-4 space-y-1">
+            {projectName && <p className="text-lg font-semibold text-gray-900">Project: {projectName}</p>}
+            {projectOwner && <p className="text-sm text-gray-600">Owner: {projectOwner}</p>}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="pt-6 space-y-6">
         <div className={`${rating.bgColor} border-2 ${rating.bgColor.replace('bg-', 'border-')} rounded-2xl p-8`}>
@@ -45,7 +51,7 @@ export default function AssessmentSummary({ categories, scores, calculateCategor
             const weightedScore = (categoryScore * category.weight) / 100;
             
             return (
-              <div key={category.id} className="bg-white rounded-xl p-4 border border-emerald-100 hover:shadow-md transition-shadow">
+              <div key={category.id} className="bg-white rounded-xl p-4 border border-emerald-100 hover:shadow-md transition-shadow print:shadow-none">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
