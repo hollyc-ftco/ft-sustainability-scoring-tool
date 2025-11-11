@@ -82,7 +82,12 @@ export const assessmentSections = {
         description: "Plan for transition to net-zero.",
         actions: "Develop project-specific net-zero pathways including residual carbon offsetting strategy; integrate with organisational carbon goals.",
         defaultPriority: 2
-      },
+      }
+    ]
+  },
+  renewable_energy: {
+    title: "Renewable Energy Integration",
+    items: [
       {
         id: "renewable_operational",
         item: "Renewable/low-carbon/zero-carbon energy options within operational phase",
