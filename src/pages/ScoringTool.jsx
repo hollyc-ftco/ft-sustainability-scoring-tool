@@ -6,6 +6,7 @@ import CategoryBreakdown from "../components/scoring/CategoryBreakdown";
 import AssessmentForm from "../components/scoring/AssessmentForm";
 import ManagementGovernance from "../components/scoring/ManagementGovernance";
 import EnergyCarbonManagement from "../components/scoring/EnergyCarbonManagement";
+import WaterManagement from "../components/scoring/WaterManagement";
 
 export default function ScoringTool() {
   const [managementGovernanceData, setManagementGovernanceData] = useState({
@@ -15,6 +16,12 @@ export default function ScoringTool() {
   });
 
   const [energyCarbonData, setEnergyCarbonData] = useState({
+    responses: {},
+    priorities: {},
+    scores: {}
+  });
+
+  const [waterManagementData, setWaterManagementData] = useState({
     responses: {},
     priorities: {},
     scores: {}
@@ -70,12 +77,16 @@ export default function ScoringTool() {
                 <TabsTrigger value="energy" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
                   Energy & Carbon Management
                 </TabsTrigger>
+                <TabsTrigger value="water" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                  Water Management
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="summary">
                 <AssessmentForm 
                   managementGovernanceData={managementGovernanceData}
                   energyCarbonData={energyCarbonData}
+                  waterManagementData={waterManagementData}
                 />
               </TabsContent>
 
@@ -90,6 +101,13 @@ export default function ScoringTool() {
                 <EnergyCarbonManagement 
                   data={energyCarbonData}
                   onDataChange={setEnergyCarbonData}
+                />
+              </TabsContent>
+
+              <TabsContent value="water">
+                <WaterManagement 
+                  data={waterManagementData}
+                  onDataChange={setWaterManagementData}
                 />
               </TabsContent>
             </Tabs>

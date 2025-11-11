@@ -119,7 +119,7 @@ const assessmentCategories = [
   }
 ];
 
-export default function AssessmentForm({ managementGovernanceData, energyCarbonData }) {
+export default function AssessmentForm({ managementGovernanceData, energyCarbonData, waterManagementData }) {
   const queryClient = useQueryClient();
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
@@ -156,6 +156,21 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   }, [energyCarbonData]);
 
+  // Auto-populate scores from Water Management tab
+  useEffect(() => {
+    if (waterManagementData && waterManagementData.scores) {
+      setScores(prev => ({
+        ...prev,
+        water_management: {
+          water_efficiency: waterManagementData.scores.water_efficiency || 0,
+          flood_risk: waterManagementData.scores.flood_risk || 0,
+          water_quality: waterManagementData.scores.water_quality || 0,
+          sustainable_drainage: waterManagementData.scores.suds || 0
+        }
+      }));
+    }
+  }, [waterManagementData]);
+
   const saveProjectMutation = useMutation({
     mutationFn: (projectData) => base44.entities.Project.create(projectData),
     onSuccess: () => {
@@ -165,8 +180,8 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
   });
 
   const handleScoreChange = (categoryId, subCategoryId, value) => {
-    // Don't allow manual changes to management_governance or energy_carbon scores
-    if (categoryId === 'management_governance' || categoryId === 'energy_carbon') {
+    // Don't allow manual changes to management_governance, energy_carbon, or water_management scores
+    if (categoryId === 'management_governance' || categoryId === 'energy_carbon' || categoryId === 'water_management') {
       return;
     }
     
@@ -303,7 +318,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
             handleScoreChange(category.id, subCategoryId, value)
           }
           categoryScore={calculateCategoryScore(category)}
-          isReadOnly={category.id === 'management_governance' || category.id === 'energy_carbon'}
+          isReadOnly={category.id === 'management_governance' || category.id === 'energy_carbon' || category.id === 'water_management'}
         />
       ))}
 
