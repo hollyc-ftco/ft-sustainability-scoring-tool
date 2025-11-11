@@ -119,7 +119,7 @@ const assessmentCategories = [
   }
 ];
 
-export default function AssessmentForm({ managementGovernanceData }) {
+export default function AssessmentForm({ managementGovernanceData, energyCarbonData }) {
   const queryClient = useQueryClient();
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
@@ -141,6 +141,21 @@ export default function AssessmentForm({ managementGovernanceData }) {
     }
   }, [managementGovernanceData]);
 
+  // Auto-populate scores from Energy & Carbon Management tab
+  useEffect(() => {
+    if (energyCarbonData && energyCarbonData.scores) {
+      setScores(prev => ({
+        ...prev,
+        energy_carbon: {
+          energy_reduction: energyCarbonData.scores.energy_reduction || 0,
+          carbon_emissions: energyCarbonData.scores.carbon_emissions || 0,
+          renewable_energy: 0, // Not tracked separately in new structure
+          carbon_offsetting: energyCarbonData.scores.carbon_offsetting || 0
+        }
+      }));
+    }
+  }, [energyCarbonData]);
+
   const saveProjectMutation = useMutation({
     mutationFn: (projectData) => base44.entities.Project.create(projectData),
     onSuccess: () => {
@@ -150,8 +165,8 @@ export default function AssessmentForm({ managementGovernanceData }) {
   });
 
   const handleScoreChange = (categoryId, subCategoryId, value) => {
-    // Don't allow manual changes to management_governance scores
-    if (categoryId === 'management_governance') {
+    // Don't allow manual changes to management_governance or energy_carbon scores
+    if (categoryId === 'management_governance' || categoryId === 'energy_carbon') {
       return;
     }
     
@@ -288,7 +303,7 @@ export default function AssessmentForm({ managementGovernanceData }) {
             handleScoreChange(category.id, subCategoryId, value)
           }
           categoryScore={calculateCategoryScore(category)}
-          isReadOnly={category.id === 'management_governance'}
+          isReadOnly={category.id === 'management_governance' || category.id === 'energy_carbon'}
         />
       ))}
 

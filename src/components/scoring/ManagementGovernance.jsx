@@ -323,37 +323,6 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
         </div>
       </CardHeader>
       <CardContent className="p-6">
-        {sectionId === 'sdg_alignment' && (
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="space-y-2">
-                <h4 className="font-semibold text-blue-900">Priority Scoring System</h4>
-                <div className="grid md:grid-cols-3 gap-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-red-100 text-red-800 border border-red-200">
-                      Mandatory (Priority 1)
-                    </Badge>
-                    <span className="text-gray-700">Score: 1</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-blue-100 text-blue-800 border border-blue-200">
-                      Best Practice (Priority 2)
-                    </Badge>
-                    <span className="text-gray-700">Score: 0.6</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-green-100 text-green-800 border border-green-200">
-                      Stretch Goal (Priority 3)
-                    </Badge>
-                    <span className="text-gray-700">Score: 0.3</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -457,6 +426,35 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
 export default function ManagementGovernance({ data, onDataChange }) {
   return (
     <div className="space-y-6">
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <div className="flex items-start gap-3">
+          <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+          <div className="space-y-2">
+            <h4 className="font-semibold text-blue-900">Priority Scoring System</h4>
+            <div className="grid md:grid-cols-3 gap-3 text-sm">
+              <div className="flex items-center gap-2">
+                <Badge className="bg-red-100 text-red-800 border border-red-200">
+                  Mandatory (Priority 1)
+                </Badge>
+                <span className="text-gray-700">Score: 1</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-blue-100 text-blue-800 border border-blue-200">
+                  Best Practice (Priority 2)
+                </Badge>
+                <span className="text-gray-700">Score: 0.6</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-green-100 text-green-800 border border-green-200">
+                  Stretch Goal (Priority 3)
+                </Badge>
+                <span className="text-gray-700">Score: 0.3</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {Object.entries(assessmentSections).map(([sectionId, section]) => (
         <AssessmentSection 
           key={sectionId} 

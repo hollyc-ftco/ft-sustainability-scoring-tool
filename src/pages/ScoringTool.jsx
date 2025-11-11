@@ -5,9 +5,16 @@ import RatingScale from "../components/scoring/RatingScale";
 import CategoryBreakdown from "../components/scoring/CategoryBreakdown";
 import AssessmentForm from "../components/scoring/AssessmentForm";
 import ManagementGovernance from "../components/scoring/ManagementGovernance";
+import EnergyCarbonManagement from "../components/scoring/EnergyCarbonManagement";
 
 export default function ScoringTool() {
   const [managementGovernanceData, setManagementGovernanceData] = useState({
+    responses: {},
+    priorities: {},
+    scores: {}
+  });
+
+  const [energyCarbonData, setEnergyCarbonData] = useState({
     responses: {},
     priorities: {},
     scores: {}
@@ -53,23 +60,36 @@ export default function ScoringTool() {
 
           <TabsContent value="assessment">
             <Tabs defaultValue="summary" className="space-y-6">
-              <TabsList className="bg-white border border-emerald-100">
+              <TabsList className="bg-white border border-emerald-100 flex-wrap">
                 <TabsTrigger value="summary" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
                   Summary
                 </TabsTrigger>
                 <TabsTrigger value="management" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
                   Management and Governance
                 </TabsTrigger>
+                <TabsTrigger value="energy" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                  Energy & Carbon Management
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="summary">
-                <AssessmentForm managementGovernanceData={managementGovernanceData} />
+                <AssessmentForm 
+                  managementGovernanceData={managementGovernanceData}
+                  energyCarbonData={energyCarbonData}
+                />
               </TabsContent>
 
               <TabsContent value="management">
                 <ManagementGovernance 
                   data={managementGovernanceData}
                   onDataChange={setManagementGovernanceData}
+                />
+              </TabsContent>
+
+              <TabsContent value="energy">
+                <EnergyCarbonManagement 
+                  data={energyCarbonData}
+                  onDataChange={setEnergyCarbonData}
                 />
               </TabsContent>
             </Tabs>
