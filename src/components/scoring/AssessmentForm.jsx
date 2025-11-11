@@ -119,7 +119,7 @@ const assessmentCategories = [
   }
 ];
 
-export default function AssessmentForm({ managementGovernanceData, energyCarbonData, waterManagementData }) {
+export default function AssessmentForm({ managementGovernanceData, energyCarbonData, waterManagementData, materialsResourceData }) {
   const queryClient = useQueryClient();
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
@@ -171,6 +171,21 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   }, [waterManagementData]);
 
+  // Auto-populate scores from Materials & Resource Efficiency tab
+  useEffect(() => {
+    if (materialsResourceData && materialsResourceData.scores) {
+      setScores(prev => ({
+        ...prev,
+        materials_resources: {
+          material_selection: materialsResourceData.scores.material_selection || 0,
+          circular_economy: materialsResourceData.scores.circular_economy || 0,
+          waste_management: materialsResourceData.scores.waste_management || 0,
+          embodied_carbon: materialsResourceData.scores.embodied_carbon || 0
+        }
+      }));
+    }
+  }, [materialsResourceData]);
+
   const saveProjectMutation = useMutation({
     mutationFn: (projectData) => base44.entities.Project.create(projectData),
     onSuccess: () => {
@@ -180,8 +195,9 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
   });
 
   const handleScoreChange = (categoryId, subCategoryId, value) => {
-    // Don't allow manual changes to management_governance, energy_carbon, or water_management scores
-    if (categoryId === 'management_governance' || categoryId === 'energy_carbon' || categoryId === 'water_management') {
+    // Don't allow manual changes to auto-populated categories
+    if (categoryId === 'management_governance' || categoryId === 'energy_carbon' || 
+        categoryId === 'water_management' || categoryId === 'materials_resources') {
       return;
     }
     
@@ -318,7 +334,8 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
             handleScoreChange(category.id, subCategoryId, value)
           }
           categoryScore={calculateCategoryScore(category)}
-          isReadOnly={category.id === 'management_governance' || category.id === 'energy_carbon' || category.id === 'water_management'}
+          isReadOnly={category.id === 'management_governance' || category.id === 'energy_carbon' || 
+                      category.id === 'water_management' || category.id === 'materials_resources'}
         />
       ))}
 

@@ -7,6 +7,7 @@ import AssessmentForm from "../components/scoring/AssessmentForm";
 import ManagementGovernance from "../components/scoring/ManagementGovernance";
 import EnergyCarbonManagement from "../components/scoring/EnergyCarbonManagement";
 import WaterManagement from "../components/scoring/WaterManagement";
+import MaterialsResourceEfficiency from "../components/scoring/MaterialsResourceEfficiency";
 
 export default function ScoringTool() {
   const [managementGovernanceData, setManagementGovernanceData] = useState({
@@ -22,6 +23,12 @@ export default function ScoringTool() {
   });
 
   const [waterManagementData, setWaterManagementData] = useState({
+    responses: {},
+    priorities: {},
+    scores: {}
+  });
+
+  const [materialsResourceData, setMaterialsResourceData] = useState({
     responses: {},
     priorities: {},
     scores: {}
@@ -80,6 +87,9 @@ export default function ScoringTool() {
                 <TabsTrigger value="water" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
                   Water Management
                 </TabsTrigger>
+                <TabsTrigger value="materials" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                  Materials & Resource Efficiency
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="summary">
@@ -87,6 +97,7 @@ export default function ScoringTool() {
                   managementGovernanceData={managementGovernanceData}
                   energyCarbonData={energyCarbonData}
                   waterManagementData={waterManagementData}
+                  materialsResourceData={materialsResourceData}
                 />
               </TabsContent>
 
@@ -108,6 +119,13 @@ export default function ScoringTool() {
                 <WaterManagement 
                   data={waterManagementData}
                   onDataChange={setWaterManagementData}
+                />
+              </TabsContent>
+
+              <TabsContent value="materials">
+                <MaterialsResourceEfficiency 
+                  data={materialsResourceData}
+                  onDataChange={setMaterialsResourceData}
                 />
               </TabsContent>
             </Tabs>
