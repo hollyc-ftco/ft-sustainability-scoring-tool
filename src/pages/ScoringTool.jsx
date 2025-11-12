@@ -10,6 +10,7 @@ import WaterManagement from "../components/scoring/WaterManagement";
 import MaterialsResourceEfficiency from "../components/scoring/MaterialsResourceEfficiency";
 import BiodiversityEcosystem from "../components/scoring/BiodiversityEcosystem";
 import TransportMobility from "../components/scoring/TransportMobility";
+import SocialImpactWellbeing from "../components/scoring/SocialImpactWellbeing";
 
 export default function ScoringTool() {
   const [managementGovernanceData, setManagementGovernanceData] = useState({
@@ -43,6 +44,12 @@ export default function ScoringTool() {
   });
 
   const [transportMobilityData, setTransportMobilityData] = useState({
+    responses: {},
+    priorities: {},
+    scores: {}
+  });
+
+  const [socialImpactData, setSocialImpactData] = useState({
     responses: {},
     priorities: {},
     scores: {}
@@ -110,6 +117,9 @@ export default function ScoringTool() {
                 <TabsTrigger value="transport" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
                   Transport & Mobility
                 </TabsTrigger>
+                <TabsTrigger value="social" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                  Social Impact & Wellbeing
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="summary">
@@ -120,6 +130,7 @@ export default function ScoringTool() {
                   materialsResourceData={materialsResourceData}
                   biodiversityEcosystemData={biodiversityEcosystemData}
                   transportMobilityData={transportMobilityData}
+                  socialImpactData={socialImpactData}
                 />
               </TabsContent>
 
@@ -162,6 +173,13 @@ export default function ScoringTool() {
                 <TransportMobility 
                   data={transportMobilityData}
                   onDataChange={setTransportMobilityData}
+                />
+              </TabsContent>
+
+              <TabsContent value="social">
+                <SocialImpactWellbeing 
+                  data={socialImpactData}
+                  onDataChange={setSocialImpactData}
                 />
               </TabsContent>
             </Tabs>
