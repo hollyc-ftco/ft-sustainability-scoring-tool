@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, Pencil, Trash2, FileText, BarChart3 } from "lucide-react";
+import { Eye, Trash2, FileText, BarChart3, Pencil } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
 
@@ -158,6 +158,16 @@ export default function Records() {
                                 title="View Graphs"
                               >
                                 <BarChart3 className="w-4 h-4" />
+                              </Button>
+                            </Link>
+                            <Link to={`${createPageUrl("EditProject")}?id=${project.id}`}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-emerald-200 hover:bg-emerald-50 text-emerald-700"
+                                title="Edit"
+                              >
+                                <Pencil className="w-4 h-4" />
                               </Button>
                             </Link>
                             <Button

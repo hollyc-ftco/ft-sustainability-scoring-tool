@@ -3,6 +3,7 @@ import ScoringTool from './pages/ScoringTool';
 import Records from './pages/Records';
 import ProjectView from './pages/ProjectView';
 import ProjectGraphs from './pages/ProjectGraphs';
+import EditProject from './pages/EditProject';
 import Layout from './Layout.jsx';
 
 
@@ -12,6 +13,7 @@ export const PAGES = {
     "Records": Records,
     "ProjectView": ProjectView,
     "ProjectGraphs": ProjectGraphs,
+    "EditProject": EditProject,
 }
 
 export const pagesConfig = {
