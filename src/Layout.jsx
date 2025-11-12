@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { LayoutDashboard, ClipboardCheck, Leaf } from "lucide-react";
+import { LayoutDashboard, ClipboardCheck, Leaf, FileText } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -25,6 +25,11 @@ const navigationItems = [
     title: "Scoring Tool",
     url: createPageUrl("ScoringTool"),
     icon: ClipboardCheck,
+  },
+  {
+    title: "Records",
+    url: createPageUrl("Records"),
+    icon: FileText,
   },
 ];
 
