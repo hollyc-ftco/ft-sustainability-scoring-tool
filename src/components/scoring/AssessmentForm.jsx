@@ -119,7 +119,7 @@ const assessmentCategories = [
   }
 ];
 
-export default function AssessmentForm({ managementGovernanceData, energyCarbonData, waterManagementData, materialsResourceData, biodiversityEcosystemData }) {
+export default function AssessmentForm({ managementGovernanceData, energyCarbonData, waterManagementData, materialsResourceData, biodiversityEcosystemData, transportMobilityData }) {
   const queryClient = useQueryClient();
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
@@ -201,6 +201,20 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   }, [biodiversityEcosystemData]);
 
+  // Auto-populate scores from Transport & Mobility tab
+  useEffect(() => {
+    if (transportMobilityData && transportMobilityData.scores) {
+      setScores(prev => ({
+        ...prev,
+        transport_mobility: {
+          transport_options: transportMobilityData.scores.transport_options || 0,
+          mobility_all: transportMobilityData.scores.mobility_all || 0,
+          transport_carbon: transportMobilityData.scores.construction_logistics || 0
+        }
+      }));
+    }
+  }, [transportMobilityData]);
+
   const saveProjectMutation = useMutation({
     mutationFn: (projectData) => base44.entities.Project.create(projectData),
     onSuccess: () => {
@@ -213,7 +227,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     // Don't allow manual changes to auto-populated categories
     if (categoryId === 'management_governance' || categoryId === 'energy_carbon' || 
         categoryId === 'water_management' || categoryId === 'materials_resources' ||
-        categoryId === 'biodiversity_ecosystem') {
+        categoryId === 'biodiversity_ecosystem' || categoryId === 'transport_mobility') {
       return;
     }
     
@@ -352,7 +366,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
           categoryScore={calculateCategoryScore(category)}
           isReadOnly={category.id === 'management_governance' || category.id === 'energy_carbon' || 
                       category.id === 'water_management' || category.id === 'materials_resources' ||
-                      category.id === 'biodiversity_ecosystem'}
+                      category.id === 'biodiversity_ecosystem' || category.id === 'transport_mobility'}
         />
       ))}
 

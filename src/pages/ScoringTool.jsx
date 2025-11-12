@@ -9,6 +9,7 @@ import EnergyCarbonManagement from "../components/scoring/EnergyCarbonManagement
 import WaterManagement from "../components/scoring/WaterManagement";
 import MaterialsResourceEfficiency from "../components/scoring/MaterialsResourceEfficiency";
 import BiodiversityEcosystem from "../components/scoring/BiodiversityEcosystem";
+import TransportMobility from "../components/scoring/TransportMobility";
 
 export default function ScoringTool() {
   const [managementGovernanceData, setManagementGovernanceData] = useState({
@@ -36,6 +37,12 @@ export default function ScoringTool() {
   });
 
   const [biodiversityEcosystemData, setBiodiversityEcosystemData] = useState({
+    responses: {},
+    priorities: {},
+    scores: {}
+  });
+
+  const [transportMobilityData, setTransportMobilityData] = useState({
     responses: {},
     priorities: {},
     scores: {}
@@ -100,6 +107,9 @@ export default function ScoringTool() {
                 <TabsTrigger value="biodiversity" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
                   Biodiversity & Ecosystem
                 </TabsTrigger>
+                <TabsTrigger value="transport" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                  Transport & Mobility
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="summary">
@@ -109,6 +119,7 @@ export default function ScoringTool() {
                   waterManagementData={waterManagementData}
                   materialsResourceData={materialsResourceData}
                   biodiversityEcosystemData={biodiversityEcosystemData}
+                  transportMobilityData={transportMobilityData}
                 />
               </TabsContent>
 
@@ -144,6 +155,13 @@ export default function ScoringTool() {
                 <BiodiversityEcosystem 
                   data={biodiversityEcosystemData}
                   onDataChange={setBiodiversityEcosystemData}
+                />
+              </TabsContent>
+
+              <TabsContent value="transport">
+                <TransportMobility 
+                  data={transportMobilityData}
+                  onDataChange={setTransportMobilityData}
                 />
               </TabsContent>
             </Tabs>
