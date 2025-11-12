@@ -39,22 +39,16 @@ export default function Records() {
     }
   };
 
-  const getStatusBadge = (status) => {
-    const statusColors = {
-      draft: "bg-gray-100 text-gray-800 border-gray-200",
-      in_progress: "bg-blue-100 text-blue-800 border-blue-200",
-      completed: "bg-emerald-100 text-emerald-800 border-emerald-200"
-    };
-
-    const statusLabels = {
-      draft: "Draft",
-      in_progress: "In Progress",
-      completed: "Completed"
+  const getStageBadge = (stage) => {
+    const stageColors = {
+      Tender: "bg-blue-100 text-blue-800 border-blue-200",
+      Active: "bg-green-100 text-green-800 border-green-200",
+      Complete: "bg-gray-100 text-gray-800 border-gray-200"
     };
 
     return (
-      <Badge className={`${statusColors[status]} border`}>
-        {statusLabels[status] || status}
+      <Badge className={`${stageColors[stage] || "bg-gray-100 text-gray-800"} border`}>
+        {stage || "N/A"}
       </Badge>
     );
   };
@@ -108,6 +102,7 @@ export default function Records() {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-gray-50">
+                      <TableHead className="font-semibold">Project Number</TableHead>
                       <TableHead className="font-semibold">Project Name</TableHead>
                       <TableHead className="font-semibold">Project Owner</TableHead>
                       <TableHead className="font-semibold text-center">Stage</TableHead>
@@ -121,13 +116,16 @@ export default function Records() {
                     {projects.map((project) => (
                       <TableRow key={project.id} className="hover:bg-emerald-50/30 transition-colors">
                         <TableCell className="font-medium text-gray-900">
+                          {project.project_number || "N/A"}
+                        </TableCell>
+                        <TableCell className="font-medium text-gray-900">
                           {project.project_name}
                         </TableCell>
                         <TableCell className="text-gray-700">
                           {project.project_owner}
                         </TableCell>
                         <TableCell className="text-center">
-                          {getStatusBadge(project.status)}
+                          {getStageBadge(project.project_stage)}
                         </TableCell>
                         <TableCell className="text-center">
                           <Badge className="bg-emerald-600 text-white">
@@ -142,14 +140,16 @@ export default function Records() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center justify-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="border-blue-200 hover:bg-blue-50 text-blue-700"
-                              title="View"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
+                            <Link to={`${createPageUrl("ProjectView")}?id=${project.id}`}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-blue-200 hover:bg-blue-50 text-blue-700"
+                                title="View"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                            </Link>
                             <Button
                               variant="outline"
                               size="sm"
