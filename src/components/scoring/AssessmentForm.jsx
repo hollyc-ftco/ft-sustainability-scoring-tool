@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Save, Calculator, Printer, Plus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import CategoryAssessment from "./CategoryAssessment";
 import AssessmentSummary from "./AssessmentSummary";
 
@@ -121,10 +128,53 @@ const assessmentCategories = [
 
 export default function AssessmentForm({ managementGovernanceData, energyCarbonData, waterManagementData, materialsResourceData, biodiversityEcosystemData, transportMobilityData, socialImpactData, innovationTechnologyData }) {
   const queryClient = useQueryClient();
+  const [projectNumber, setProjectNumber] = useState("");
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
+  const [projectStage, setProjectStage] = useState("Tender");
   const [scores, setScores] = useState({});
   const [showSummary, setShowSummary] = useState(false);
+  const [validationError, setValidationError] = useState("");
+
+  // Fetch all projects to check for existing Tender assessments
+  const { data: allProjects = [] } = useQuery({
+    queryKey: ['projects'],
+    queryFn: () => base44.entities.Project.list(),
+  });
+
+  // Check if Active stage is allowed
+  const canSelectActive = () => {
+    if (!projectNumber) return false;
+    const tenderAssessment = allProjects.find(
+      p => p.project_number === projectNumber && p.project_stage === "Tender"
+    );
+    return !!tenderAssessment;
+  };
+
+  // Check if Tender already exists for this project number
+  const tenderExists = () => {
+    if (!projectNumber) return false;
+    return allProjects.some(
+      p => p.project_number === projectNumber && p.project_stage === "Tender"
+    );
+  };
+
+  // Handle project stage change with validation
+  const handleProjectStageChange = (value) => {
+    setValidationError("");
+    
+    if (value === "Active" && !canSelectActive()) {
+      setValidationError("Active stage is only allowed if there is an existing Tender assessment for this project number.");
+      return;
+    }
+    
+    if (value === "Tender" && tenderExists()) {
+      setValidationError("Only one Tender assessment is allowed per project number.");
+      return;
+    }
+    
+    setProjectStage(value);
+  };
 
   // Auto-populate scores from Management and Governance tab
   useEffect(() => {
@@ -297,14 +347,27 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
   };
 
   const handleSave = () => {
-    if (!projectName || !projectOwner) {
-      alert("Please enter project name and owner");
+    if (!projectNumber || !projectName || !projectOwner) {
+      alert("Please enter project number, project name and owner");
+      return;
+    }
+
+    // Validate project stage
+    if (projectStage === "Active" && !canSelectActive()) {
+      alert("Active stage is only allowed if there is an existing Tender assessment for this project number.");
+      return;
+    }
+
+    if (projectStage === "Tender" && tenderExists()) {
+      alert("Only one Tender assessment is allowed per project number.");
       return;
     }
 
     const projectData = {
+      project_number: projectNumber,
       project_name: projectName,
       project_owner: projectOwner,
+      project_stage: projectStage,
       status: "completed",
       total_score: parseFloat(calculateTotalScore()),
       management_governance: scores.management_governance || {},
@@ -326,10 +389,13 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
 
   const handleCreateNew = () => {
     if (confirm("Are you sure you want to create a new assessment? All current data will be cleared.")) {
+      setProjectNumber("");
       setProjectName("");
       setProjectOwner("");
+      setProjectStage("Tender");
       setScores({});
       setShowSummary(false);
+      setValidationError("");
     }
   };
 
@@ -360,7 +426,22 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
           </div>
         </CardHeader>
         <CardContent>
+          {validationError && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {validationError}
+            </div>
+          )}
           <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="projectNumber">Project Number</Label>
+              <Input
+                id="projectNumber"
+                placeholder="Enter project number"
+                value={projectNumber}
+                onChange={(e) => setProjectNumber(e.target.value)}
+                className="border-emerald-200 focus:border-emerald-500"
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="projectName">Project Name</Label>
               <Input
@@ -380,6 +461,29 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
                 onChange={(e) => setProjectOwner(e.target.value)}
                 className="border-emerald-200 focus:border-emerald-500"
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="projectStage">Project Stage</Label>
+              <Select value={projectStage} onValueChange={handleProjectStageChange}>
+                <SelectTrigger className="border-emerald-200 focus:border-emerald-500">
+                  <SelectValue placeholder="Select project stage" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Tender">Tender</SelectItem>
+                  <SelectItem 
+                    value="Active"
+                    disabled={!canSelectActive()}
+                  >
+                    Active {!canSelectActive() && "(Requires Tender assessment)"}
+                  </SelectItem>
+                  <SelectItem value="Complete">Complete</SelectItem>
+                </SelectContent>
+              </Select>
+              {projectStage === "Tender" && tenderExists() && (
+                <p className="text-xs text-amber-600 mt-1">
+                  Warning: A Tender assessment already exists for this project number
+                </p>
+              )}
             </div>
           </div>
         </CardContent>
@@ -427,8 +531,10 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
           scores={scores}
           calculateCategoryScore={calculateCategoryScore}
           totalScore={calculateTotalScore()}
+          projectNumber={projectNumber}
           projectName={projectName}
           projectOwner={projectOwner}
+          projectStage={projectStage}
         />
       )}
     </div>
