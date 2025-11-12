@@ -11,6 +11,7 @@ import MaterialsResourceEfficiency from "../components/scoring/MaterialsResource
 import BiodiversityEcosystem from "../components/scoring/BiodiversityEcosystem";
 import TransportMobility from "../components/scoring/TransportMobility";
 import SocialImpactWellbeing from "../components/scoring/SocialImpactWellbeing";
+import InnovationTechnology from "../components/scoring/InnovationTechnology";
 
 export default function ScoringTool() {
   const [managementGovernanceData, setManagementGovernanceData] = useState({
@@ -50,6 +51,12 @@ export default function ScoringTool() {
   });
 
   const [socialImpactData, setSocialImpactData] = useState({
+    responses: {},
+    priorities: {},
+    scores: {}
+  });
+
+  const [innovationTechnologyData, setInnovationTechnologyData] = useState({
     responses: {},
     priorities: {},
     scores: {}
@@ -120,6 +127,9 @@ export default function ScoringTool() {
                 <TabsTrigger value="social" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
                   Social Impact & Wellbeing
                 </TabsTrigger>
+                <TabsTrigger value="innovation" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                  Innovation & Technology
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="summary">
@@ -131,6 +141,7 @@ export default function ScoringTool() {
                   biodiversityEcosystemData={biodiversityEcosystemData}
                   transportMobilityData={transportMobilityData}
                   socialImpactData={socialImpactData}
+                  innovationTechnologyData={innovationTechnologyData}
                 />
               </TabsContent>
 
@@ -180,6 +191,13 @@ export default function ScoringTool() {
                 <SocialImpactWellbeing 
                   data={socialImpactData}
                   onDataChange={setSocialImpactData}
+                />
+              </TabsContent>
+
+              <TabsContent value="innovation">
+                <InnovationTechnology 
+                  data={innovationTechnologyData}
+                  onDataChange={setInnovationTechnologyData}
                 />
               </TabsContent>
             </Tabs>

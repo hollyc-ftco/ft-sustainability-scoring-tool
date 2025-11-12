@@ -119,7 +119,7 @@ const assessmentCategories = [
   }
 ];
 
-export default function AssessmentForm({ managementGovernanceData, energyCarbonData, waterManagementData, materialsResourceData, biodiversityEcosystemData, transportMobilityData, socialImpactData }) {
+export default function AssessmentForm({ managementGovernanceData, energyCarbonData, waterManagementData, materialsResourceData, biodiversityEcosystemData, transportMobilityData, socialImpactData, innovationTechnologyData }) {
   const queryClient = useQueryClient();
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
@@ -230,6 +230,20 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   }, [socialImpactData]);
 
+  // Auto-populate scores from Innovation & Technology tab
+  useEffect(() => {
+    if (innovationTechnologyData && innovationTechnologyData.scores) {
+      setScores(prev => ({
+        ...prev,
+        innovation_technology: {
+          technology_integration: innovationTechnologyData.scores.technology_integration || 0,
+          green_infrastructure: innovationTechnologyData.scores.green_infrastructure || 0,
+          construction_techniques: innovationTechnologyData.scores.construction_techniques || 0
+        }
+      }));
+    }
+  }, [innovationTechnologyData]);
+
   const saveProjectMutation = useMutation({
     mutationFn: (projectData) => base44.entities.Project.create(projectData),
     onSuccess: () => {
@@ -243,7 +257,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     if (categoryId === 'management_governance' || categoryId === 'energy_carbon' || 
         categoryId === 'water_management' || categoryId === 'materials_resources' ||
         categoryId === 'biodiversity_ecosystem' || categoryId === 'transport_mobility' ||
-        categoryId === 'social_impact') {
+        categoryId === 'social_impact' || categoryId === 'innovation_technology') {
       return;
     }
     
@@ -383,7 +397,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
           isReadOnly={category.id === 'management_governance' || category.id === 'energy_carbon' || 
                       category.id === 'water_management' || category.id === 'materials_resources' ||
                       category.id === 'biodiversity_ecosystem' || category.id === 'transport_mobility' ||
-                      category.id === 'social_impact'}
+                      category.id === 'social_impact' || category.id === 'innovation_technology'}
         />
       ))}
 
