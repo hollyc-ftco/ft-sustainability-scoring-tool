@@ -207,35 +207,53 @@ export default function ProjectView() {
         {/* Category Scores */}
         <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
           <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
-            <CardTitle className="text-2xl">Category Scores</CardTitle>
+            <CardTitle className="text-2xl">Category Scores & Details</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="space-y-4">
+            <div className="space-y-6">
               {categories.map((category) => {
                 const categoryData = project[category.id];
                 const categoryScore = calculateCategoryScore(categoryData);
                 
                 return (
-                  <div key={category.id} className="border border-emerald-100 rounded-xl p-4 bg-white">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-1">
-                          <h5 className="font-semibold text-gray-900">{category.name}</h5>
-                          <Badge variant="outline" className="text-xs">
-                            Weight: {category.weight}%
-                          </Badge>
+                  <div key={category.id} className="border-2 border-emerald-100 rounded-xl overflow-hidden bg-white">
+                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 border-b border-emerald-100">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h5 className="font-semibold text-gray-900 text-lg">{category.name}</h5>
+                            <Badge variant="outline" className="text-xs">
+                              Weight: {category.weight}%
+                            </Badge>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div
+                              className="bg-gradient-to-r from-emerald-500 to-teal-600 h-full rounded-full transition-all duration-500"
+                              style={{ width: `${categoryScore}%` }}
+                            />
+                          </div>
+                        </div>
+                        <Badge className="bg-emerald-600 text-white text-lg py-2 px-4 ml-4">
+                          {categoryScore}%
+                        </Badge>
+                      </div>
+                    </div>
+                    {categoryData && (
+                      <div className="p-4">
+                        <div className="grid md:grid-cols-2 gap-3">
+                          {Object.entries(categoryData).map(([key, value]) => (
+                            <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                              <span className="text-sm text-gray-700 capitalize">
+                                {key.replace(/_/g, ' ')}
+                              </span>
+                              <Badge className={`${value >= 70 ? 'bg-green-600' : value >= 50 ? 'bg-yellow-600' : 'bg-orange-600'} text-white`}>
+                                {value?.toFixed(2) || 0}%
+                              </Badge>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                      <Badge className="bg-emerald-600 text-white text-lg py-1 px-3">
-                        {categoryScore}%
-                      </Badge>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-emerald-500 to-teal-600 h-full rounded-full transition-all duration-500"
-                        style={{ width: `${categoryScore}%` }}
-                      />
-                    </div>
+                    )}
                   </div>
                 );
               })}

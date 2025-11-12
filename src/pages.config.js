@@ -2,6 +2,7 @@ import Dashboard from './pages/Dashboard';
 import ScoringTool from './pages/ScoringTool';
 import Records from './pages/Records';
 import ProjectView from './pages/ProjectView';
+import ProjectGraphs from './pages/ProjectGraphs';
 import Layout from './Layout.jsx';
 
 
@@ -10,6 +11,7 @@ export const PAGES = {
     "ScoringTool": ScoringTool,
     "Records": Records,
     "ProjectView": ProjectView,
+    "ProjectGraphs": ProjectGraphs,
 }
 
 export const pagesConfig = {
