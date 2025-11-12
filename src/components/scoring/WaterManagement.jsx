@@ -1,7 +1,7 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -286,14 +286,20 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
   });
 
   useEffect(() => {
-    const sumActualScores = section.items.reduce((total, item) => {
-      const score = responses[item.id] ? priorityScores[priorities[item.id]].score : 0;
-      return total + score;
-    }, 0);
+    let sumActualScores = 0;
+    let sumPriorityScores = 0;
     
-    const sumPriorityScores = section.items.reduce((total, item) => {
-      return total + priorityScores[priorities[item.id]].score;
-    }, 0);
+    section.items.forEach(item => {
+      // Only include items that are not explicitly 'not_applicable' in the denominator
+      if (responses[item.id] !== "not_applicable") {
+        sumPriorityScores += priorityScores[priorities[item.id]].score;
+        
+        // Only add to actual score if response is 'yes'
+        if (responses[item.id] === "yes") {
+          sumActualScores += priorityScores[priorities[item.id]].score;
+        }
+      }
+    });
     
     const totalScore = sumPriorityScores === 0 ? 0 : (sumActualScores / sumPriorityScores) * 100;
 
@@ -303,12 +309,12 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
       priorities: { ...prev.priorities, [sectionId]: priorities },
       scores: { ...prev.scores, [sectionId]: totalScore }
     }));
-  }, [responses, priorities]);
+  }, [responses, priorities, section, sectionId, onDataChange]); // Added section, sectionId, onDataChange to dependencies
 
-  const handleCheckboxChange = (itemId, checked) => {
+  const handleResponseChange = (itemId, value) => {
     setResponses(prev => ({
       ...prev,
-      [itemId]: checked
+      [itemId]: value
     }));
   };
 
@@ -320,20 +326,27 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
   };
 
   const calculateScore = (itemId) => {
-    if (responses[itemId]) {
+    if (responses[itemId] === "yes") {
       return priorityScores[priorities[itemId]].score;
     }
     return 0;
   };
 
   const calculateTotal = () => {
-    const sumActualScores = section.items.reduce((total, item) => {
-      return total + calculateScore(item.id);
-    }, 0);
+    let sumActualScores = 0;
+    let sumPriorityScores = 0;
     
-    const sumPriorityScores = section.items.reduce((total, item) => {
-      return total + priorityScores[priorities[item.id]].score;
-    }, 0);
+    section.items.forEach(item => {
+      // Only include items that are not explicitly 'not_applicable' in the denominator
+      if (responses[item.id] !== "not_applicable") {
+        sumPriorityScores += priorityScores[priorities[item.id]].score;
+        
+        // Only add to actual score if response is 'yes'
+        if (responses[item.id] === "yes") {
+          sumActualScores += priorityScores[priorities[item.id]].score;
+        }
+      }
+    });
     
     if (sumPriorityScores === 0) return "0.00";
     
@@ -359,7 +372,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                 <TableHead className="w-1/4">Description</TableHead>
                 <TableHead className="w-1/3">Actions</TableHead>
                 <TableHead className="text-center w-40">Priority</TableHead>
-                <TableHead className="text-center w-24">Yes/No</TableHead>
+                <TableHead className="text-center w-32">Response</TableHead> {/* Changed to Response */}
                 <TableHead className="text-center w-24">Score</TableHead>
               </TableRow>
             </TableHeader>
@@ -367,6 +380,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
               {section.items.map((item) => {
                 const score = calculateScore(item.id);
                 const priority = priorities[item.id];
+                const response = responses[item.id] || ""; // Get response string
                 
                 return (
                   <TableRow key={item.id} className="hover:bg-emerald-50/30">
@@ -413,20 +427,25 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                       </Select>
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="flex justify-center">
-                        <Checkbox
-                          checked={responses[item.id] || false}
-                          onCheckedChange={(checked) => handleCheckboxChange(item.id, checked)}
-                          className="border-emerald-300 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
-                        />
-                      </div>
+                      <Select
+                        value={response}
+                        onValueChange={(value) => handleResponseChange(item.id, value)}
+                      >
+                        <SelectTrigger className="w-full border-emerald-200">
+                          <SelectValue placeholder="Select..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="yes">Yes</SelectItem>
+                          <SelectItem value="not_applicable">Not Applicable</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell className="text-center">
                       <Badge 
-                        variant={score > 0 ? "default" : "outline"}
-                        className={score > 0 ? "bg-emerald-600 text-white" : "border-gray-300 text-gray-500"}
+                        variant={response === "yes" ? "default" : "outline"}
+                        className={response === "yes" ? "bg-emerald-600 text-white" : response === "not_applicable" ? "border-gray-300 text-gray-400" : "border-gray-300 text-gray-500"}
                       >
-                        {score.toFixed(1)}
+                        {response === "not_applicable" ? "N/A" : score.toFixed(1)}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -478,6 +497,9 @@ export default function WaterManagement({ data, onDataChange }) {
                 <span className="text-gray-700">Score: 0.3</span>
               </div>
             </div>
+            <p className="text-sm text-gray-700 mt-2">
+              <strong>Note:</strong> Items marked as "Not Applicable" are excluded from the total score calculation.
+            </p>
           </div>
         </div>
       </div>
