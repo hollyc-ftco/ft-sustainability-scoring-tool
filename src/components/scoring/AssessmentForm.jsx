@@ -464,6 +464,34 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="projectStage">Project Stage</Label>
+              <Select value={projectStage} onValueChange={handleProjectStageChange}>
+                <SelectTrigger className="border-emerald-200 focus:border-emerald-500">
+                  <SelectValue placeholder="Select project stage" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Tender">Tender</SelectItem>
+                  <SelectItem 
+                    value="Active"
+                    disabled={!canSelectActive()}
+                  >
+                    Active {!canSelectActive() && "(Requires Tender assessment)"}
+                  </SelectItem>
+                  <SelectItem value="Complete">Complete</SelectItem>
+                </SelectContent>
+              </Select>
+              {projectStage === "Tender" && tenderExists() && (
+                <p className="text-xs text-amber-600 mt-1">
+                  Warning: A Tender assessment already exists for this project number
+                </p>
+              )}
+              {projectNumber && (
+                <p className="text-xs text-blue-600 mt-1">
+                  Reference: {generateReference(projectStage)}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="projectName">Project Name</Label>
               <Input
                 id="projectName"
