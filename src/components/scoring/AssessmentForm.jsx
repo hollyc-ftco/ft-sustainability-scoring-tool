@@ -136,11 +136,28 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
   const [showSummary, setShowSummary] = useState(false);
   const [validationError, setValidationError] = useState("");
 
-  // Fetch all projects to check for existing Tender assessments
+  // Fetch all projects to check for existing assessments
   const { data: allProjects = [] } = useQuery({
     queryKey: ['projects'],
     queryFn: () => base44.entities.Project.list(),
   });
+
+  // Generate reference number
+  const generateReference = (stage) => {
+    if (!projectNumber) return "";
+    
+    const stagePrefix = stage === "Active" ? "A" : stage === "Tender" ? "T" : "C";
+    
+    // Count existing assessments for this project number and stage
+    const existingAssessments = allProjects.filter(
+      p => p.project_number === projectNumber && p.project_stage === stage
+    );
+    
+    const nextNumber = existingAssessments.length + 1;
+    const formattedNumber = String(nextNumber).padStart(3, '0');
+    
+    return `${projectNumber}_${stagePrefix}_${formattedNumber}`;
+  };
 
   // Check if Active stage is allowed
   const canSelectActive = () => {
@@ -363,7 +380,11 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
       return;
     }
 
+    // Generate reference
+    const reference = generateReference(projectStage);
+
     const projectData = {
+      reference: reference,
       project_number: projectNumber,
       project_name: projectName,
       project_owner: projectOwner,
@@ -461,29 +482,6 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
                 onChange={(e) => setProjectOwner(e.target.value)}
                 className="border-emerald-200 focus:border-emerald-500"
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="projectStage">Project Stage</Label>
-              <Select value={projectStage} onValueChange={handleProjectStageChange}>
-                <SelectTrigger className="border-emerald-200 focus:border-emerald-500">
-                  <SelectValue placeholder="Select project stage" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Tender">Tender</SelectItem>
-                  <SelectItem 
-                    value="Active"
-                    disabled={!canSelectActive()}
-                  >
-                    Active {!canSelectActive() && "(Requires Tender assessment)"}
-                  </SelectItem>
-                  <SelectItem value="Complete">Complete</SelectItem>
-                </SelectContent>
-              </Select>
-              {projectStage === "Tender" && tenderExists() && (
-                <p className="text-xs text-amber-600 mt-1">
-                  Warning: A Tender assessment already exists for this project number
-                </p>
-              )}
             </div>
           </div>
         </CardContent>

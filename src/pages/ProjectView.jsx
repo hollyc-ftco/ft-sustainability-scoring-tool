@@ -136,6 +136,10 @@ export default function ProjectView() {
           <CardContent className="p-6">
             <div className="grid md:grid-cols-2 gap-4">
               <div>
+                <p className="text-sm text-gray-600 mb-1">Reference</p>
+                <p className="font-semibold text-emerald-700 text-lg">{project.reference || "Not specified"}</p>
+              </div>
+              <div>
                 <p className="text-sm text-gray-600 mb-1">Project Number</p>
                 <p className="font-semibold text-gray-900">{project.project_number || "Not specified"}</p>
               </div>
