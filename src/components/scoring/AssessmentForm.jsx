@@ -119,7 +119,7 @@ const assessmentCategories = [
   }
 ];
 
-export default function AssessmentForm({ managementGovernanceData, energyCarbonData, waterManagementData, materialsResourceData }) {
+export default function AssessmentForm({ managementGovernanceData, energyCarbonData, waterManagementData, materialsResourceData, biodiversityEcosystemData }) {
   const queryClient = useQueryClient();
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
@@ -186,6 +186,21 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   }, [materialsResourceData]);
 
+  // Auto-populate scores from Biodiversity & Ecosystem tab
+  useEffect(() => {
+    if (biodiversityEcosystemData && biodiversityEcosystemData.scores) {
+      setScores(prev => ({
+        ...prev,
+        biodiversity_ecosystem: {
+          biodiversity_preservation: biodiversityEcosystemData.scores.biodiversity_preservation || 0,
+          ecological_connectivity: biodiversityEcosystemData.scores.ecological_connectivity || 0,
+          native_species: biodiversityEcosystemData.scores.native_species_planting || 0,
+          sustainable_land: biodiversityEcosystemData.scores.sustainable_land_use || 0
+        }
+      }));
+    }
+  }, [biodiversityEcosystemData]);
+
   const saveProjectMutation = useMutation({
     mutationFn: (projectData) => base44.entities.Project.create(projectData),
     onSuccess: () => {
@@ -197,7 +212,8 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
   const handleScoreChange = (categoryId, subCategoryId, value) => {
     // Don't allow manual changes to auto-populated categories
     if (categoryId === 'management_governance' || categoryId === 'energy_carbon' || 
-        categoryId === 'water_management' || categoryId === 'materials_resources') {
+        categoryId === 'water_management' || categoryId === 'materials_resources' ||
+        categoryId === 'biodiversity_ecosystem') {
       return;
     }
     
@@ -335,7 +351,8 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
           }
           categoryScore={calculateCategoryScore(category)}
           isReadOnly={category.id === 'management_governance' || category.id === 'energy_carbon' || 
-                      category.id === 'water_management' || category.id === 'materials_resources'}
+                      category.id === 'water_management' || category.id === 'materials_resources' ||
+                      category.id === 'biodiversity_ecosystem'}
         />
       ))}
 
