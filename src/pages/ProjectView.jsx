@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Award, Star, CheckCircle, AlertCircle, XCircle } from "lucide-react";
+import { ArrowLeft, Award, Star, CheckCircle, AlertCircle, XCircle, User } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
 
@@ -53,14 +53,14 @@ const getRating = (score) => {
 };
 
 const categories = [
-  { id: "management_governance", name: "Management and Governance", weight: 10 },
-  { id: "energy_carbon", name: "Energy and Carbon Management", weight: 20 },
+  { id: "management_governance", name: "Management & Governance", weight: 10 },
+  { id: "energy_carbon", name: "Energy & Carbon", weight: 20 },
   { id: "water_management", name: "Water Management", weight: 15 },
-  { id: "materials_resources", name: "Materials and Resource Efficiency", weight: 10 },
-  { id: "biodiversity_ecosystem", name: "Biodiversity and Ecosystem Services", weight: 15 },
-  { id: "transport_mobility", name: "Transport and Mobility", weight: 10 },
-  { id: "social_impact", name: "Social Impact and Community Well-being", weight: 10 },
-  { id: "innovation_technology", name: "Innovation and Technology", weight: 10 }
+  { id: "materials_resources", name: "Materials & Resources", weight: 10 },
+  { id: "biodiversity_ecosystem", name: "Biodiversity & Ecosystem", weight: 15 },
+  { id: "transport_mobility", name: "Transport & Mobility", weight: 10 },
+  { id: "social_impact", name: "Social Impact", weight: 10 },
+  { id: "innovation_technology", name: "Innovation & Technology", weight: 10 }
 ];
 
 export default function ProjectView() {
@@ -124,8 +124,8 @@ export default function ProjectView() {
               Back to Records
             </Button>
           </Link>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Project Assessment</h1>
-          <p className="text-gray-600 text-lg">Detailed view of project sustainability assessment</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Project Assessment Details</h1>
+          <p className="text-gray-600 text-lg">{project.project_name}</p>
         </div>
 
         {/* Project Information */}
@@ -137,11 +137,11 @@ export default function ProjectView() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Reference</p>
-                <p className="font-semibold text-emerald-700 text-lg">{project.reference || "Not specified"}</p>
+                <p className="font-semibold text-emerald-700 text-lg">{project.reference}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-1">Project Number</p>
-                <p className="font-semibold text-gray-900">{project.project_number || "Not specified"}</p>
+                <p className="font-semibold text-gray-900">{project.project_number}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-1">Project Name</p>
@@ -157,8 +157,8 @@ export default function ProjectView() {
                   project.project_stage === "Tender" ? "bg-blue-100 text-blue-800" :
                   project.project_stage === "Active" ? "bg-green-100 text-green-800" :
                   "bg-gray-100 text-gray-800"
-                }`}>
-                  {project.project_stage || "Not specified"}
+                } border`}>
+                  {project.project_stage}
                 </Badge>
               </div>
               <div>
@@ -167,16 +167,15 @@ export default function ProjectView() {
                   {new Date(project.created_date).toLocaleDateString()}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Status</p>
-                <Badge className={`${
-                  project.status === "draft" ? "bg-gray-100 text-gray-800" :
-                  project.status === "in_progress" ? "bg-blue-100 text-blue-800" :
-                  "bg-emerald-100 text-emerald-800"
-                }`}>
-                  {project.status}
-                </Badge>
-              </div>
+              {project.created_by && (
+                <div className="md:col-span-2">
+                  <p className="text-sm text-gray-600 mb-1">Created By</p>
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-gray-500" />
+                    <p className="font-semibold text-gray-900">{project.created_by}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -197,7 +196,7 @@ export default function ProjectView() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-gray-600 mb-1">Total Score</p>
-                  <p className="text-5xl font-bold text-gray-900">{project.total_score?.toFixed(2) || "0.00"}%</p>
+                  <p className="text-5xl font-bold text-gray-900">{project.total_score?.toFixed(2)}%</p>
                 </div>
               </div>
             </div>
@@ -214,6 +213,7 @@ export default function ProjectView() {
               {categories.map((category) => {
                 const categoryData = project[category.id];
                 const categoryScore = calculateCategoryScore(categoryData);
+                const categoryComment = project.category_comments?.[category.id];
                 
                 return (
                   <div key={category.id} className="border-2 border-emerald-100 rounded-xl overflow-hidden bg-white">
@@ -240,7 +240,7 @@ export default function ProjectView() {
                     </div>
                     {categoryData && (
                       <div className="p-4">
-                        <div className="grid md:grid-cols-2 gap-3">
+                        <div className="grid md:grid-cols-2 gap-3 mb-3">
                           {Object.entries(categoryData).map(([key, value]) => (
                             <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                               <span className="text-sm text-gray-700 capitalize">
@@ -252,6 +252,12 @@ export default function ProjectView() {
                             </div>
                           ))}
                         </div>
+                        {categoryComment && (
+                          <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p className="text-sm font-semibold text-blue-900 mb-2">Comments:</p>
+                            <p className="text-sm text-blue-800 whitespace-pre-wrap">{categoryComment}</p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
