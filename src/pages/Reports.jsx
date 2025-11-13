@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -7,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
-import { TrendingUp, TrendingDown, Minus, BarChart3, Eye, ChevronDown, ChevronUp, Search } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, BarChart3, Eye, ChevronDown, ChevronUp, Search, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -77,6 +78,7 @@ export default function Reports() {
   const [showDetailedItems, setShowDetailedItems] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const [hiddenStages, setHiddenStages] = useState(new Set());
   const dropdownRef = useRef(null);
 
   const { data: allProjects = [], isLoading } = useQuery({
@@ -93,12 +95,17 @@ export default function Reports() {
   );
 
   // Filter assessments by selected project number
-  const projectAssessments = selectedProjectNumber 
+  const allProjectAssessments = selectedProjectNumber 
     ? allProjects.filter(p => p.project_number === selectedProjectNumber).sort((a, b) => {
         const stageOrder = { 'Tender': 1, 'Active': 2, 'Complete': 3 };
         return stageOrder[a.project_stage] - stageOrder[b.project_stage];
       })
     : [];
+
+  // Filter out hidden stages
+  const projectAssessments = allProjectAssessments.filter(
+    assessment => !hiddenStages.has(assessment.id)
+  );
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -116,6 +123,7 @@ export default function Reports() {
     setSelectedProjectNumber(projectNum);
     setSearchQuery(projectNum);
     setShowDropdown(false);
+    setHiddenStages(new Set()); // Reset hidden stages when selecting new project
   };
 
   const handleInputChange = (e) => {
@@ -127,6 +135,18 @@ export default function Reports() {
     } else {
       setSelectedProjectNumber("");
     }
+  };
+
+  const toggleStageVisibility = (assessmentId) => {
+    setHiddenStages(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(assessmentId)) {
+        newSet.delete(assessmentId);
+      } else {
+        newSet.add(assessmentId);
+      }
+      return newSet;
+    });
   };
 
   const calculateCategoryScore = (categoryData) => {
@@ -240,9 +260,9 @@ export default function Reports() {
                 </div>
               )}
 
-              {selectedProjectNumber && projectAssessments.length > 0 && (
+              {selectedProjectNumber && allProjectAssessments.length > 0 && (
                 <p className="text-sm text-emerald-600">
-                  ✓ {projectAssessments.length} assessment{projectAssessments.length > 1 ? 's' : ''} found
+                  ✓ {allProjectAssessments.length} assessment{allProjectAssessments.length > 1 ? 's' : ''} found
                 </p>
               )}
             </div>
@@ -265,7 +285,7 @@ export default function Reports() {
               </p>
             </CardContent>
           </Card>
-        ) : projectAssessments.length === 0 ? (
+        ) : allProjectAssessments.length === 0 ? (
           <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
             <CardContent className="p-12 text-center">
               <p className="text-gray-600">No assessments found for this project number</p>
@@ -279,316 +299,364 @@ export default function Reports() {
                 <CardTitle className="text-2xl">Project Overview</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-3 gap-4 mb-6">
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Project Number</p>
                     <p className="font-semibold text-gray-900 text-lg">{selectedProjectNumber}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Project Name</p>
-                    <p className="font-semibold text-gray-900">{projectAssessments[0]?.project_name || "N/A"}</p>
+                    <p className="font-semibold text-gray-900">{allProjectAssessments[0]?.project_name || "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Total Assessments</p>
                     <Badge className="bg-emerald-600 text-white text-lg px-3 py-1">
-                      {projectAssessments.length}
+                      {allProjectAssessments.length}
                     </Badge>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Assessment Cards */}
-            <div className="grid md:grid-cols-3 gap-6 mb-6">
-              {projectAssessments.map((assessment, index) => {
-                const previousAssessment = index > 0 ? projectAssessments[index - 1] : null;
-                const scoreDiff = previousAssessment 
-                  ? assessment.total_score - previousAssessment.total_score 
-                  : null;
-
-                return (
-                  <Card key={assessment.id} className="border-emerald-100 bg-white/60 backdrop-blur-sm">
-                    <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-gray-600 mb-1">Stage</p>
-                          {getStageBadge(assessment.project_stage)}
-                        </div>
-                        <Link to={`${createPageUrl("ProjectView")}?id=${assessment.id}`}>
-                          <Button variant="outline" size="sm" className="border-blue-200 hover:bg-blue-50">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </Link>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <div className="text-center mb-4">
-                        <p className="text-sm text-gray-600 mb-2">Total Score</p>
-                        <p className="text-4xl font-bold text-gray-900">
-                          {assessment.total_score?.toFixed(1)}%
-                        </p>
-                        {scoreDiff !== null && (
-                          <div className="mt-2 flex items-center justify-center gap-2">
-                            {getChangeIndicator(assessment.total_score, previousAssessment?.total_score)}
-                          </div>
-                        )}
-                      </div>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Reference:</span>
-                          <span className="font-medium text-emerald-700">{assessment.reference}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Created:</span>
-                          <span className="font-medium">{new Date(assessment.created_date).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-
-            {/* Category Comparison Chart */}
-            <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm mb-6">
-              <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
-                <CardTitle className="text-2xl">Category Score Comparison</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <ResponsiveContainer width="100%" height={500}>
-                  <BarChart data={comparisonData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="category" angle={-45} textAnchor="end" height={150} />
-                    <YAxis domain={[0, 100]} />
-                    <Tooltip />
-                    <Legend />
-                    {projectAssessments.map((assessment, index) => {
-                      const colors = ['#3b82f6', '#10b981', '#6b7280'];
+                {/* Stage visibility toggles */}
+                <div className="border-t border-emerald-100 pt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-semibold text-gray-700">Toggle Stages in Comparison:</p>
+                    <p className="text-xs text-gray-500">
+                      {projectAssessments.length} of {allProjectAssessments.length} visible
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {allProjectAssessments.map((assessment) => {
+                      const isHidden = hiddenStages.has(assessment.id);
                       return (
-                        <Bar 
+                        <Button
                           key={assessment.id}
-                          dataKey={assessment.project_stage} 
-                          fill={colors[index % colors.length]} 
-                          name={`${assessment.project_stage} (${assessment.total_score?.toFixed(1)}%)`}
-                        />
+                          onClick={() => toggleStageVisibility(assessment.id)}
+                          variant={isHidden ? "outline" : "default"}
+                          size="sm"
+                          className={`${
+                            isHidden 
+                              ? 'border-gray-300 text-gray-400 hover:bg-gray-50' 
+                              : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                          }`}
+                        >
+                          {isHidden ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+                          {assessment.project_stage}
+                          <Badge 
+                            variant="outline" 
+                            className={`ml-2 text-xs ${
+                              isHidden ? 'border-gray-300 text-gray-400' : 'border-white text-white'
+                            }`}
+                          >
+                            {assessment.total_score?.toFixed(1)}%
+                          </Badge>
+                        </Button>
                       );
                     })}
-                  </BarChart>
-                </ResponsiveContainer>
+                  </div>
+                  {projectAssessments.length === 0 && (
+                    <p className="text-sm text-amber-600 mt-3">
+                      ⚠️ At least one stage must be visible for comparison
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
-            {/* Trend Line Chart */}
-            {projectAssessments.length > 1 && (
-              <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm mb-6">
-                <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
-                  <CardTitle className="text-2xl">Score Progression</CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={projectAssessments.map(a => ({
-                      stage: a.project_stage,
-                      score: a.total_score,
-                      date: new Date(a.created_date).toLocaleDateString()
-                    }))}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="stage" />
-                      <YAxis domain={[0, 100]} />
-                      <Tooltip />
-                      <Legend />
-                      <Line 
-                        type="monotone" 
-                        dataKey="score" 
-                        stroke="#10b981" 
-                        strokeWidth={3}
-                        name="Total Score (%)"
-                        dot={{ fill: '#10b981', r: 6 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            )}
+            {projectAssessments.length > 0 && (
+              <>
+                {/* Assessment Cards */}
+                <div className="grid md:grid-cols-3 gap-6 mb-6">
+                  {projectAssessments.map((assessment, index) => {
+                    const previousAssessment = index > 0 ? projectAssessments[index - 1] : null;
+                    const scoreDiff = previousAssessment 
+                      ? assessment.total_score - previousAssessment.total_score 
+                      : null;
 
-            {/* Category Comparison Table */}
-            <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
-              <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-2xl">Category Comparison</CardTitle>
-                  <Button
-                    onClick={() => setShowDetailedItems(!showDetailedItems)}
-                    variant="outline"
-                    className="border-emerald-200 hover:bg-emerald-50"
-                  >
-                    {showDetailedItems ? (
-                      <>
-                        <ChevronUp className="w-4 h-4 mr-2" />
-                        Hide Subcategories
-                      </>
-                    ) : (
-                      <>
-                        <ChevronDown className="w-4 h-4 mr-2" />
-                        Show Subcategories
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b-2 border-emerald-200">
-                        <th className="text-left p-3 font-semibold text-gray-900">Category</th>
-                        <th className="text-center p-3 font-semibold text-gray-900">Weight</th>
-                        {projectAssessments.map(assessment => (
-                          <th key={assessment.id} className="text-center p-3">
-                            <div className="flex flex-col items-center gap-2">
+                    return (
+                      <Card key={assessment.id} className="border-emerald-100 bg-white/60 backdrop-blur-sm">
+                        <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-gray-600 mb-1">Stage</p>
                               {getStageBadge(assessment.project_stage)}
-                              <span className="text-xs text-gray-500">
-                                {new Date(assessment.created_date).toLocaleDateString()}
-                              </span>
                             </div>
-                          </th>
-                        ))}
-                        {projectAssessments.length > 1 && (
-                          <th className="text-center p-3 font-semibold text-gray-900">Change</th>
+                            <Link to={`${createPageUrl("ProjectView")}?id=${assessment.id}`}>
+                              <Button variant="outline" size="sm" className="border-blue-200 hover:bg-blue-50">
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                            </Link>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                          <div className="text-center mb-4">
+                            <p className="text-sm text-gray-600 mb-2">Total Score</p>
+                            <p className="text-4xl font-bold text-gray-900">
+                              {assessment.total_score?.toFixed(1)}%
+                            </p>
+                            {scoreDiff !== null && (
+                              <div className="mt-2 flex items-center justify-center gap-2">
+                                {getChangeIndicator(assessment.total_score, previousAssessment?.total_score)}
+                              </div>
+                            )}
+                          </div>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600">Reference:</span>
+                              <span className="font-medium text-emerald-700">{assessment.reference}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600">Created:</span>
+                              <span className="font-medium">{new Date(assessment.created_date).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+
+                {/* Category Comparison Chart */}
+                <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm mb-6">
+                  <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
+                    <CardTitle className="text-2xl">Category Score Comparison</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <ResponsiveContainer width="100%" height={500}>
+                      <BarChart data={comparisonData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="category" angle={-45} textAnchor="end" height={150} />
+                        <YAxis domain={[0, 100]} />
+                        <Tooltip />
+                        <Legend />
+                        {projectAssessments.map((assessment, index) => {
+                          const colors = ['#3b82f6', '#10b981', '#6b7280'];
+                          return (
+                            <Bar 
+                              key={assessment.id}
+                              dataKey={assessment.project_stage} 
+                              fill={colors[index % colors.length]} 
+                              name={`${assessment.project_stage} (${assessment.total_score?.toFixed(1)}%)`}
+                            />
+                          );
+                        })}
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+
+                {/* Trend Line Chart */}
+                {projectAssessments.length > 1 && (
+                  <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm mb-6">
+                    <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
+                      <CardTitle className="text-2xl">Score Progression</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={projectAssessments.map(a => ({
+                          stage: a.project_stage,
+                          score: a.total_score,
+                          date: new Date(a.created_date).toLocaleDateString()
+                        }))}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="stage" />
+                          <YAxis domain={[0, 100]} />
+                          <Tooltip />
+                          <Legend />
+                          <Line 
+                            type="monotone" 
+                            dataKey="score" 
+                            stroke="#10b981" 
+                            strokeWidth={3}
+                            name="Total Score (%)"
+                            dot={{ fill: '#10b981', r: 6 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Category Comparison Table */}
+                <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
+                  <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-2xl">Category Comparison</CardTitle>
+                      <Button
+                        onClick={() => setShowDetailedItems(!showDetailedItems)}
+                        variant="outline"
+                        className="border-emerald-200 hover:bg-emerald-50"
+                      >
+                        {showDetailedItems ? (
+                          <>
+                            <ChevronUp className="w-4 h-4 mr-2" />
+                            Hide Subcategories
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="w-4 h-4 mr-2" />
+                            Show Subcategories
+                          </>
                         )}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {categories.map((category, catIndex) => {
-                        const scores = projectAssessments.map(a => calculateCategoryScore(a[category.id]));
-                        const firstScore = scores[0];
-                        const lastScore = scores[scores.length - 1];
-                        const subcategories = subcategoryDetails[category.id] || [];
-                        
-                        return (
-                          <React.Fragment key={category.id}>
-                            <tr className={`border-b border-emerald-100 ${catIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
-                              <td className="p-3 font-medium text-gray-900">{category.name}</td>
-                              <td className="p-3 text-center">
-                                <Badge variant="outline" className="text-xs">
-                                  {category.weight}%
-                                </Badge>
-                              </td>
-                              {scores.map((score, index) => (
-                                <td key={index} className="p-3 text-center">
-                                  <Badge className={`${score >= 70 ? 'bg-green-600' : score >= 50 ? 'bg-yellow-600' : 'bg-orange-600'} text-white`}>
-                                    {score.toFixed(1)}%
-                                  </Badge>
-                                </td>
-                              ))}
-                              {projectAssessments.length > 1 && (
-                                <td className="p-3 text-center">
-                                  {getChangeIndicator(lastScore, firstScore)}
-                                </td>
-                              )}
-                            </tr>
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b-2 border-emerald-200">
+                            <th className="text-left p-3 font-semibold text-gray-900">Category</th>
+                            <th className="text-center p-3 font-semibold text-gray-900">Weight</th>
+                            {projectAssessments.map(assessment => (
+                              <th key={assessment.id} className="text-center p-3">
+                                <div className="flex flex-col items-center gap-2">
+                                  {getStageBadge(assessment.project_stage)}
+                                  <span className="text-xs text-gray-500">
+                                    {new Date(assessment.created_date).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              </th>
+                            ))}
+                            {projectAssessments.length > 1 && (
+                              <th className="text-center p-3 font-semibold text-gray-900">Change</th>
+                            )}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {categories.map((category, catIndex) => {
+                            const scores = projectAssessments.map(a => calculateCategoryScore(a[category.id]));
+                            const firstScore = scores[0];
+                            const lastScore = scores[scores.length - 1];
+                            const subcategories = subcategoryDetails[category.id] || [];
                             
-                            {/* Subcategories - shown when expanded */}
-                            {showDetailedItems && subcategories.map((subcategory) => {
-                              const subScores = projectAssessments.map(a => getSubcategoryScore(a, category.id, subcategory.id));
-                              const firstSubScore = subScores[0];
-                              const lastSubScore = subScores[subScores.length - 1];
-                              
-                              return (
-                                <tr key={subcategory.id} className={`border-b border-gray-100 ${catIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
-                                  <td className="p-3 pl-8 text-sm text-gray-700">
-                                    <span className="text-gray-400 mr-2">└─</span>
-                                    {subcategory.name}
-                                  </td>
+                            return (
+                              <React.Fragment key={category.id}>
+                                <tr className={`border-b border-emerald-100 ${catIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+                                  <td className="p-3 font-medium text-gray-900">{category.name}</td>
                                   <td className="p-3 text-center">
-                                    <span className="text-xs text-gray-400">-</span>
+                                    <Badge variant="outline" className="text-xs">
+                                      {category.weight}%
+                                    </Badge>
                                   </td>
-                                  {subScores.map((subScore, index) => (
+                                  {scores.map((score, index) => (
                                     <td key={index} className="p-3 text-center">
-                                      <Badge 
-                                        variant="outline"
-                                        className={`text-xs ${subScore >= 70 ? 'border-green-400 text-green-700' : subScore >= 50 ? 'border-yellow-400 text-yellow-700' : 'border-orange-400 text-orange-700'}`}
-                                      >
-                                        {subScore.toFixed(1)}%
+                                      <Badge className={`${score >= 70 ? 'bg-green-600' : score >= 50 ? 'bg-yellow-600' : 'bg-orange-600'} text-white`}>
+                                        {score.toFixed(1)}%
                                       </Badge>
                                     </td>
                                   ))}
                                   {projectAssessments.length > 1 && (
-                                    <td className="p-3 text-center text-xs">
-                                      {getChangeIndicator(lastSubScore, firstSubScore)}
+                                    <td className="p-3 text-center">
+                                      {getChangeIndicator(lastScore, firstScore)}
                                     </td>
                                   )}
                                 </tr>
-                              );
-                            })}
-                          </React.Fragment>
-                        );
-                      })}
-                      <tr className="bg-emerald-50 font-bold border-t-2 border-emerald-300">
-                        <td className="p-3 text-gray-900">TOTAL SCORE</td>
-                        <td className="p-3 text-center">-</td>
-                        {projectAssessments.map((assessment) => (
-                          <td key={assessment.id} className="p-3 text-center">
-                            <Badge className="bg-emerald-600 text-white text-lg px-3 py-1">
-                              {assessment.total_score?.toFixed(1)}%
-                            </Badge>
-                          </td>
-                        ))}
-                        {projectAssessments.length > 1 && (
-                          <td className="p-3 text-center">
-                            {getChangeIndicator(
-                              projectAssessments[projectAssessments.length - 1].total_score,
-                              projectAssessments[0].total_score
+                                
+                                {/* Subcategories - shown when expanded */}
+                                {showDetailedItems && subcategories.map((subcategory) => {
+                                  const subScores = projectAssessments.map(a => getSubcategoryScore(a, category.id, subcategory.id));
+                                  const firstSubScore = subScores[0];
+                                  const lastSubScore = subScores[subScores.length - 1];
+                                  
+                                  return (
+                                    <tr key={subcategory.id} className={`border-b border-gray-100 ${catIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+                                      <td className="p-3 pl-8 text-sm text-gray-700">
+                                        <span className="text-gray-400 mr-2">└─</span>
+                                        {subcategory.name}
+                                      </td>
+                                      <td className="p-3 text-center">
+                                        <span className="text-xs text-gray-400">-</span>
+                                      </td>
+                                      {subScores.map((subScore, index) => (
+                                        <td key={index} className="p-3 text-center">
+                                          <Badge 
+                                            variant="outline"
+                                            className={`text-xs ${subScore >= 70 ? 'border-green-400 text-green-700' : subScore >= 50 ? 'border-yellow-400 text-yellow-700' : 'border-orange-400 text-orange-700'}`}
+                                          >
+                                            {subScore.toFixed(1)}%
+                                          </Badge>
+                                        </td>
+                                      ))}
+                                      {projectAssessments.length > 1 && (
+                                        <td className="p-3 text-center text-xs">
+                                          {getChangeIndicator(lastSubScore, firstSubScore)}
+                                        </td>
+                                      )}
+                                    </tr>
+                                  );
+                                })}
+                              </React.Fragment>
+                            );
+                          })}
+                          <tr className="bg-emerald-50 font-bold border-t-2 border-emerald-300">
+                            <td className="p-3 text-gray-900">TOTAL SCORE</td>
+                            <td className="p-3 text-center">-</td>
+                            {projectAssessments.map((assessment) => (
+                              <td key={assessment.id} className="p-3 text-center">
+                                <Badge className="bg-emerald-600 text-white text-lg px-3 py-1">
+                                  {assessment.total_score?.toFixed(1)}%
+                                </Badge>
+                              </td>
+                            ))}
+                            {projectAssessments.length > 1 && (
+                              <td className="p-3 text-center">
+                                {getChangeIndicator(
+                                  projectAssessments[projectAssessments.length - 1].total_score,
+                                  projectAssessments[0].total_score
+                                )}
+                              </td>
                             )}
-                          </td>
-                        )}
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            {/* Comments Comparison */}
-            {projectAssessments.some(a => a.category_comments && Object.values(a.category_comments).some(c => c)) && (
-              <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm mt-6">
-                <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
-                  <CardTitle className="text-2xl">Category Comments Comparison</CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="space-y-6">
-                    {categories.map(category => {
-                      const hasComments = projectAssessments.some(
-                        a => a.category_comments && a.category_comments[category.id]
-                      );
-                      
-                      if (!hasComments) return null;
+                {/* Comments Comparison */}
+                {projectAssessments.some(a => a.category_comments && Object.values(a.category_comments).some(c => c)) && (
+                  <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm mt-6">
+                    <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
+                      <CardTitle className="text-2xl">Category Comments Comparison</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-6">
+                        {categories.map(category => {
+                          const hasComments = projectAssessments.some(
+                            a => a.category_comments && a.category_comments[category.id]
+                          );
+                          
+                          if (!hasComments) return null;
 
-                      return (
-                        <div key={category.id} className="border border-emerald-100 rounded-lg p-4 bg-white">
-                          <h4 className="font-semibold text-gray-900 mb-3">{category.name}</h4>
-                          <div className="space-y-3">
-                            {projectAssessments.map(assessment => {
-                              const comment = assessment.category_comments?.[category.id];
-                              if (!comment) return null;
-                              
-                              return (
-                                <div key={assessment.id} className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    {getStageBadge(assessment.project_stage)}
-                                    <span className="text-xs text-gray-500">
-                                      {new Date(assessment.created_date).toLocaleDateString()}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm text-blue-900">{comment}</p>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
+                          return (
+                            <div key={category.id} className="border border-emerald-100 rounded-lg p-4 bg-white">
+                              <h4 className="font-semibold text-gray-900 mb-3">{category.name}</h4>
+                              <div className="space-y-3">
+                                {projectAssessments.map(assessment => {
+                                  const comment = assessment.category_comments?.[category.id];
+                                  if (!comment) return null;
+                                  
+                                  return (
+                                    <div key={assessment.id} className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        {getStageBadge(assessment.project_stage)}
+                                        <span className="text-xs text-gray-500">
+                                          {new Date(assessment.created_date).toLocaleDateString()}
+                                        </span>
+                                      </div>
+                                      <p className="text-sm text-blue-900">{comment}</p>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </>
             )}
           </>
         )}
