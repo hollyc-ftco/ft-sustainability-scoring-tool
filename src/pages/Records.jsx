@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -216,6 +217,7 @@ export default function Records() {
                       <TableHead className="font-semibold">Project No.</TableHead>
                       <TableHead className="font-semibold">Project Name</TableHead>
                       <TableHead className="font-semibold">Project Owner</TableHead>
+                      <TableHead className="font-semibold">Department</TableHead>
                       <TableHead className="font-semibold text-center">Stage</TableHead>
                       <TableHead className="font-semibold text-center">Total Score</TableHead>
                       <TableHead className="font-semibold text-center">Rating</TableHead>
@@ -237,6 +239,9 @@ export default function Records() {
                         </TableCell>
                         <TableCell className="text-gray-700">
                           {project.project_owner}
+                        </TableCell>
+                        <TableCell className="text-gray-700">
+                          {project.department || "N/A"}
                         </TableCell>
                         <TableCell className="text-center">
                           {getStageBadge(project.project_stage)}

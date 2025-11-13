@@ -153,6 +153,10 @@ export default function ProjectView() {
                 <p className="font-semibold text-gray-900">{project.project_owner}</p>
               </div>
               <div>
+                <p className="text-sm text-gray-600 mb-1">Department</p>
+                <p className="font-semibold text-gray-900">{project.department || "Not specified"}</p>
+              </div>
+              <div>
                 <p className="text-sm text-gray-600 mb-1">Created By</p>
                 <p className="font-semibold text-gray-900">{project.created_by_name || "Not specified"}</p>
               </div>

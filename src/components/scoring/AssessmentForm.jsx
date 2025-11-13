@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
@@ -132,6 +133,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
   const [projectNumber, setProjectNumber] = useState("");
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
+  const [department, setDepartment] = useState(""); // New state for department
   const [createdByName, setCreatedByName] = useState("");
   const [projectStage, setProjectStage] = useState("Tender");
   const [scores, setScores] = useState({});
@@ -161,9 +163,13 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
         if (existingProject.project_owner && !projectOwner) {
           setProjectOwner(existingProject.project_owner);
         }
+        // Auto-fill department if it exists
+        if (existingProject.department && !department) {
+          setDepartment(existingProject.department);
+        }
       }
     }
-  }, [projectNumber, allProjects]);
+  }, [projectNumber, allProjects, projectName, projectOwner, department]); // Added department to dependency array
 
   // Generate reference number
   const generateReference = (stage) => {
@@ -418,6 +424,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
       project_number: projectNumber,
       project_name: projectName,
       project_owner: projectOwner,
+      department: department, // Added department
       created_by_name: createdByName,
       project_stage: projectStage,
       status: "completed",
@@ -445,6 +452,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
       setProjectNumber("");
       setProjectName("");
       setProjectOwner("");
+      setDepartment(""); // Clear department on new assessment
       setCreatedByName("");
       setProjectStage("Tender");
       setScores({});
@@ -545,7 +553,20 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
                 className="border-emerald-200 focus:border-emerald-500"
               />
             </div>
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2">
+              <Label htmlFor="department">Department</Label>
+              <Select value={department} onValueChange={setDepartment}>
+                <SelectTrigger className="border-emerald-200 focus:border-emerald-500">
+                  <SelectValue placeholder="Select department" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Circular Economy & Environment">Circular Economy & Environment</SelectItem>
+                  <SelectItem value="Energy and Planning">Energy and Planning</SelectItem>
+                  <SelectItem value="Sustainable Infrastructure">Sustainable Infrastructure</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="createdByName">Created By</Label>
               <Input
                 id="createdByName"

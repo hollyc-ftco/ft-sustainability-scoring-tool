@@ -35,7 +35,8 @@ export default function EditProject() {
   const [projectNumber, setProjectNumber] = useState("");
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
-  const [createdByName, setCreatedByName] = useState(""); // Added state for Created By Name
+  const [department, setDepartment] = useState(""); // Added state for Department
+  const [createdByName, setCreatedByName] = useState("");
   const [projectStage, setProjectStage] = useState("Tender");
 
   const [managementGovernanceData, setManagementGovernanceData] = useState({
@@ -94,7 +95,8 @@ export default function EditProject() {
       setProjectNumber(project.project_number || "");
       setProjectName(project.project_name || "");
       setProjectOwner(project.project_owner || "");
-      setCreatedByName(project.created_by_name || ""); // Load created_by_name
+      setDepartment(project.department || ""); // Load department
+      setCreatedByName(project.created_by_name || "");
       setProjectStage(project.project_stage || "Tender");
       
       // Note: You would need to store the detailed responses/priorities data in the Project entity
@@ -188,7 +190,8 @@ export default function EditProject() {
       project_number: projectNumber,
       project_name: projectName,
       project_owner: projectOwner,
-      created_by_name: createdByName, // Included created_by_name in projectData
+      department: department, // Included department in projectData
+      created_by_name: createdByName,
       project_stage: projectStage,
       total_score: totalScore,
       ...scores
@@ -285,6 +288,20 @@ export default function EditProject() {
                   onChange={(e) => setProjectOwner(e.target.value)}
                   className="border-emerald-200 focus:border-emerald-500"
                 />
+              </div>
+              {/* Department Select Input */}
+              <div className="space-y-2">
+                <Label htmlFor="department">Department</Label>
+                <Select value={department} onValueChange={setDepartment}>
+                  <SelectTrigger className="border-emerald-200 focus:border-emerald-500">
+                    <SelectValue placeholder="Select department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Circular Economy & Environment">Circular Economy & Environment</SelectItem>
+                    <SelectItem value="Energy and Planning">Energy and Planning</SelectItem>
+                    <SelectItem value="Sustainable Infrastructure">Sustainable Infrastructure</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="createdByName">Created By</Label>
