@@ -1,11 +1,10 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -13,8 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Area, AreaChart } from "recharts";
-import { TrendingUp, TrendingDown, Minus, BarChart3, Eye, ChevronDown, ChevronUp, Search } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
+import { TrendingUp, TrendingDown, Minus, BarChart3, Eye, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -81,7 +80,6 @@ const subcategoryDetails = {
 
 export default function Reports() {
   const [selectedProjectNumber, setSelectedProjectNumber] = useState("");
-  const [projectNumberSearch, setProjectNumberSearch] = useState("");
   const [showDetailedItems, setShowDetailedItems] = useState(false);
 
   const { data: allProjects = [], isLoading } = useQuery({
@@ -89,14 +87,8 @@ export default function Reports() {
     queryFn: () => base44.entities.Project.list('-created_date'),
   });
 
-  // Get unique project numbers and filter based on search
-  const projectNumbers = useMemo(() => {
-    const uniqueNumbers = [...new Set(allProjects.map(p => p.project_number).filter(Boolean))];
-    if (!projectNumberSearch) return uniqueNumbers;
-    return uniqueNumbers.filter(num => 
-      num.toLowerCase().includes(projectNumberSearch.toLowerCase())
-    );
-  }, [allProjects, projectNumberSearch]);
+  // Get unique project numbers
+  const projectNumbers = [...new Set(allProjects.map(p => p.project_number).filter(Boolean))];
 
   // Filter assessments by selected project number
   const projectAssessments = selectedProjectNumber 
@@ -127,38 +119,6 @@ export default function Reports() {
     });
     return dataPoint;
   });
-
-  // Prepare radar chart data for latest assessment
-  const radarData = projectAssessments.length > 0 
-    ? categories.map(cat => ({
-        category: cat.name,
-        score: calculateCategoryScore(projectAssessments[projectAssessments.length - 1][cat.id])
-      }))
-    : [];
-
-  // Prepare trend data showing score progression for each category
-  const categoryTrendData = categories.map(cat => {
-    const trend = {
-      category: cat.name,
-    };
-    projectAssessments.forEach(assessment => {
-      trend[assessment.project_stage] = calculateCategoryScore(assessment[cat.id]);
-    });
-    return trend;
-  });
-
-  // Prepare improvement analysis data
-  const improvementData = projectAssessments.length > 1 
-    ? categories.map(cat => {
-        const firstScore = calculateCategoryScore(projectAssessments[0][cat.id]);
-        const lastScore = calculateCategoryScore(projectAssessments[projectAssessments.length - 1][cat.id]);
-        return {
-          category: cat.name,
-          improvement: lastScore - firstScore,
-          percentage: firstScore > 0 ? ((lastScore - firstScore) / firstScore * 100) : 0
-        };
-      }).sort((a, b) => b.improvement - a.improvement)
-    : [];
 
   const getStageBadge = (stage) => {
     const stageColors = {
@@ -209,30 +169,16 @@ export default function Reports() {
           <CardContent>
             <div className="space-y-2">
               <Label htmlFor="projectNumber">Project Number</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  id="projectNumberSearch"
-                  placeholder="Search project number..."
-                  value={projectNumberSearch}
-                  onChange={(e) => setProjectNumberSearch(e.target.value)}
-                  className="border-emerald-200 focus:border-emerald-500 pl-10"
-                />
-              </div>
               <Select value={selectedProjectNumber} onValueChange={setSelectedProjectNumber}>
                 <SelectTrigger className="border-emerald-200 focus:border-emerald-500">
                   <SelectValue placeholder="Select a project number" />
                 </SelectTrigger>
                 <SelectContent>
-                  {projectNumbers.length === 0 ? (
-                    <div className="p-2 text-sm text-gray-500">No matching projects</div>
-                  ) : (
-                    projectNumbers.map((projectNum) => (
-                      <SelectItem key={projectNum} value={projectNum}>
-                        {projectNum}
-                      </SelectItem>
-                    ))
-                  )}
+                  {projectNumbers.map((projectNum) => (
+                    <SelectItem key={projectNum} value={projectNum}>
+                      {projectNum}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -338,143 +284,6 @@ export default function Reports() {
                 );
               })}
             </div>
-
-            {/* Analysis and Trends Section */}
-            {projectAssessments.length > 1 && (
-              <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm mb-6">
-                <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100">
-                  <CardTitle className="text-2xl">Analysis and Trends</CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="grid lg:grid-cols-2 gap-6">
-                    {/* Category Performance Radar */}
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-4">Current Performance Profile</h4>
-                      <ResponsiveContainer width="100%" height={350}>
-                        <RadarChart data={radarData}>
-                          <PolarGrid />
-                          <PolarAngleAxis dataKey="category" tick={{ fontSize: 11 }} />
-                          <PolarRadiusAxis domain={[0, 100]} />
-                          <Radar 
-                            name="Latest Score" 
-                            dataKey="score" 
-                            stroke="#8b5cf6" 
-                            fill="#8b5cf6" 
-                            fillOpacity={0.5} 
-                          />
-                          <Tooltip />
-                        </RadarChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    {/* Improvement Rankings */}
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-4">Category Improvement Rankings</h4>
-                      <div className="space-y-3">
-                        {improvementData.map((item, index) => (
-                          <div key={item.category} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg">
-                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 text-white font-bold text-sm">
-                              {index + 1}
-                            </div>
-                            <div className="flex-1">
-                              <p className="font-medium text-gray-900 text-sm">{item.category}</p>
-                              <p className="text-xs text-gray-500">
-                                {item.improvement >= 0 ? '+' : ''}{item.improvement.toFixed(1)}% 
-                                {item.percentage !== 0 && ` (${item.percentage > 0 ? '+' : ''}${item.percentage.toFixed(1)}%)`}
-                              </p>
-                            </div>
-                            <div>
-                              {item.improvement > 0 ? (
-                                <TrendingUp className="w-5 h-5 text-green-600" />
-                              ) : item.improvement < 0 ? (
-                                <TrendingDown className="w-5 h-5 text-red-600" />
-                              ) : (
-                                <Minus className="w-5 h-5 text-gray-400" />
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Category Trends Over Time */}
-                  <div className="mt-6">
-                    <h4 className="font-semibold text-gray-900 mb-4">Category Trends Over Project Stages</h4>
-                    <ResponsiveContainer width="100%" height={400}>
-                      <AreaChart data={categoryTrendData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="category" angle={-45} textAnchor="end" height={120} />
-                        <YAxis domain={[0, 100]} />
-                        <Tooltip />
-                        <Legend />
-                        {projectAssessments.map((assessment, index) => {
-                          const colors = ['#3b82f6', '#10b981', '#6b7280'];
-                          const fillColors = ['rgba(59, 130, 246, 0.3)', 'rgba(16, 185, 129, 0.3)', 'rgba(107, 114, 128, 0.3)'];
-                          return (
-                            <Area
-                              key={assessment.id}
-                              type="monotone"
-                              dataKey={assessment.project_stage}
-                              stroke={colors[index % colors.length]}
-                              fill={fillColors[index % fillColors.length]}
-                              name={assessment.project_stage}
-                            />
-                          );
-                        })}
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
-
-                  {/* Key Insights */}
-                  <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg">
-                    <h4 className="font-semibold text-purple-900 mb-3">Key Insights</h4>
-                    <div className="grid md:grid-cols-2 gap-4 text-sm">
-                      <div className="flex items-start gap-2">
-                        <TrendingUp className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="font-medium text-gray-900">Best Improvement</p>
-                          <p className="text-gray-700">
-                            {improvementData[0]?.category}: +{improvementData[0]?.improvement.toFixed(1)}%
-                          </p>
-                        </div>
-                      </div>
-                      {improvementData.length > 0 && improvementData[improvementData.length - 1].improvement < 0 && (
-                        <div className="flex items-start gap-2">
-                          <TrendingDown className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="font-medium text-gray-900">Needs Attention</p>
-                            <p className="text-gray-700">
-                              {improvementData[improvementData.length - 1]?.category}: {improvementData[improvementData.length - 1]?.improvement.toFixed(1)}%
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      <div className="flex items-start gap-2">
-                        <BarChart3 className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="font-medium text-gray-900">Overall Progress</p>
-                          <p className="text-gray-700">
-                            {projectAssessments[0].total_score.toFixed(1)}% → {projectAssessments[projectAssessments.length - 1].total_score.toFixed(1)}%
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <Badge className="bg-purple-600 text-white mt-0.5">
-                          {projectAssessments.length}
-                        </Badge>
-                        <div>
-                          <p className="font-medium text-gray-900">Assessment Stages</p>
-                          <p className="text-gray-700">
-                            {projectAssessments.map(a => a.project_stage).join(' → ')}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
 
             {/* Category Comparison Chart */}
             <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm mb-6">
