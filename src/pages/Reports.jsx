@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
-import { TrendingUp, TrendingDown, Minus, BarChart3, Eye, ChevronDown, ChevronUp } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, BarChart3, Eye, ChevronDown, ChevronUp, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -76,6 +75,9 @@ const subcategoryDetails = {
 export default function Reports() {
   const [selectedProjectNumber, setSelectedProjectNumber] = useState("");
   const [showDetailedItems, setShowDetailedItems] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
 
   const { data: allProjects = [], isLoading } = useQuery({
     queryKey: ['projects'],
@@ -83,15 +85,49 @@ export default function Reports() {
   });
 
   // Get unique project numbers
-  const projectNumbers = [...new Set(allProjects.map(p => p.project_number).filter(Boolean))].sort();
+  const projectNumbers = [...new Set(allProjects.map(p => p.project_number).filter(Boolean))];
+
+  // Filter project numbers based on search query
+  const filteredProjectNumbers = projectNumbers.filter(num => 
+    num.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Filter assessments by selected project number
   const projectAssessments = selectedProjectNumber 
-    ? allProjects.filter(p => p.project_number?.toLowerCase() === selectedProjectNumber.toLowerCase()).sort((a, b) => {
+    ? allProjects.filter(p => p.project_number === selectedProjectNumber).sort((a, b) => {
         const stageOrder = { 'Tender': 1, 'Active': 2, 'Complete': 3 };
         return stageOrder[a.project_stage] - stageOrder[b.project_stage];
       })
     : [];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelectProject = (projectNum) => {
+    setSelectedProjectNumber(projectNum);
+    setSearchQuery(projectNum);
+    setShowDropdown(false);
+  };
+
+  const handleInputChange = (e) => {
+    setSearchQuery(e.target.value);
+    setShowDropdown(true);
+    // If the exact match exists, set it as selected
+    if (projectNumbers.includes(e.target.value)) {
+      setSelectedProjectNumber(e.target.value);
+    } else {
+      setSelectedProjectNumber("");
+    }
+  };
 
   const calculateCategoryScore = (categoryData) => {
     if (!categoryData) return 0;
@@ -129,7 +165,7 @@ export default function Reports() {
   };
 
   const getChangeIndicator = (current, previous) => {
-    if (previous === null || previous === undefined || current === previous) {
+    if (!previous || current === previous) {
       return <Minus className="w-4 h-4 text-gray-400" />;
     }
     if (current > previous) {
@@ -162,24 +198,51 @@ export default function Reports() {
             <CardTitle className="text-xl">Select Project to Compare</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-2 relative" ref={dropdownRef}>
               <Label htmlFor="projectNumber">Project Number</Label>
-              <Input
-                id="projectNumber"
-                placeholder="Type or select project number..."
-                value={selectedProjectNumber}
-                onChange={(e) => setSelectedProjectNumber(e.target.value)}
-                className="border-emerald-200 focus:border-emerald-500"
-                list="project-numbers"
-              />
-              <datalist id="project-numbers">
-                {projectNumbers.map((projectNum) => (
-                  <option key={projectNum} value={projectNum} />
-                ))}
-              </datalist>
-              {selectedProjectNumber && projectAssessments.length === 0 && (
-                <p className="text-sm text-amber-600">
-                  No assessments found for this project number
+              <div className="relative">
+                <Input
+                  id="projectNumber"
+                  placeholder="Type to search project number..."
+                  value={searchQuery}
+                  onChange={handleInputChange}
+                  onFocus={() => setShowDropdown(true)}
+                  className="border-emerald-200 focus:border-emerald-500"
+                />
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              </div>
+              
+              {/* Dropdown list */}
+              {showDropdown && filteredProjectNumbers.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-emerald-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  {filteredProjectNumbers.map((projectNum) => (
+                    <button
+                      key={projectNum}
+                      onClick={() => handleSelectProject(projectNum)}
+                      className={`w-full text-left px-4 py-3 hover:bg-emerald-50 transition-colors border-b border-gray-100 last:border-b-0 ${
+                        selectedProjectNumber === projectNum ? 'bg-emerald-50 font-semibold' : ''
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-900">{projectNum}</span>
+                        {selectedProjectNumber === projectNum && (
+                          <Badge className="bg-emerald-600 text-white text-xs">Selected</Badge>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {showDropdown && searchQuery && filteredProjectNumbers.length === 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-emerald-200 rounded-lg shadow-lg p-4">
+                  <p className="text-sm text-gray-600 text-center">No projects found matching "{searchQuery}"</p>
+                </div>
+              )}
+
+              {selectedProjectNumber && projectAssessments.length > 0 && (
+                <p className="text-sm text-emerald-600">
+                  ✓ {projectAssessments.length} assessment{projectAssessments.length > 1 ? 's' : ''} found
                 </p>
               )}
             </div>
@@ -424,7 +487,7 @@ export default function Reports() {
                             </tr>
                             
                             {/* Subcategories - shown when expanded */}
-                            {showDetailedItems && subcategories.map((subcategory, subIndex) => {
+                            {showDetailedItems && subcategories.map((subcategory) => {
                               const subScores = projectAssessments.map(a => getSubcategoryScore(a, category.id, subcategory.id));
                               const firstSubScore = subScores[0];
                               const lastSubScore = subScores[subScores.length - 1];
