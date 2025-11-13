@@ -309,7 +309,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
       priorities: { ...prev.priorities, [sectionId]: priorities },
       scores: { ...prev.scores, [sectionId]: totalScore }
     }));
-  }, [responses, priorities, section, sectionId, onDataChange]); // Added section, sectionId, onDataChange to dependencies
+  }, [responses, priorities, section, sectionId, onDataChange]);
 
   const handleResponseChange = (itemId, value) => {
     setResponses(prev => ({
@@ -372,7 +372,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                 <TableHead className="w-1/4">Description</TableHead>
                 <TableHead className="w-1/3">Actions</TableHead>
                 <TableHead className="text-center w-40">Priority</TableHead>
-                <TableHead className="text-center w-32">Response</TableHead> {/* Changed to Response */}
+                <TableHead className="text-center w-32">Response</TableHead>
                 <TableHead className="text-center w-24">Score</TableHead>
               </TableRow>
             </TableHeader>
@@ -380,7 +380,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
               {section.items.map((item) => {
                 const score = calculateScore(item.id);
                 const priority = priorities[item.id];
-                const response = responses[item.id] || ""; // Get response string
+                const response = responses[item.id] || "";
                 
                 return (
                   <TableRow key={item.id} className="hover:bg-emerald-50/30">
@@ -436,6 +436,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="yes">Yes</SelectItem>
+                          <SelectItem value="no">No</SelectItem>
                           <SelectItem value="not_applicable">Not Applicable</SelectItem>
                         </SelectContent>
                       </Select>

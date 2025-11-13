@@ -425,7 +425,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
               {section.items.map((item) => {
                 const score = calculateScore(item.id);
                 const priority = priorities[item.id];
-                const response = responses[item.id] || ""; // Default to empty string for 'no'
+                const response = responses[item.id] || ""; 
 
                 return (
                   <TableRow key={item.id} className="hover:bg-emerald-50/30">
@@ -481,7 +481,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="yes">Yes</SelectItem>
-                          <SelectItem value={null}>No</SelectItem> {/* Empty string for 'No' */}
+                          <SelectItem value="no">No</SelectItem>
                           <SelectItem value="not_applicable">Not Applicable</SelectItem>
                         </SelectContent>
                       </Select>
