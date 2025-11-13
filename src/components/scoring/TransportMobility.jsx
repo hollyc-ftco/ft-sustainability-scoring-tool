@@ -245,7 +245,8 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
     if (responses[itemId] === "yes") {
       return priorityScores[priorities[itemId]].score;
     }
-    return 0;
+    // If response is "no" or empty, score is 0. If "not_applicable", it's handled by total calculation.
+    return 0; 
   };
 
   const calculateTotal = () => {
@@ -253,10 +254,10 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
     let sumPriorityScores = 0;
     
     section.items.forEach(item => {
-      if (responses[item.id] !== "not_applicable") {
+      if (responses[item.id] !== "not_applicable") { // Only consider items that are not "not_applicable" for the denominator
         sumPriorityScores += priorityScores[priorities[item.id]].score;
         
-        if (responses[item.id] === "yes") {
+        if (responses[item.id] === "yes") { // Only count "yes" responses for the numerator
           sumActualScores += priorityScores[priorities[item.id]].score;
         }
       }
@@ -350,6 +351,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="yes">Yes</SelectItem>
+                          <SelectItem value="no">No</SelectItem> {/* Added 'No' option */}
                           <SelectItem value="not_applicable">Not Applicable</SelectItem>
                         </SelectContent>
                       </Select>

@@ -584,6 +584,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="yes">Yes</SelectItem>
+                          <SelectItem value="no">No</SelectItem>
                           <SelectItem value="not_applicable">Not Applicable</SelectItem>
                         </SelectContent>
                       </Select>
@@ -617,7 +618,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
   );
 }
 
-export default function TransportMobility({ data, onDataChange }) {
+export default function SocialImpactWellbeing({ data, onDataChange }) {
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">

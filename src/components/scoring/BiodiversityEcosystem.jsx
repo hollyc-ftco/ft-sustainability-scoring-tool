@@ -516,6 +516,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="yes">Yes</SelectItem>
+                          <SelectItem value="no">No</SelectItem>
                           <SelectItem value="not_applicable">Not Applicable</SelectItem>
                         </SelectContent>
                       </Select>
