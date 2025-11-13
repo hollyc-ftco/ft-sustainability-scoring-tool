@@ -6,29 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input"; // New import
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"; // New imports
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"; // New imports
-import {
-  Select, // Retain Select import if it's used elsewhere, otherwise remove. It's not used in the changed section.
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
-import { TrendingUp, TrendingDown, Minus, BarChart3, Eye, ChevronDown, ChevronUp, Check, ChevronsUpDown } from "lucide-react"; // Added Check, ChevronsUpDown
+import { TrendingUp, TrendingDown, Minus, BarChart3, Eye, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -96,7 +76,6 @@ const subcategoryDetails = {
 export default function Reports() {
   const [selectedProjectNumber, setSelectedProjectNumber] = useState("");
   const [showDetailedItems, setShowDetailedItems] = useState(false);
-  const [open, setOpen] = useState(false); // New state for the combobox popover
 
   const { data: allProjects = [], isLoading } = useQuery({
     queryKey: ['projects'],
@@ -108,7 +87,7 @@ export default function Reports() {
 
   // Filter assessments by selected project number
   const projectAssessments = selectedProjectNumber 
-    ? allProjects.filter(p => p.project_number === selectedProjectNumber).sort((a, b) => {
+    ? allProjects.filter(p => p.project_number?.toLowerCase() === selectedProjectNumber.toLowerCase()).sort((a, b) => {
         const stageOrder = { 'Tender': 1, 'Active': 2, 'Complete': 3 };
         return stageOrder[a.project_stage] - stageOrder[b.project_stage];
       })
@@ -185,46 +164,24 @@ export default function Reports() {
           <CardContent>
             <div className="space-y-2">
               <Label htmlFor="projectNumber">Project Number</Label>
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className="w-full justify-between border-emerald-200 hover:bg-emerald-50"
-                  >
-                    {selectedProjectNumber || "Select a project number..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-                  <Command>
-                    <CommandInput placeholder="Search project number..." />
-                    <CommandList>
-                      <CommandEmpty>No project found.</CommandEmpty>
-                      <CommandGroup>
-                        {projectNumbers.map((projectNum) => (
-                          <CommandItem
-                            key={projectNum}
-                            value={projectNum}
-                            onSelect={(currentValue) => {
-                              setSelectedProjectNumber(currentValue === selectedProjectNumber ? "" : currentValue);
-                              setOpen(false);
-                            }}
-                          >
-                            <Check
-                              className={`mr-2 h-4 w-4 ${
-                                selectedProjectNumber === projectNum ? "opacity-100" : "opacity-0"
-                              }`}
-                            />
-                            {projectNum}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <Input
+                id="projectNumber"
+                placeholder="Type or select project number..."
+                value={selectedProjectNumber}
+                onChange={(e) => setSelectedProjectNumber(e.target.value)}
+                className="border-emerald-200 focus:border-emerald-500"
+                list="project-numbers"
+              />
+              <datalist id="project-numbers">
+                {projectNumbers.map((projectNum) => (
+                  <option key={projectNum} value={projectNum} />
+                ))}
+              </datalist>
+              {selectedProjectNumber && projectAssessments.length === 0 && (
+                <p className="text-sm text-amber-600">
+                  No assessments found for this project number
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
