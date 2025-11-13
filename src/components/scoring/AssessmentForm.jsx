@@ -145,6 +145,26 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     queryFn: () => base44.entities.Project.list(),
   });
 
+  // Auto-fill project details when project number changes
+  useEffect(() => {
+    if (projectNumber && allProjects.length > 0) {
+      // Find an existing project with this project number
+      const existingProject = allProjects.find(
+        p => p.project_number === projectNumber
+      );
+      
+      if (existingProject) {
+        // Auto-fill name and owner if they exist
+        if (existingProject.project_name && !projectName) {
+          setProjectName(existingProject.project_name);
+        }
+        if (existingProject.project_owner && !projectOwner) {
+          setProjectOwner(existingProject.project_owner);
+        }
+      }
+    }
+  }, [projectNumber, allProjects]);
+
   // Generate reference number
   const generateReference = (stage) => {
     if (!projectNumber) return "";

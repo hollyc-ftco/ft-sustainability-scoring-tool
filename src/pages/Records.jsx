@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -12,12 +14,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, Trash2, FileText, BarChart3, Pencil } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Eye, Trash2, FileText, BarChart3, Pencil, Search, X } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
 
 export default function Records() {
   const queryClient = useQueryClient();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [stageFilter, setStageFilter] = useState("all");
 
   const { data: projects, isLoading } = useQuery({
     queryKey: ['projects'],
@@ -61,6 +72,22 @@ export default function Records() {
     return <Badge className="bg-red-100 text-red-800 border border-red-200">Unclassified</Badge>;
   };
 
+  // Filter projects based on search query and stage
+  const filteredProjects = projects.filter(project => {
+    const matchesSearch = searchQuery === "" || 
+      project.project_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.project_name?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesStage = stageFilter === "all" || project.project_stage === stageFilter;
+    
+    return matchesSearch && matchesStage;
+  });
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setStageFilter("all");
+  };
+
   return (
     <div className="p-6 md:p-10">
       <div className="max-w-7xl mx-auto">
@@ -69,32 +96,115 @@ export default function Records() {
           <p className="text-gray-600 text-lg">View all saved project assessments</p>
         </div>
 
+        {/* Search and Filter Section */}
+        <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm mb-6">
+          <CardHeader>
+            <CardTitle className="text-xl flex items-center gap-2">
+              <Search className="w-5 h-5" />
+              Search & Filter
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="md:col-span-2 space-y-2">
+                <Label htmlFor="search">Search by Project Number or Name</Label>
+                <div className="relative">
+                  <Input
+                    id="search"
+                    placeholder="Enter project number or name..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="border-emerald-200 focus:border-emerald-500 pr-10"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="stage">Filter by Stage</Label>
+                <Select value={stageFilter} onValueChange={setStageFilter}>
+                  <SelectTrigger className="border-emerald-200 focus:border-emerald-500">
+                    <SelectValue placeholder="Select stage" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Stages</SelectItem>
+                    <SelectItem value="Tender">Tender</SelectItem>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Complete">Complete</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            {(searchQuery || stageFilter !== "all") && (
+              <div className="mt-4 flex items-center gap-3">
+                <p className="text-sm text-gray-600">
+                  Showing {filteredProjects.length} of {projects.length} records
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="border-emerald-200 hover:bg-emerald-50"
+                >
+                  <X className="w-3 h-3 mr-2" />
+                  Clear Filters
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {isLoading ? (
           <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
             <CardContent className="p-12 text-center">
               <p className="text-gray-600">Loading records...</p>
             </CardContent>
           </Card>
-        ) : projects.length === 0 ? (
+        ) : filteredProjects.length === 0 ? (
           <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
             <CardContent className="p-12 text-center">
-              <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Records Yet</h3>
-              <p className="text-gray-600 mb-6">
-                Start by creating and saving an assessment in the Scoring Tool
-              </p>
-              <Link to={createPageUrl("ScoringTool")}>
-                <Button className="bg-emerald-600 hover:bg-emerald-700">
-                  Go to Scoring Tool
-                </Button>
-              </Link>
+              {projects.length === 0 ? (
+                <>
+                  <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Records Yet</h3>
+                  <p className="text-gray-600 mb-6">
+                    Start by creating and saving an assessment in the Scoring Tool
+                  </p>
+                  <Link to={createPageUrl("ScoringTool")}>
+                    <Button className="bg-emerald-600 hover:bg-emerald-700">
+                      Go to Scoring Tool
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Matching Records</h3>
+                  <p className="text-gray-600 mb-6">
+                    No projects found matching your search criteria
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={clearFilters}
+                    className="border-emerald-200 hover:bg-emerald-50"
+                  >
+                    Clear Filters
+                  </Button>
+                </>
+              )}
             </CardContent>
           </Card>
         ) : (
           <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-2xl">
-                All Assessments ({projects.length})
+                All Assessments ({filteredProjects.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -114,7 +224,7 @@ export default function Records() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {projects.map((project) => (
+                    {filteredProjects.map((project) => (
                       <TableRow key={project.id} className="hover:bg-emerald-50/30 transition-colors">
                         <TableCell className="font-medium text-emerald-700">
                           {project.reference || "N/A"}
