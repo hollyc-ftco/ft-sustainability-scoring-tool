@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
-import { TrendingUp, TrendingDown, Minus, BarChart3, Eye } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, BarChart3, Eye, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -28,8 +28,59 @@ const categories = [
   { id: "innovation_technology", name: "Innovation & Technology", weight: 10 }
 ];
 
+// Subcategory details for each category
+const subcategoryDetails = {
+  management_governance: [
+    { id: "sdg_alignment", name: "SDGs Alignment" },
+    { id: "environmental_systems", name: "Environmental Systems" },
+    { id: "stakeholder_engagement", name: "Stakeholder Engagement" },
+    { id: "policy_planning", name: "Policy and Planning" }
+  ],
+  energy_carbon: [
+    { id: "energy_reduction", name: "Energy Reduction" },
+    { id: "carbon_emissions", name: "Carbon Emissions" },
+    { id: "renewable_energy", name: "Renewable Energy" },
+    { id: "carbon_offsetting", name: "Carbon Offsetting" }
+  ],
+  water_management: [
+    { id: "water_efficiency", name: "Water Efficiency" },
+    { id: "flood_risk", name: "Flood Risk" },
+    { id: "water_quality", name: "Water Quality" },
+    { id: "sustainable_drainage", name: "Sustainable Drainage" }
+  ],
+  materials_resources: [
+    { id: "material_selection", name: "Material Selection" },
+    { id: "circular_economy", name: "Circular Economy" },
+    { id: "waste_management", name: "Waste Management" },
+    { id: "embodied_carbon", name: "Embodied Carbon" }
+  ],
+  biodiversity_ecosystem: [
+    { id: "biodiversity_preservation", name: "Biodiversity Preservation" },
+    { id: "ecological_connectivity", name: "Ecological Connectivity" },
+    { id: "native_species", name: "Native Species" },
+    { id: "sustainable_land", name: "Sustainable Land" }
+  ],
+  transport_mobility: [
+    { id: "transport_options", name: "Transport Options" },
+    { id: "mobility_all", name: "Mobility for All" },
+    { id: "transport_carbon", name: "Transport Carbon" }
+  ],
+  social_impact: [
+    { id: "health_wellbeing", name: "Health & Wellbeing" },
+    { id: "community_engagement", name: "Community Engagement" },
+    { id: "cultural_heritage", name: "Cultural Heritage" },
+    { id: "job_creation", name: "Job Creation" }
+  ],
+  innovation_technology: [
+    { id: "technology_integration", name: "Technology Integration" },
+    { id: "green_infrastructure", name: "Green Infrastructure" },
+    { id: "construction_techniques", name: "Construction Techniques" }
+  ]
+};
+
 export default function Reports() {
   const [selectedProjectNumber, setSelectedProjectNumber] = useState("");
+  const [showDetailedItems, setShowDetailedItems] = useState(false);
 
   const { data: allProjects = [], isLoading } = useQuery({
     queryKey: ['projects'],
@@ -53,6 +104,11 @@ export default function Reports() {
     if (values.length === 0) return 0;
     const sum = values.reduce((acc, val) => acc + (val || 0), 0);
     return parseFloat((sum / values.length).toFixed(1));
+  };
+
+  const getSubcategoryScore = (assessment, categoryId, subcategoryId) => {
+    if (!assessment[categoryId]) return 0;
+    return assessment[categoryId][subcategoryId] || 0;
   };
 
   // Prepare comparison data
@@ -290,10 +346,29 @@ export default function Reports() {
               </Card>
             )}
 
-            {/* Detailed Category Comparison Table */}
+            {/* Category Comparison Table */}
             <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
               <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
-                <CardTitle className="text-2xl">Detailed Category Comparison</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-2xl">Category Comparison</CardTitle>
+                  <Button
+                    onClick={() => setShowDetailedItems(!showDetailedItems)}
+                    variant="outline"
+                    className="border-emerald-200 hover:bg-emerald-50"
+                  >
+                    {showDetailedItems ? (
+                      <>
+                        <ChevronUp className="w-4 h-4 mr-2" />
+                        Hide Subcategories
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-4 h-4 mr-2" />
+                        Show Subcategories
+                      </>
+                    )}
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="overflow-x-auto">
@@ -322,28 +397,65 @@ export default function Reports() {
                         const scores = projectAssessments.map(a => calculateCategoryScore(a[category.id]));
                         const firstScore = scores[0];
                         const lastScore = scores[scores.length - 1];
+                        const subcategories = subcategoryDetails[category.id] || [];
                         
                         return (
-                          <tr key={category.id} className={`border-b border-emerald-100 ${catIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
-                            <td className="p-3 font-medium text-gray-900">{category.name}</td>
-                            <td className="p-3 text-center">
-                              <Badge variant="outline" className="text-xs">
-                                {category.weight}%
-                              </Badge>
-                            </td>
-                            {scores.map((score, index) => (
-                              <td key={index} className="p-3 text-center">
-                                <Badge className={`${score >= 70 ? 'bg-green-600' : score >= 50 ? 'bg-yellow-600' : 'bg-orange-600'} text-white`}>
-                                  {score.toFixed(1)}%
+                          <React.Fragment key={category.id}>
+                            <tr className={`border-b border-emerald-100 ${catIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+                              <td className="p-3 font-medium text-gray-900">{category.name}</td>
+                              <td className="p-3 text-center">
+                                <Badge variant="outline" className="text-xs">
+                                  {category.weight}%
                                 </Badge>
                               </td>
-                            ))}
-                            {projectAssessments.length > 1 && (
-                              <td className="p-3 text-center">
-                                {getChangeIndicator(lastScore, firstScore)}
-                              </td>
-                            )}
-                          </tr>
+                              {scores.map((score, index) => (
+                                <td key={index} className="p-3 text-center">
+                                  <Badge className={`${score >= 70 ? 'bg-green-600' : score >= 50 ? 'bg-yellow-600' : 'bg-orange-600'} text-white`}>
+                                    {score.toFixed(1)}%
+                                  </Badge>
+                                </td>
+                              ))}
+                              {projectAssessments.length > 1 && (
+                                <td className="p-3 text-center">
+                                  {getChangeIndicator(lastScore, firstScore)}
+                                </td>
+                              )}
+                            </tr>
+                            
+                            {/* Subcategories - shown when expanded */}
+                            {showDetailedItems && subcategories.map((subcategory, subIndex) => {
+                              const subScores = projectAssessments.map(a => getSubcategoryScore(a, category.id, subcategory.id));
+                              const firstSubScore = subScores[0];
+                              const lastSubScore = subScores[subScores.length - 1];
+                              
+                              return (
+                                <tr key={subcategory.id} className={`border-b border-gray-100 ${catIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+                                  <td className="p-3 pl-8 text-sm text-gray-700">
+                                    <span className="text-gray-400 mr-2">└─</span>
+                                    {subcategory.name}
+                                  </td>
+                                  <td className="p-3 text-center">
+                                    <span className="text-xs text-gray-400">-</span>
+                                  </td>
+                                  {subScores.map((subScore, index) => (
+                                    <td key={index} className="p-3 text-center">
+                                      <Badge 
+                                        variant="outline"
+                                        className={`text-xs ${subScore >= 70 ? 'border-green-400 text-green-700' : subScore >= 50 ? 'border-yellow-400 text-yellow-700' : 'border-orange-400 text-orange-700'}`}
+                                      >
+                                        {subScore.toFixed(1)}%
+                                      </Badge>
+                                    </td>
+                                  ))}
+                                  {projectAssessments.length > 1 && (
+                                    <td className="p-3 text-center text-xs">
+                                      {getChangeIndicator(lastSubScore, firstSubScore)}
+                                    </td>
+                                  )}
+                                </tr>
+                              );
+                            })}
+                          </React.Fragment>
                         );
                       })}
                       <tr className="bg-emerald-50 font-bold border-t-2 border-emerald-300">
@@ -373,7 +485,7 @@ export default function Reports() {
 
             {/* Comments Comparison */}
             {projectAssessments.some(a => a.category_comments && Object.values(a.category_comments).some(c => c)) && (
-              <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
+              <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm mt-6">
                 <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
                   <CardTitle className="text-2xl">Category Comments Comparison</CardTitle>
                 </CardHeader>
