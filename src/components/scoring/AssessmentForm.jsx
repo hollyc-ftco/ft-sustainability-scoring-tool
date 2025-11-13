@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { Save, Calculator, Printer, Plus } from "lucide-react";
 import {
   Select,
@@ -131,8 +132,10 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
   const [projectNumber, setProjectNumber] = useState("");
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
+  const [createdByName, setCreatedByName] = useState("");
   const [projectStage, setProjectStage] = useState("Tender");
   const [scores, setScores] = useState({});
+  const [comments, setComments] = useState({});
   const [showSummary, setShowSummary] = useState(false);
   const [validationError, setValidationError] = useState("");
 
@@ -337,6 +340,13 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }));
   };
 
+  const handleCommentChange = (categoryId, value) => {
+    setComments(prev => ({
+      ...prev,
+      [categoryId]: value
+    }));
+  };
+
   const calculateCategoryScore = (category) => {
     const categoryScores = scores[category.id] || {};
     let totalScore = 0;
@@ -388,9 +398,11 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
       project_number: projectNumber,
       project_name: projectName,
       project_owner: projectOwner,
+      created_by_name: createdByName,
       project_stage: projectStage,
       status: "completed",
       total_score: parseFloat(calculateTotalScore()),
+      category_comments: comments,
       management_governance: scores.management_governance || {},
       energy_carbon: scores.energy_carbon || {},
       water_management: scores.water_management || {},
@@ -413,8 +425,10 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
       setProjectNumber("");
       setProjectName("");
       setProjectOwner("");
+      setCreatedByName("");
       setProjectStage("Tender");
       setScores({});
+      setComments({});
       setShowSummary(false);
       setValidationError("");
     }
@@ -511,24 +525,53 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
                 className="border-emerald-200 focus:border-emerald-500"
               />
             </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="createdByName">Created By</Label>
+              <Input
+                id="createdByName"
+                placeholder="Enter your name"
+                value={createdByName}
+                onChange={(e) => setCreatedByName(e.target.value)}
+                className="border-emerald-200 focus:border-emerald-500"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {assessmentCategories.map((category) => (
-        <CategoryAssessment
-          key={category.id}
-          category={category}
-          scores={scores[category.id] || {}}
-          onScoreChange={(subCategoryId, value) => 
-            handleScoreChange(category.id, subCategoryId, value)
-          }
-          categoryScore={calculateCategoryScore(category)}
-          isReadOnly={category.id === 'management_governance' || category.id === 'energy_carbon' || 
-                      category.id === 'water_management' || category.id === 'materials_resources' ||
-                      category.id === 'biodiversity_ecosystem' || category.id === 'transport_mobility' ||
-                      category.id === 'social_impact' || category.id === 'innovation_technology'}
-        />
+        <div key={category.id}>
+          <CategoryAssessment
+            category={category}
+            scores={scores[category.id] || {}}
+            onScoreChange={(subCategoryId, value) => 
+              handleScoreChange(category.id, subCategoryId, value)
+            }
+            categoryScore={calculateCategoryScore(category)}
+            isReadOnly={category.id === 'management_governance' || category.id === 'energy_carbon' || 
+                        category.id === 'water_management' || category.id === 'materials_resources' ||
+                        category.id === 'biodiversity_ecosystem' || category.id === 'transport_mobility' ||
+                        category.id === 'social_impact' || category.id === 'innovation_technology'}
+          />
+          
+          {/* Comment box for category */}
+          <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm mt-2">
+            <CardContent className="pt-6">
+              <div className="space-y-2">
+                <Label htmlFor={`comment-${category.id}`} className="text-sm font-medium text-gray-700">
+                  Comments for {category.name}
+                </Label>
+                <Textarea
+                  id={`comment-${category.id}`}
+                  placeholder="Add any comments or notes for this category..."
+                  value={comments[category.id] || ""}
+                  onChange={(e) => handleCommentChange(category.id, e.target.value)}
+                  className="border-emerald-200 focus:border-emerald-500 min-h-[80px]"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       ))}
 
       <div className="flex gap-4 justify-end sticky bottom-6 z-10">
@@ -560,7 +603,9 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
           projectNumber={projectNumber}
           projectName={projectName}
           projectOwner={projectOwner}
+          createdByName={createdByName}
           projectStage={projectStage}
+          comments={comments}
         />
       )}
     </div>
