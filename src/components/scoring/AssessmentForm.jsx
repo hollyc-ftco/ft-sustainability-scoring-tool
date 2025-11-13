@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Save, Calculator, Printer, Plus, User } from "lucide-react";
+import { Save, Calculator, Printer, Plus } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -134,20 +133,8 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
   const [projectOwner, setProjectOwner] = useState("");
   const [projectStage, setProjectStage] = useState("Tender");
   const [scores, setScores] = useState({});
-  const [comments, setComments] = useState({});
   const [showSummary, setShowSummary] = useState(false);
   const [validationError, setValidationError] = useState("");
-  const [currentUser, setCurrentUser] = useState(null);
-
-  // Fetch current user
-  useQuery({
-    queryKey: ['currentUser'],
-    queryFn: async () => {
-      const user = await base44.auth.me();
-      setCurrentUser(user);
-      return user;
-    },
-  });
 
   // Fetch all projects to check for existing assessments
   const { data: allProjects = [] } = useQuery({
@@ -161,6 +148,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     
     const stagePrefix = stage === "Active" ? "A" : stage === "Tender" ? "T" : "C";
     
+    // Count existing assessments for this project number and stage
     const existingAssessments = allProjects.filter(
       p => p.project_number === projectNumber && p.project_stage === stage
     );
@@ -171,6 +159,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     return `${projectNumber}_${stagePrefix}_${formattedNumber}`;
   };
 
+  // Check if Active stage is allowed
   const canSelectActive = () => {
     if (!projectNumber) return false;
     const tenderAssessment = allProjects.find(
@@ -179,6 +168,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     return !!tenderAssessment;
   };
 
+  // Check if Tender already exists for this project number
   const tenderExists = () => {
     if (!projectNumber) return false;
     return allProjects.some(
@@ -186,6 +176,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     );
   };
 
+  // Handle project stage change with validation
   const handleProjectStageChange = (value) => {
     setValidationError("");
     
@@ -202,7 +193,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     setProjectStage(value);
   };
 
-  // Auto-populate scores from tabs
+  // Auto-populate scores from Management and Governance tab
   useEffect(() => {
     if (managementGovernanceData && managementGovernanceData.scores) {
       setScores(prev => ({
@@ -217,6 +208,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   }, [managementGovernanceData]);
 
+  // Auto-populate scores from Energy & Carbon Management tab
   useEffect(() => {
     if (energyCarbonData && energyCarbonData.scores) {
       setScores(prev => ({
@@ -231,6 +223,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   }, [energyCarbonData]);
 
+  // Auto-populate scores from Water Management tab
   useEffect(() => {
     if (waterManagementData && waterManagementData.scores) {
       setScores(prev => ({
@@ -245,6 +238,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   }, [waterManagementData]);
 
+  // Auto-populate scores from Materials & Resource Efficiency tab
   useEffect(() => {
     if (materialsResourceData && materialsResourceData.scores) {
       setScores(prev => ({
@@ -259,6 +253,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   }, [materialsResourceData]);
 
+  // Auto-populate scores from Biodiversity & Ecosystem tab
   useEffect(() => {
     if (biodiversityEcosystemData && biodiversityEcosystemData.scores) {
       setScores(prev => ({
@@ -273,6 +268,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   }, [biodiversityEcosystemData]);
 
+  // Auto-populate scores from Transport & Mobility tab
   useEffect(() => {
     if (transportMobilityData && transportMobilityData.scores) {
       setScores(prev => ({
@@ -286,6 +282,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   }, [transportMobilityData]);
 
+  // Auto-populate scores from Social Impact & Wellbeing tab
   useEffect(() => {
     if (socialImpactData && socialImpactData.scores) {
       setScores(prev => ({
@@ -300,6 +297,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   }, [socialImpactData]);
 
+  // Auto-populate scores from Innovation & Technology tab
   useEffect(() => {
     if (innovationTechnologyData && innovationTechnologyData.scores) {
       setScores(prev => ({
@@ -322,6 +320,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
   });
 
   const handleScoreChange = (categoryId, subCategoryId, value) => {
+    // Don't allow manual changes to auto-populated categories
     if (categoryId === 'management_governance' || categoryId === 'energy_carbon' || 
         categoryId === 'water_management' || categoryId === 'materials_resources' ||
         categoryId === 'biodiversity_ecosystem' || categoryId === 'transport_mobility' ||
@@ -335,13 +334,6 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
         ...prev[categoryId],
         [subCategoryId]: parseFloat(value) || 0
       }
-    }));
-  };
-
-  const handleCommentChange = (categoryId, value) => {
-    setComments(prev => ({
-      ...prev,
-      [categoryId]: value
     }));
   };
 
@@ -377,6 +369,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
       return;
     }
 
+    // Validate project stage
     if (projectStage === "Active" && !canSelectActive()) {
       alert("Active stage is only allowed if there is an existing Tender assessment for this project number.");
       return;
@@ -387,6 +380,7 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
       return;
     }
 
+    // Generate reference
     const reference = generateReference(projectStage);
 
     const projectData = {
@@ -397,7 +391,6 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
       project_stage: projectStage,
       status: "completed",
       total_score: parseFloat(calculateTotalScore()),
-      category_comments: comments,
       management_governance: scores.management_governance || {},
       energy_carbon: scores.energy_carbon || {},
       water_management: scores.water_management || {},
@@ -422,7 +415,6 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
       setProjectOwner("");
       setProjectStage("Tender");
       setScores({});
-      setComments({});
       setShowSummary(false);
       setValidationError("");
     }
@@ -519,61 +511,24 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
                 className="border-emerald-200 focus:border-emerald-500"
               />
             </div>
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="createdBy">Created By</Label>
-              <div className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                <User className="w-5 h-5 text-gray-500" />
-                <span className="text-gray-700">
-                  {currentUser?.email || "Loading..."}
-                </span>
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>
 
       {assessmentCategories.map((category) => (
-        <Card key={category.id} className="border-emerald-100 bg-white/60 backdrop-blur-sm">
-          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-xl">{category.name}</CardTitle>
-                <p className="text-sm text-gray-600 mt-1">Weight: {category.weight}%</p>
-              </div>
-              <Badge className="bg-emerald-600 text-white text-lg py-2 px-4">
-                {calculateCategoryScore(category).toFixed(1)}%
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <div className="bg-white rounded-lg border border-emerald-100 p-4">
-                <h5 className="font-semibold text-gray-900 mb-3">Sub-Categories</h5>
-                <div className="space-y-2">
-                  {category.subCategories.map(sub => {
-                    const score = scores[category.id]?.[sub.id] || 0;
-                    return (
-                      <div key={sub.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span className="text-sm text-gray-700">{sub.name}</span>
-                        <Badge className="bg-gray-600 text-white">{score.toFixed(1)}%</Badge>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor={`comment-${category.id}`}>Category Comments</Label>
-                <Textarea
-                  id={`comment-${category.id}`}
-                  placeholder={`Add comments or notes for ${category.name}...`}
-                  value={comments[category.id] || ""}
-                  onChange={(e) => handleCommentChange(category.id, e.target.value)}
-                  className="border-emerald-200 focus:border-emerald-500 min-h-[100px]"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <CategoryAssessment
+          key={category.id}
+          category={category}
+          scores={scores[category.id] || {}}
+          onScoreChange={(subCategoryId, value) => 
+            handleScoreChange(category.id, subCategoryId, value)
+          }
+          categoryScore={calculateCategoryScore(category)}
+          isReadOnly={category.id === 'management_governance' || category.id === 'energy_carbon' || 
+                      category.id === 'water_management' || category.id === 'materials_resources' ||
+                      category.id === 'biodiversity_ecosystem' || category.id === 'transport_mobility' ||
+                      category.id === 'social_impact' || category.id === 'innovation_technology'}
+        />
       ))}
 
       <div className="flex gap-4 justify-end sticky bottom-6 z-10">
@@ -600,14 +555,12 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
         <AssessmentSummary
           categories={assessmentCategories}
           scores={scores}
-          comments={comments}
           calculateCategoryScore={calculateCategoryScore}
           totalScore={calculateTotalScore()}
           projectNumber={projectNumber}
           projectName={projectName}
           projectOwner={projectOwner}
           projectStage={projectStage}
-          createdBy={currentUser?.email}
         />
       )}
     </div>

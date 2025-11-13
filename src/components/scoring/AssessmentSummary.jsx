@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Award, Star, CheckCircle, AlertCircle, XCircle, User } from "lucide-react";
+import { Award, Star, CheckCircle, AlertCircle, XCircle } from "lucide-react";
 
 const getRating = (score) => {
   if (score >= 85) {
@@ -49,15 +49,13 @@ const getRating = (score) => {
 
 export default function AssessmentSummary({ 
   categories, 
-  scores,
-  comments,
+  scores, 
   calculateCategoryScore, 
   totalScore,
   projectNumber,
   projectName, 
   projectOwner,
-  projectStage,
-  createdBy
+  projectStage
 }) {
   const rating = getRating(parseFloat(totalScore));
   const RatingIcon = rating.icon;
@@ -93,15 +91,6 @@ export default function AssessmentSummary({
                 {projectStage || "Not specified"}
               </Badge>
             </div>
-            {createdBy && (
-              <div className="md:col-span-2">
-                <p className="text-sm text-gray-600 mb-1">Created By</p>
-                <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-gray-500" />
-                  <p className="font-semibold text-gray-900">{createdBy}</p>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Overall Rating */}
@@ -129,7 +118,6 @@ export default function AssessmentSummary({
             {categories.map((category) => {
               const categoryScore = calculateCategoryScore(category);
               const percentage = categoryScore.toFixed(2);
-              const categoryComment = comments?.[category.id];
               
               return (
                 <div key={category.id} className="border border-emerald-100 rounded-xl p-4 bg-white">
@@ -146,18 +134,12 @@ export default function AssessmentSummary({
                       {percentage}%
                     </Badge>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden mb-3">
+                  <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                     <div
                       className="bg-gradient-to-r from-emerald-500 to-teal-600 h-full rounded-full transition-all duration-500"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-                  {categoryComment && (
-                    <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="text-sm font-semibold text-blue-900 mb-1">Comments:</p>
-                      <p className="text-sm text-blue-800 whitespace-pre-wrap">{categoryComment}</p>
-                    </div>
-                  )}
                 </div>
               );
             })}
