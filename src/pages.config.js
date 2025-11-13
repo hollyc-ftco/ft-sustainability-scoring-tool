@@ -4,6 +4,7 @@ import Records from './pages/Records';
 import ProjectView from './pages/ProjectView';
 import ProjectGraphs from './pages/ProjectGraphs';
 import EditProject from './pages/EditProject';
+import Reports from './pages/Reports';
 import Layout from './Layout.jsx';
 
 
@@ -14,6 +15,7 @@ export const PAGES = {
     "ProjectView": ProjectView,
     "ProjectGraphs": ProjectGraphs,
     "EditProject": EditProject,
+    "Reports": Reports,
 }
 
 export const pagesConfig = {
