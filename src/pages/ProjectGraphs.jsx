@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Award, Star, CheckCircle, AlertCircle, XCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, PieChart, Pie, Cell } from "recharts";
@@ -67,7 +67,23 @@ export default function ProjectGraphs() {
     const values = Object.values(categoryData);
     if (values.length === 0) return 0;
     const sum = values.reduce((acc, val) => acc + (val || 0), 0);
-    return (sum / values.length);
+    return parseFloat((sum / values.length).toFixed(1));
+  };
+
+  const getRatingColor = (score) => {
+    if (score >= 85) return '#10b981'; // Outstanding - Green
+    if (score >= 70) return '#3b82f6'; // Excellent - Blue
+    if (score >= 55) return '#eab308'; // Good - Yellow
+    if (score >= 40) return '#f97316'; // Pass - Orange
+    return '#ef4444'; // Unclassified - Red
+  };
+
+  const getRatingName = (score) => {
+    if (score >= 85) return 'Outstanding';
+    if (score >= 70) return 'Excellent';
+    if (score >= 55) return 'Good';
+    if (score >= 40) return 'Pass';
+    return 'Unclassified';
   };
 
   // Prepare data for charts
@@ -77,10 +93,15 @@ export default function ProjectGraphs() {
     weight: cat.weight
   }));
 
-  const radarChartData = categories.map(cat => ({
-    category: cat.name.split(' ')[0],
-    score: calculateCategoryScore(project[cat.id])
-  }));
+  const radarChartData = categories.map(cat => {
+    const score = calculateCategoryScore(project[cat.id]);
+    return {
+      category: cat.name.split(' ')[0],
+      score: score,
+      rating: getRatingName(score),
+      fullScore: `${score}% - ${getRatingName(score)}`
+    };
+  });
 
   const pieChartData = categories.map(cat => ({
     name: cat.name,
@@ -111,7 +132,7 @@ export default function ProjectGraphs() {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Total Score</p>
-                <p className="text-4xl font-bold text-gray-900">{project.total_score?.toFixed(2)}%</p>
+                <p className="text-4xl font-bold text-gray-900">{project.total_score?.toFixed(1)}%</p>
               </div>
             </div>
           </CardContent>
@@ -145,13 +166,104 @@ export default function ProjectGraphs() {
             <CardContent className="p-6">
               <ResponsiveContainer width="100%" height={400}>
                 <RadarChart data={radarChartData}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="category" />
-                  <PolarRadiusAxis domain={[0, 100]} />
-                  <Radar name="Score" dataKey="score" stroke="#10b981" fill="#10b981" fillOpacity={0.6} />
-                  <Tooltip />
+                  <PolarGrid 
+                    stroke="#d1d5db"
+                    polarRadius={[20, 40, 60, 80, 100]}
+                  />
+                  <PolarAngleAxis 
+                    dataKey="category"
+                    tick={{ fill: '#374151', fontSize: 12 }}
+                  />
+                  <PolarRadiusAxis 
+                    domain={[0, 100]}
+                    tick={{ fill: '#6b7280', fontSize: 10 }}
+                    tickCount={6}
+                  />
+                  {/* Rating bands */}
+                  <Radar 
+                    name="Unclassified (0-40)" 
+                    dataKey={() => 40}
+                    stroke="#ef4444" 
+                    fill="#ef4444" 
+                    fillOpacity={0.1}
+                  />
+                  <Radar 
+                    name="Pass (40-55)" 
+                    dataKey={() => 55}
+                    stroke="#f97316" 
+                    fill="#f97316" 
+                    fillOpacity={0.1}
+                  />
+                  <Radar 
+                    name="Good (55-70)" 
+                    dataKey={() => 70}
+                    stroke="#eab308" 
+                    fill="#eab308" 
+                    fillOpacity={0.1}
+                  />
+                  <Radar 
+                    name="Excellent (70-85)" 
+                    dataKey={() => 85}
+                    stroke="#3b82f6" 
+                    fill="#3b82f6" 
+                    fillOpacity={0.1}
+                  />
+                  <Radar 
+                    name="Outstanding (85-100)" 
+                    dataKey={() => 100}
+                    stroke="#10b981" 
+                    fill="#10b981" 
+                    fillOpacity={0.1}
+                  />
+                  {/* Actual scores */}
+                  <Radar 
+                    name="Score" 
+                    dataKey="score" 
+                    stroke="#059669" 
+                    fill="#10b981" 
+                    fillOpacity={0.6}
+                    strokeWidth={3}
+                  />
+                  <Tooltip 
+                    content={({ payload }) => {
+                      if (payload && payload.length > 0) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-white p-3 border border-emerald-200 rounded-lg shadow-lg">
+                            <p className="font-semibold text-gray-900">{data.category}</p>
+                            <p className="text-emerald-700 font-bold">{data.score}%</p>
+                            <p className="text-sm text-gray-600">{data.rating}</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Legend />
                 </RadarChart>
               </ResponsiveContainer>
+              <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <span>Unclassified (&lt;40)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                  <span>Pass (40-55)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <span>Good (55-70)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                  <span>Excellent (70-85)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span>Outstanding (85+)</span>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -203,7 +315,7 @@ export default function ProjectGraphs() {
                         <span className="font-semibold text-gray-900">{category.name}</span>
                         <div className="flex items-center gap-2">
                           <Badge variant="outline" className="text-xs">Weight: {category.weight}%</Badge>
-                          <Badge className="bg-emerald-600 text-white">{score.toFixed(2)}%</Badge>
+                          <Badge className="bg-emerald-600 text-white">{score.toFixed(1)}%</Badge>
                         </div>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">

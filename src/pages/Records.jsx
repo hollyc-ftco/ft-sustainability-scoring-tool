@@ -103,6 +103,7 @@ export default function Records() {
                   <TableHeader>
                     <TableRow className="bg-gray-50">
                       <TableHead className="font-semibold">Reference</TableHead>
+                      <TableHead className="font-semibold">Project No.</TableHead>
                       <TableHead className="font-semibold">Project Name</TableHead>
                       <TableHead className="font-semibold">Project Owner</TableHead>
                       <TableHead className="font-semibold text-center">Stage</TableHead>
@@ -117,6 +118,9 @@ export default function Records() {
                       <TableRow key={project.id} className="hover:bg-emerald-50/30 transition-colors">
                         <TableCell className="font-medium text-emerald-700">
                           {project.reference || "N/A"}
+                        </TableCell>
+                        <TableCell className="font-medium text-blue-700">
+                          {project.project_number || "N/A"}
                         </TableCell>
                         <TableCell className="font-medium text-gray-900">
                           {project.project_name}
