@@ -55,7 +55,9 @@ export default function AssessmentSummary({
   projectNumber,
   projectName, 
   projectOwner,
-  projectStage
+  createdByName,
+  projectStage,
+  comments
 }) {
   const rating = getRating(parseFloat(totalScore));
   const RatingIcon = rating.icon;
@@ -80,6 +82,10 @@ export default function AssessmentSummary({
             <div>
               <p className="text-sm text-gray-600 mb-1">Project Owner</p>
               <p className="font-semibold text-gray-900">{projectOwner || "Not specified"}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Created By</p>
+              <p className="font-semibold text-gray-900">{createdByName || "Not specified"}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600 mb-1">Project Stage</p>
@@ -118,6 +124,7 @@ export default function AssessmentSummary({
             {categories.map((category) => {
               const categoryScore = calculateCategoryScore(category);
               const percentage = categoryScore.toFixed(2);
+              const categoryComment = comments && comments[category.id];
               
               return (
                 <div key={category.id} className="border border-emerald-100 rounded-xl p-4 bg-white">
@@ -134,12 +141,18 @@ export default function AssessmentSummary({
                       {percentage}%
                     </Badge>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden mb-3">
                     <div
                       className="bg-gradient-to-r from-emerald-500 to-teal-600 h-full rounded-full transition-all duration-500"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
+                  {categoryComment && (
+                    <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-xs font-semibold text-blue-800 mb-1">Comments:</p>
+                      <p className="text-sm text-blue-900">{categoryComment}</p>
+                    </div>
+                  )}
                 </div>
               );
             })}
