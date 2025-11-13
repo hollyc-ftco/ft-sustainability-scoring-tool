@@ -1,3 +1,4 @@
+
 import React from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -152,6 +153,10 @@ export default function ProjectView() {
                 <p className="font-semibold text-gray-900">{project.project_owner}</p>
               </div>
               <div>
+                <p className="text-sm text-gray-600 mb-1">Created By</p>
+                <p className="font-semibold text-gray-900">{project.created_by_name || "Not specified"}</p>
+              </div>
+              <div>
                 <p className="text-sm text-gray-600 mb-1">Project Stage</p>
                 <Badge className={`${
                   project.project_stage === "Tender" ? "bg-blue-100 text-blue-800" :
@@ -214,6 +219,7 @@ export default function ProjectView() {
               {categories.map((category) => {
                 const categoryData = project[category.id];
                 const categoryScore = calculateCategoryScore(categoryData);
+                const categoryComment = project.category_comments && project.category_comments[category.id];
                 
                 return (
                   <div key={category.id} className="border-2 border-emerald-100 rounded-xl overflow-hidden bg-white">
@@ -252,6 +258,12 @@ export default function ProjectView() {
                             </div>
                           ))}
                         </div>
+                        {categoryComment && (
+                          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p className="text-sm font-semibold text-blue-800 mb-2">Comments:</p>
+                            <p className="text-sm text-blue-900 whitespace-pre-wrap">{categoryComment}</p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
