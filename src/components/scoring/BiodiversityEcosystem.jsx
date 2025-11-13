@@ -17,7 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Info } from "lucide-react";
+import { Info, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const priorityScores = {
   1: { label: "Mandatory", score: 1, color: "bg-red-100 text-red-800 border-red-200" },
@@ -357,7 +358,17 @@ export const assessmentSections = {
 };
 
 function AssessmentSection({ section, sectionId, data, onDataChange }) {
-  const [responses, setResponses] = useState(data.responses[sectionId] || {});
+  const [responses, setResponses] = useState(() => {
+    if (data.responses[sectionId]) {
+      return data.responses[sectionId];
+    }
+    // Default all responses to "no"
+    const initial = {};
+    section.items.forEach(item => {
+      initial[item.id] = "no";
+    });
+    return initial;
+  });
   const [priorities, setPriorities] = useState(() => {
     if (data.priorities[sectionId]) {
       return data.priorities[sectionId];
@@ -550,7 +561,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
   );
 }
 
-export default function BiodiversityEcosystem({ data, onDataChange }) {
+export default function BiodiversityEcosystem({ data, onDataChange, onNext }) {
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
@@ -594,6 +605,17 @@ export default function BiodiversityEcosystem({ data, onDataChange }) {
           onDataChange={onDataChange}
         />
       ))}
+
+      <div className="flex justify-end">
+        <Button 
+          onClick={onNext}
+          className="bg-emerald-600 hover:bg-emerald-700"
+          size="lg"
+        >
+          Next: Transport & Mobility
+          <ArrowRight className="w-5 h-5 ml-2" />
+        </Button>
+      </div>
     </div>
   );
 }

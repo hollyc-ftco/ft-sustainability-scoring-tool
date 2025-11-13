@@ -14,6 +14,8 @@ import SocialImpactWellbeing from "../components/scoring/SocialImpactWellbeing";
 import InnovationTechnology from "../components/scoring/InnovationTechnology";
 
 export default function ScoringTool() {
+  const [activeAssessmentTab, setActiveAssessmentTab] = useState("summary");
+  
   const [managementGovernanceData, setManagementGovernanceData] = useState({
     responses: {},
     priorities: {},
@@ -101,7 +103,7 @@ export default function ScoringTool() {
           </TabsContent>
 
           <TabsContent value="assessment">
-            <Tabs defaultValue="summary" className="space-y-6">
+            <Tabs value={activeAssessmentTab} onValueChange={setActiveAssessmentTab} className="space-y-6">
               <TabsList className="bg-white border border-emerald-100 flex-wrap">
                 <TabsTrigger value="summary" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
                   Summary
@@ -149,6 +151,7 @@ export default function ScoringTool() {
                 <ManagementGovernance 
                   data={managementGovernanceData}
                   onDataChange={setManagementGovernanceData}
+                  onNext={() => setActiveAssessmentTab("energy")}
                 />
               </TabsContent>
 
@@ -156,6 +159,7 @@ export default function ScoringTool() {
                 <EnergyCarbonManagement 
                   data={energyCarbonData}
                   onDataChange={setEnergyCarbonData}
+                  onNext={() => setActiveAssessmentTab("water")}
                 />
               </TabsContent>
 
@@ -163,6 +167,7 @@ export default function ScoringTool() {
                 <WaterManagement 
                   data={waterManagementData}
                   onDataChange={setWaterManagementData}
+                  onNext={() => setActiveAssessmentTab("materials")}
                 />
               </TabsContent>
 
@@ -170,6 +175,7 @@ export default function ScoringTool() {
                 <MaterialsResourceEfficiency 
                   data={materialsResourceData}
                   onDataChange={setMaterialsResourceData}
+                  onNext={() => setActiveAssessmentTab("biodiversity")}
                 />
               </TabsContent>
 
@@ -177,6 +183,7 @@ export default function ScoringTool() {
                 <BiodiversityEcosystem 
                   data={biodiversityEcosystemData}
                   onDataChange={setBiodiversityEcosystemData}
+                  onNext={() => setActiveAssessmentTab("transport")}
                 />
               </TabsContent>
 
@@ -184,6 +191,7 @@ export default function ScoringTool() {
                 <TransportMobility 
                   data={transportMobilityData}
                   onDataChange={setTransportMobilityData}
+                  onNext={() => setActiveAssessmentTab("social")}
                 />
               </TabsContent>
 
@@ -191,6 +199,7 @@ export default function ScoringTool() {
                 <SocialImpactWellbeing 
                   data={socialImpactData}
                   onDataChange={setSocialImpactData}
+                  onNext={() => setActiveAssessmentTab("innovation")}
                 />
               </TabsContent>
 
@@ -198,6 +207,7 @@ export default function ScoringTool() {
                 <InnovationTechnology 
                   data={innovationTechnologyData}
                   onDataChange={setInnovationTechnologyData}
+                  onNext={() => setActiveAssessmentTab("summary")}
                 />
               </TabsContent>
             </Tabs>

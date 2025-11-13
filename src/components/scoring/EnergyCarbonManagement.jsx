@@ -17,7 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Info } from "lucide-react";
+import { Info, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const priorityScores = {
   1: { label: "Mandatory", score: 1, color: "bg-red-100 text-red-800 border-red-200" },
@@ -161,7 +162,17 @@ export const assessmentSections = {
 };
 
 function AssessmentSection({ section, sectionId, data, onDataChange }) {
-  const [responses, setResponses] = useState(data.responses[sectionId] || {});
+  const [responses, setResponses] = useState(() => {
+    if (data.responses[sectionId]) {
+      return data.responses[sectionId];
+    }
+    // Default all responses to "no"
+    const initial = {};
+    section.items.forEach(item => {
+      initial[item.id] = "no";
+    });
+    return initial;
+  });
   const [priorities, setPriorities] = useState(() => {
     if (data.priorities[sectionId]) {
       return data.priorities[sectionId];
@@ -195,7 +206,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
       priorities: { ...prev.priorities, [sectionId]: priorities },
       scores: { ...prev.scores, [sectionId]: totalScore }
     }));
-  }, [responses, priorities]);
+  }, [responses, priorities, section.items, sectionId, onDataChange]); // Added onDataChange, section.items, sectionId to dependency array for useEffect hook
 
   const handleResponseChange = (itemId, value) => {
     setResponses(prev => ({
@@ -320,7 +331,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="yes">Yes</SelectItem>
-                          <SelectItem value="no">No</SelectItem> {/* Added "No" option */}
+                          <SelectItem value="no">No</SelectItem>
                           <SelectItem value="not_applicable">Not Applicable</SelectItem>
                         </SelectContent>
                       </Select>
@@ -354,7 +365,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
   );
 }
 
-export default function EnergyCarbonManagement({ data, onDataChange }) {
+export default function EnergyCarbonManagement({ data, onDataChange, onNext }) {
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
@@ -398,6 +409,17 @@ export default function EnergyCarbonManagement({ data, onDataChange }) {
           onDataChange={onDataChange}
         />
       ))}
+
+      <div className="flex justify-end">
+        <Button 
+          onClick={onNext}
+          className="bg-emerald-600 hover:bg-emerald-700"
+          size="lg"
+        >
+          Next: Water Management
+          <ArrowRight className="w-5 h-5 ml-2" />
+        </Button>
+      </div>
     </div>
   );
 }
