@@ -410,30 +410,40 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
     }));
   };
 
-  const calculateScore = (itemId) => {
-    if (responses[itemId] === "yes") {
-      return priorityScores[priorities[itemId]].score;
-    }
-    return 0;
-  };
-
   const calculateTotal = () => {
-    let sumActualScores = 0;
-    let sumPriorityScores = 0;
+    let mandatoryTotal = 0;
+    let mandatoryYes = 0;
+    let nonMandatoryTotal = 0;
+    let nonMandatoryYes = 0;
     
     section.items.forEach(item => {
       if (responses[item.id] !== "not_applicable") {
-        sumPriorityScores += priorityScores[priorities[item.id]].score;
-        
-        if (responses[item.id] === "yes") {
-          sumActualScores += priorityScores[priorities[item.id]].score;
+        if (priorities[item.id] === 1) {
+          mandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            mandatoryYes++;
+          }
+        } else {
+          nonMandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            nonMandatoryYes++;
+          }
         }
       }
     });
     
-    if (sumPriorityScores === 0) return "0.00";
+    let totalScore = 0;
     
-    return ((sumActualScores / sumPriorityScores) * 100).toFixed(2);
+    if (mandatoryTotal > 0 && nonMandatoryTotal > 0) {
+      totalScore = (mandatoryYes / mandatoryTotal) * MANDATORY_WEIGHT + 
+                   (nonMandatoryYes / nonMandatoryTotal) * NON_MANDATORY_WEIGHT;
+    } else if (mandatoryTotal > 0) {
+      totalScore = (mandatoryYes / mandatoryTotal) * 100;
+    } else if (nonMandatoryTotal > 0) {
+      totalScore = (nonMandatoryYes / nonMandatoryTotal) * 100;
+    }
+    
+    return totalScore.toFixed(2);
   };
 
   return (
