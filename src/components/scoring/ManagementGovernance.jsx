@@ -476,7 +476,6 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
             </TableHeader>
             <TableBody>
               {section.items.map((item) => {
-                const score = calculateScore(item.id);
                 const priority = priorities[item.id];
                 const response = responses[item.id] || "";
                 
