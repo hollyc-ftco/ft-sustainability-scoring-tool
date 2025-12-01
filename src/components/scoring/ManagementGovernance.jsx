@@ -519,7 +519,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                         variant={response === "yes" ? "default" : "outline"}
                         className={response === "yes" ? "bg-emerald-600 text-white" : response === "not_applicable" ? "border-gray-300 text-gray-400" : "border-gray-300 text-gray-500"}
                       >
-                        {response === "not_applicable" ? "N/A" : score.toFixed(1)}
+                        {response === "not_applicable" ? "N/A" : response === "yes" ? "✓" : "-"}
                       </Badge>
                     </TableCell>
                   </TableRow>
