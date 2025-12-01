@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,8 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button"; // Added Button import
-import { Info, ArrowRight } from "lucide-react"; // Added ArrowRight import
+import { Button } from "@/components/ui/button";
+import { Info, ArrowRight, Lock } from "lucide-react";
 
 const priorityScores = {
   1: { label: "Mandatory", score: 1, color: "bg-red-100 text-red-800 border-red-200" },
@@ -35,27 +34,104 @@ export const assessmentSections = {
         item: "Consider SDGs",
         description: "Consider SDG goals within project design",
         actions: "Fill in sustainability checklist. Identify actions against each relevant SDG.",
-        defaultPriority: 2
-      },
-      {
-        id: "sdg_9",
-        item: "SDG 9",
-        description: "Consider SDG 9, focusing on reliable, resilient and sustainable infrastructure.",
-        actions: "Quality, reliable, sustainable and resilient new infrastructure. Existing infrastructure retrofitted.",
         defaultPriority: 1
       },
       {
-        id: "sdg_11",
-        item: "SDG 11",
-        description: "Consider SDG 11, focusing on inclusive, safe, resilient and sustainable urban development.",
-        actions: "Ensure access to housing and services for all. Provide access to safe, affordable, accessible and sustainable transport systems for all. Inclusive and sustainable urbanization. Protect the cultural and natural heritage. Pay attention to air quality and waste management. Provide access to green spaces for all.",
-        defaultPriority: 3
+        id: "sdg_9_innovation",
+        item: "SDG 9",
+        description: "Consider SDG 9, focusing on reliable, resilient and sustainable infrastructure.",
+        actions: "Include innovation and resilience in project kick-off meeting.",
+        defaultPriority: 1
       },
       {
-        id: "sdg_12",
+        id: "sdg_9_frameworks",
+        item: "SDG 9",
+        description: "Consider SDG 9, focusing on reliable, resilient and sustainable infrastructure.",
+        actions: "Consider the use of Irish specific frameworks for innovation such as BREEAM Infrastructure, TII sustainability toolkit etc.",
+        defaultPriority: 2
+      },
+      {
+        id: "sdg_9_bim",
+        item: "SDG 9",
+        description: "Consider SDG 9, focusing on reliable, resilient and sustainable infrastructure.",
+        actions: "Comply with BIM requirements.",
+        defaultPriority: 2
+      },
+      {
+        id: "sdg_11_nature",
+        item: "SDG 11",
+        description: "Consider SDG 11, focusing on inclusive, safe, resilient and sustainable urban development.",
+        actions: "Consider Nature-based solutions and Biodiversity Net Gain at kick-off stage.",
+        defaultPriority: 2
+      },
+      {
+        id: "sdg_11_pollinator",
+        item: "SDG 11",
+        description: "Consider SDG 11, focusing on inclusive, safe, resilient and sustainable urban development.",
+        actions: "Check alignment with NPWS All-Ireland Pollinator Plan at Kick-off stage.",
+        defaultPriority: 2
+      },
+      {
+        id: "sdg_11_natura",
+        item: "SDG 11",
+        description: "Consider SDG 11, focusing on inclusive, safe, resilient and sustainable urban development.",
+        actions: "Ensure compliance with Natura 2000 assessment processes.",
+        defaultPriority: 2
+      },
+      {
+        id: "sdg_11_suds",
+        item: "SDG 11",
+        description: "Consider SDG 11, focusing on inclusive, safe, resilient and sustainable urban development.",
+        actions: "Consider SUDS and/or flood resilience at kick-off stage.",
+        defaultPriority: 2
+      },
+      {
+        id: "sdg_11_archaeology",
+        item: "SDG 11",
+        description: "Consider SDG 11, focusing on inclusive, safe, resilient and sustainable urban development.",
+        actions: "Where appropriate consider archaeological heritage at kick-off stage.",
+        defaultPriority: 2
+      },
+      {
+        id: "sdg_11_landscape",
+        item: "SDG 11",
+        description: "Consider SDG 11, focusing on inclusive, safe, resilient and sustainable urban development.",
+        actions: "Where appropriate consider landscape visual impact/design at kick-off stage.",
+        defaultPriority: 2
+      },
+      {
+        id: "sdg_11_safety",
+        item: "SDG 11",
+        description: "Consider SDG 11, focusing on inclusive, safe, resilient and sustainable urban development.",
+        actions: "Consider safety & social equity in design at kick-off stage.",
+        defaultPriority: 2
+      },
+      {
+        id: "sdg_12_resources",
         item: "SDG 12",
         description: "Consider SDG 12, focusing on waste reduction and implementing sustainable practices.",
-        actions: "Implement sustainable management and the efficient use of natural resources. Reduce waste by recycling and reusing.",
+        actions: "Consider sustainable management and the efficient use of natural resources at Kick-off stage. Reduce waste by recycling and reusing.",
+        defaultPriority: 2
+      },
+      {
+        id: "sdg_12_kpis",
+        item: "SDG 12",
+        description: "Consider SDG 12, focusing on waste reduction and implementing sustainable practices.",
+        actions: "Set up system of Project KPIs for waste and materials (e.g. % reduction in virgin materials, % reuse on site, embodied carbon savings).",
+        defaultPriority: 2
+      },
+      {
+        id: "sdg_12_circular",
+        item: "SDG 12",
+        description: "Consider SDG 12, focusing on waste reduction and implementing sustainable practices.",
+        actions: "Consider circular economy at kick-off stage (e.g. deconstruction plans, modular construction, use of reclaimed materials).",
+        defaultPriority: 2
+      },
+      {
+        id: "sdg_12_carbon",
+        item: "SDG 12",
+        description: "Consider SDG 12, focusing on waste reduction and implementing sustainable practices.",
+        actions: "Consider Carbon Accounting and/or life cycle assessment (LCA) at Kick-off stage.",
         defaultPriority: 2
       }
     ]
@@ -67,7 +143,7 @@ export const assessmentSections = {
         id: "env_impacts_assessment",
         item: "Environmental impacts and benefits assessment",
         description: "Undertake an environmental impacts and benefits assessment of the project on a wider scope than the project owner's interests.",
-        actions: "Prepare EIAs. Align with ISO 14001. List environmental impacts and benefits: soil contamination, biodiversity effects, habitat destruction/creation, noise pollution, emissions, etc.",
+        actions: "Prepare EIAs or most appropriate environmental assessment. Align with ISO 14001. List environmental impacts and benefits: soil contamination, biodiversity effects, habitat destruction/creation, noise pollution, emissions, etc.",
         defaultPriority: 1
       },
       {
@@ -89,21 +165,21 @@ export const assessmentSections = {
         item: "Environmental and social aspects assessment",
         description: "Consider and assess the environmental and social aspects of the project.",
         actions: "Prepare ESIAs. Record the results and prepare mitigation options. Consider biodiversity, soil & water quality, ecosystem services, natural processes. Consider public health & wellbeing, cultural & natural heritage, social equity.",
-        defaultPriority: 1
+        defaultPriority: 2
       },
       {
         id: "coordination",
         item: "Co-ordination of environmental and social aspects",
         description: "A member of the project team was appointed as responsible for co-ordinating the management of the environmental and social aspects of the project.",
-        actions: "For large projects have an individual whose sole responsibility is environmental and social co-ordiantion. For smaller projects designate an individual whose responsibilities will include environmental and social co-ordination.",
+        actions: "For large projects have an individual whose sole responsibility is environmental and social co-ordination. For smaller projects designate an individual whose responsibilities will include environmental and social co-ordination.",
         defaultPriority: 2
       },
       {
         id: "sustainability_mechanisms",
         item: "Sustainability management mechanisms",
         description: "Appropriate mechanics were put in place to manage the project's environmental and social risks, impacts and opportunities.",
-        actions: "Prepare Project Environmental Managment Plans focusing on sustainable supply-chain, ethical sourcing, waste managment, energy management, water management, ethical labour practices, work-life balance, community engagement.",
-        defaultPriority: 1
+        actions: "Prepare Project Environmental Management Plans focusing on sustainable supply-chain, ethical sourcing, waste management, energy management, water management, ethical labour practices, work-life balance, community engagement.",
+        defaultPriority: 2
       },
       {
         id: "implementation_mechanisms",
@@ -130,7 +206,7 @@ export const assessmentSections = {
         id: "project_communications",
         item: "Project team communications",
         description: "At each project stage, all those directly engaged in the project have been informed of the environmental impacts and opportunities, and associated social issues, of their part or stage of the project.",
-        actions: "Include and emphasise environmental and soical impacts management results in contracts, reports, project team meetings, project reviews.",
+        actions: "Include and emphasise environmental and social impacts management results in contracts, reports, project team meetings, project reviews.",
         defaultPriority: 2
       },
       {
@@ -164,7 +240,7 @@ export const assessmentSections = {
         item: "Communication",
         description: "Establish clear, consistent and transparent communication with stakeholders and ensure that the sustainability goals are communicated frequently. Engage early in the design and decision-making process and schedule regular meetings.",
         actions: "Regular reports/presentations/briefings/meetings. Receive and analyse feedback.",
-        defaultPriority: 2
+        defaultPriority: 1
       },
       {
         id: "engagement_approaches",
@@ -183,7 +259,7 @@ export const assessmentSections = {
       {
         id: "monitor_engagement",
         item: "Monitor engagement",
-        description: "Regularly monitor and evaluate the effectiveness of the stakeholder engagement strategies. Use feedback from stakeholers to continuously improve approach.",
+        description: "Regularly monitor and evaluate the effectiveness of the stakeholder engagement strategies. Use feedback from stakeholders to continuously improve approach.",
         actions: "Use feedback from stakeholders. Analyse results. Adjust engagement practices if necessary.",
         defaultPriority: 2
       }
@@ -195,8 +271,8 @@ export const assessmentSections = {
       {
         id: "npf_requirements",
         item: "NPF environmental assessment requirements",
-        description: "Ensure that if the project is requiring consent arising from from the NPF, it is subject to relevant environmental assessment reuirements, including SEA, EIA, SFRA and AA.",
-        actions: "Conduct screening report based on project type, scale and location. Complete the relevant Enviromental assessments outlined in the description",
+        description: "Ensure that if the project is requiring consent arising from the NPF, it is subject to relevant environmental assessment requirements, including SEA, EIA, SFRA and AA.",
+        actions: "Conduct screening report based on project type, scale and location. Complete the relevant Environmental assessments outlined in the description.",
         defaultPriority: 1
       },
       {
@@ -204,7 +280,7 @@ export const assessmentSections = {
         item: "Population increase",
         description: "Ensure that the proposed population growth of 950k by 2040 has been taken into account in planning. Take into account the differing growth rates between the regions.",
         actions: "Identify location of project and corresponding population change estimates. Adapt to a growing population: more traffic, more residents, more businesses. Promote urbanization.",
-        defaultPriority: 2
+        defaultPriority: 1
       },
       {
         id: "compact_growth",
@@ -224,15 +300,15 @@ export const assessmentSections = {
         id: "communities",
         item: "Communities",
         description: "Does the project offer inclusiveness for people of age and people with disability?",
-        actions: "Provide accessibility, wide pavements, tactile covers, community spaces, proximity to amenities",
+        actions: "Provide accessibility, wide pavements, tactile covers, community spaces, proximity to amenities.",
         defaultPriority: 2
       },
       {
         id: "reducing_carbon",
         item: "Reducing carbon footprint",
         description: "Integrate climate action into planning.",
-        actions: "Reduce energy consumption, use renewable energy, prioritise local suppliers & workforce, reuse & recycle, sustainable material use, carbon offsetting",
-        defaultPriority: 1
+        actions: "Reduce energy consumption, use renewable energy, prioritise local suppliers & workforce, reuse & recycle, sustainable material use, carbon offsetting.",
+        defaultPriority: 2
       },
       {
         id: "waste_management",
@@ -250,7 +326,6 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
     if (data.responses[sectionId]) {
       return data.responses[sectionId];
     }
-    // Default all responses to "no"
     const initial = {};
     section.items.forEach(item => {
       initial[item.id] = "no";
@@ -273,7 +348,6 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
     let sumPriorityScores = 0;
     
     section.items.forEach(item => {
-      // Only include items that are not marked as "Not Applicable"
       if (responses[item.id] !== "not_applicable") {
         sumPriorityScores += priorityScores[priorities[item.id]].score;
         
@@ -291,19 +365,12 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
       priorities: { ...prev.priorities, [sectionId]: priorities },
       scores: { ...prev.scores, [sectionId]: totalScore }
     }));
-  }, [responses, priorities, section.items, sectionId, onDataChange]); // Added dependencies to useEffect
+  }, [responses, priorities, section.items, sectionId, onDataChange]);
 
   const handleResponseChange = (itemId, value) => {
     setResponses(prev => ({
       ...prev,
       [itemId]: value
-    }));
-  };
-
-  const handlePriorityChange = (itemId, priority) => {
-    setPriorities(prev => ({
-      ...prev,
-      [itemId]: parseInt(priority)
     }));
   };
 
@@ -351,7 +418,12 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                 <TableHead className="w-32">Item</TableHead>
                 <TableHead className="w-1/4">Description</TableHead>
                 <TableHead className="w-1/3">Actions</TableHead>
-                <TableHead className="text-center w-40">Priority</TableHead>
+                <TableHead className="text-center w-40">
+                  <div className="flex items-center justify-center gap-1">
+                    Priority
+                    <Lock className="w-3 h-3 text-gray-400" />
+                  </div>
+                </TableHead>
                 <TableHead className="text-center w-32">Response</TableHead>
                 <TableHead className="text-center w-24">Score</TableHead>
               </TableRow>
@@ -374,37 +446,12 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                       {item.actions}
                     </TableCell>
                     <TableCell className="text-center">
-                      <Select
-                        value={priority.toString()}
-                        onValueChange={(value) => handlePriorityChange(item.id, value)}
-                      >
-                        <SelectTrigger className="w-full border-emerald-200">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-red-100 text-red-800 border border-red-200 text-xs">
-                                1 - Mandatory
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="2">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-blue-100 text-blue-800 border border-blue-200 text-xs">
-                                2 - Best Practice
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="3">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-green-100 text-green-800 border border-green-200 text-xs">
-                                3 - Stretch Goal
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center justify-center gap-1">
+                        <Badge className={`${priorityScores[priority].color} border text-xs`}>
+                          {priority} - {priorityScores[priority].label}
+                        </Badge>
+                        <Lock className="w-3 h-3 text-gray-300" />
+                      </div>
                     </TableCell>
                     <TableCell className="text-center">
                       <Select
@@ -450,7 +497,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
   );
 }
 
-export default function ManagementGovernance({ data, onDataChange, onNext }) { // Added onNext prop
+export default function ManagementGovernance({ data, onDataChange, onNext }) {
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
@@ -479,7 +526,7 @@ export default function ManagementGovernance({ data, onDataChange, onNext }) { /
               </div>
             </div>
             <p className="text-sm text-gray-700 mt-2">
-              <strong>Note:</strong> Items marked as "Not Applicable" are excluded from the total score calculation.
+              <strong>Note:</strong> Items marked as "Not Applicable" are excluded from the total score calculation. Priority values are locked and cannot be modified.
             </p>
           </div>
         </div>
