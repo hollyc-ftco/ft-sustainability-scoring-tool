@@ -20,10 +20,15 @@ import { Button } from "@/components/ui/button";
 import { Info, ArrowRight, Lock } from "lucide-react";
 
 const priorityScores = {
-  1: { label: "Mandatory", score: 1, color: "bg-red-100 text-red-800 border-red-200" },
-  2: { label: "Best Practice", score: 0.6, color: "bg-blue-100 text-blue-800 border-blue-200" },
-  3: { label: "Stretch Goal", score: 0.3, color: "bg-green-100 text-green-800 border-green-200" }
+  1: { label: "Mandatory", color: "bg-red-100 text-red-800 border-red-200" },
+  2: { label: "Best Practice", color: "bg-blue-100 text-blue-800 border-blue-200" },
+  3: { label: "Stretch Goal", color: "bg-green-100 text-green-800 border-green-200" }
 };
+
+// Mandatory items (Priority 1) = 40% of total score
+// Best Practice (Priority 2) + Stretch Goal (Priority 3) = 60% of total score
+const MANDATORY_WEIGHT = 40;
+const NON_MANDATORY_WEIGHT = 60;
 
 export const assessmentSections = {
   sdg_alignment: {
