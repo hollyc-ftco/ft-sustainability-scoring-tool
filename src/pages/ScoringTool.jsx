@@ -104,32 +104,32 @@ export default function ScoringTool() {
 
           <TabsContent value="assessment">
             <Tabs value={activeAssessmentTab} onValueChange={setActiveAssessmentTab} className="space-y-6">
-              <TabsList className="bg-white border border-emerald-100 flex-wrap">
-                <TabsTrigger value="summary" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+              <TabsList className="bg-white border border-emerald-100 flex-wrap h-auto p-1 gap-1">
+                <TabsTrigger value="summary" className="data-[state=active]:bg-gray-600 data-[state=active]:text-white">
                   Summary
                 </TabsTrigger>
-                <TabsTrigger value="management" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                <TabsTrigger value="management" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                   Management and Governance
                 </TabsTrigger>
-                <TabsTrigger value="energy" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                <TabsTrigger value="energy" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
                   Energy & Carbon Management
                 </TabsTrigger>
-                <TabsTrigger value="water" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                <TabsTrigger value="water" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">
                   Water Management
                 </TabsTrigger>
-                <TabsTrigger value="materials" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                <TabsTrigger value="materials" className="data-[state=active]:bg-amber-600 data-[state=active]:text-white">
                   Materials & Resource Efficiency
                 </TabsTrigger>
-                <TabsTrigger value="biodiversity" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                <TabsTrigger value="biodiversity" className="data-[state=active]:bg-green-600 data-[state=active]:text-white">
                   Biodiversity & Ecosystem
                 </TabsTrigger>
-                <TabsTrigger value="transport" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                <TabsTrigger value="transport" className="data-[state=active]:bg-red-500 data-[state=active]:text-white">
                   Transport & Mobility
                 </TabsTrigger>
-                <TabsTrigger value="social" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                <TabsTrigger value="social" className="data-[state=active]:bg-pink-500 data-[state=active]:text-white">
                   Social Impact & Wellbeing
                 </TabsTrigger>
-                <TabsTrigger value="innovation" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
+                <TabsTrigger value="innovation" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
                   Innovation & Technology
                 </TabsTrigger>
               </TabsList>

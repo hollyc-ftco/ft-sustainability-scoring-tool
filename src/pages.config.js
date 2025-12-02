@@ -5,7 +5,7 @@ import ProjectView from './pages/ProjectView';
 import ProjectGraphs from './pages/ProjectGraphs';
 import EditProject from './pages/EditProject';
 import Reports from './pages/Reports';
-import Layout from './Layout.jsx';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
@@ -21,5 +21,5 @@ export const PAGES = {
 export const pagesConfig = {
     mainPage: "Dashboard",
     Pages: PAGES,
-    Layout: Layout,
+    Layout: __Layout,
 };
