@@ -42,11 +42,18 @@ export const assessmentSections = {
         defaultPriority: 2
       },
       {
+        id: "technology_integration",
+        item: "Technology Integration",
+        description: "Consideration given to technology integration in project design.",
+        actions: "Consider the use of technological integrations in the project delivery at kick-off stage.",
+        defaultPriority: 1
+      },
+      {
         id: "digital_twin",
         item: "Digital Twin Integration",
         description: "Use real-time data and modelling to improve asset performance.",
         actions: "Link BIM with IoT sensors to track conditions; simulate asset use scenarios; apply to predictive maintenance and performance optimisation.",
-        defaultPriority: 3
+        defaultPriority: 2
       },
       {
         id: "carbon_dashboards",
@@ -67,7 +74,7 @@ export const assessmentSections = {
         item: "Artificial Intelligence",
         description: "Provide training to utilise AI to undertake tasks including creating drawings, suggesting design options, analysing and filtering data. Follow the developments in AI technologies and identify new area it can be utilised in.",
         actions: "Integrate AI tools for generative design, cost estimation, and risk analysis. Automate data filtering and submittal reviews. Monitor AI developments and trial new tools annually.",
-        defaultPriority: 2
+        defaultPriority: 3
       },
       {
         id: "sustainable_materials",
@@ -101,6 +108,13 @@ export const assessmentSections = {
         description: "Protect, promote and create green areas with a healthy ecosystem both on large scale by preserving protected areas, river basins, pasture, low-intensity agricultural areas, etc.; and on the local scale by maintaining and creating biodiversity-rich parks, gardens, green roofs, meadows, hedgerows, etc.",
         actions: "Preserve or enhance wetlands, woodlands, and riparian habitats. Include native planting in landscape plans. Avoid fragmentation by minimising footprint on ecologically rich areas.",
         defaultPriority: 2
+      },
+      {
+        id: "green_infrastructure_consideration",
+        item: "Green Infrastructure",
+        description: "Consideration given to green infrastructure in project design.",
+        actions: "Consider the integration of Green Infrastructure into the project at all stages.",
+        defaultPriority: 1
       },
       {
         id: "green_network",
@@ -143,11 +157,18 @@ export const assessmentSections = {
     title: "Construction Techniques",
     items: [
       {
-        id: "prefabrication",
-        item: "Prefabrication",
+        id: "innovation",
+        item: "Innovation",
         description: "Implement modern construction techniques in design phase, including modular design, pre-cast solutions or 3D-printed sections to reduce waste, energy consumption and site pollution.",
         actions: "Design components for modular/precast/off-site fabrication. Conduct DFMA (Design for Manufacture and Assembly) reviews. Minimise on-site wet trades and emissions.",
         defaultPriority: 2
+      },
+      {
+        id: "construction_techniques_consideration",
+        item: "Construction Techniques",
+        description: "Consider innovative and sustainable construction techniques at all project stages.",
+        actions: "Consider innovative and sustainable construction techniques at all project stages.",
+        defaultPriority: 1
       },
       {
         id: "hybrid_concrete",
@@ -168,21 +189,21 @@ export const assessmentSections = {
         item: "3D printing",
         description: "Explore options to implement 3D-printed elements in structures.",
         actions: "Pilot 3D-printed formwork or structural elements in minor works. Monitor developments for large-scale printable components (e.g., walls, street furniture).",
-        defaultPriority: 3
+        defaultPriority: 2
       },
       {
         id: "self_healing_concrete",
         item: "Self-healing concrete",
         description: "Explore the options and assess the feasibility of using self-healing concrete to promote structure lifespans.",
         actions: "Specify self-healing mixes for key durability zones (e.g., basements, retaining walls). Collaborate with research institutions for pilot trials. Monitor performance over life-cycle.",
-        defaultPriority: 3
+        defaultPriority: 2
       },
       {
         id: "robotics",
         item: "Robotics",
         description: "Explore options to implement robots in the construction stage, substituting humans in carrying out repetitive or hazardous tasks.",
         actions: "Use robots for repetitive or hazardous tasks (rebar tying, inspection, concrete printing). Evaluate cost-benefit and safety improvements. Integrate with BIM for task automation.",
-        defaultPriority: 3
+        defaultPriority: 2
       }
     ]
   }
