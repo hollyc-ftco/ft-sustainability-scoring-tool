@@ -417,7 +417,7 @@ export default function EnergyCarbonManagement({ data, onDataChange, onNext }) {
               </div>
             </div>
             <p className="text-sm text-gray-700 mt-2">
-              <strong>Note:</strong> Items marked as "Not Applicable" are excluded from the total score calculation.
+              <strong>Note:</strong> Mandatory items (Priority 1) constitute 40% of the subcategory score. Best Practice and Stretch Goal items make up the remaining 60%. Items marked as "Not Applicable" are excluded from calculations. Priority values are locked.
             </p>
           </div>
         </div>
