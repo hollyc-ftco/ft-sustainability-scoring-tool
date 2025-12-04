@@ -310,7 +310,12 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                 <TableHead className="w-32">Item</TableHead>
                 <TableHead className="w-1/4">Description</TableHead>
                 <TableHead className="w-1/3">Actions</TableHead>
-                <TableHead className="text-center w-40">Priority</TableHead>
+                <TableHead className="text-center w-40">
+                  <div className="flex items-center justify-center gap-1">
+                    Priority
+                    <Lock className="w-3 h-3 text-gray-400" />
+                  </div>
+                </TableHead>
                 <TableHead className="text-center w-32">Response</TableHead>
                 <TableHead className="text-center w-24">Score</TableHead>
               </TableRow>
