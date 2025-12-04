@@ -1,17 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RatingScale from "../components/scoring/RatingScale";
 import CategoryBreakdown from "../components/scoring/CategoryBreakdown";
 import AssessmentForm from "../components/scoring/AssessmentForm";
-import ManagementGovernance from "../components/scoring/ManagementGovernance";
-import EnergyCarbonManagement from "../components/scoring/EnergyCarbonManagement";
-import WaterManagement from "../components/scoring/WaterManagement";
-import MaterialsResourceEfficiency from "../components/scoring/MaterialsResourceEfficiency";
-import BiodiversityEcosystem from "../components/scoring/BiodiversityEcosystem";
-import TransportMobility from "../components/scoring/TransportMobility";
-import SocialImpactWellbeing from "../components/scoring/SocialImpactWellbeing";
-import InnovationTechnology from "../components/scoring/InnovationTechnology";
+import ManagementGovernance, { assessmentSections as mgSections } from "../components/scoring/ManagementGovernance";
+import EnergyCarbonManagement, { assessmentSections as ecSections } from "../components/scoring/EnergyCarbonManagement";
+import WaterManagement, { assessmentSections as wmSections } from "../components/scoring/WaterManagement";
+import MaterialsResourceEfficiency, { assessmentSections as mrSections } from "../components/scoring/MaterialsResourceEfficiency";
+import BiodiversityEcosystem, { assessmentSections as beSections } from "../components/scoring/BiodiversityEcosystem";
+import TransportMobility, { assessmentSections as tmSections } from "../components/scoring/TransportMobility";
+import SocialImpactWellbeing, { assessmentSections as siSections } from "../components/scoring/SocialImpactWellbeing";
+import InnovationTechnology, { assessmentSections as itSections } from "../components/scoring/InnovationTechnology";
+import MandatoryCheckDialog from "../components/scoring/MandatoryCheckDialog";
 
 export default function ScoringTool() {
   const [activeAssessmentTab, setActiveAssessmentTab] = useState("summary");
@@ -63,6 +64,69 @@ export default function ScoringTool() {
     priorities: {},
     scores: {}
   });
+
+  const [mandatoryDialogOpen, setMandatoryDialogOpen] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState(null);
+  const [dialogData, setDialogData] = useState({ missingMandatory: [], currentScore: 0, sectionName: "" });
+  const [sectionReasons, setSectionReasons] = useState({});
+
+  const checkMandatoryRequirements = useCallback((data, sections, sectionName) => {
+    const missingMandatory = [];
+    let totalScore = 0;
+    let sectionCount = 0;
+
+    Object.entries(sections).forEach(([sectionId, section]) => {
+      const responses = data.responses[sectionId] || {};
+      const priorities = data.priorities[sectionId] || {};
+      const sectionScore = data.scores[sectionId] || 0;
+      
+      totalScore += sectionScore;
+      sectionCount++;
+
+      section.items.forEach(item => {
+        const priority = priorities[item.id] || item.defaultPriority;
+        const response = responses[item.id];
+        
+        if (priority === 1 && response !== "yes" && response !== "not_applicable") {
+          missingMandatory.push(item.item);
+        }
+      });
+    });
+
+    const avgScore = sectionCount > 0 ? totalScore / sectionCount : 0;
+    return { missingMandatory, avgScore };
+  }, []);
+
+  const handleNavigationWithCheck = useCallback((currentData, sections, sectionName, nextTab) => {
+    const { missingMandatory, avgScore } = checkMandatoryRequirements(currentData, sections, sectionName);
+    
+    if (missingMandatory.length > 0 || avgScore < 40) {
+      setDialogData({ missingMandatory, currentScore: avgScore, sectionName });
+      setPendingNavigation(nextTab);
+      setMandatoryDialogOpen(true);
+    } else {
+      setActiveAssessmentTab(nextTab);
+    }
+  }, [checkMandatoryRequirements]);
+
+  const handleDialogConfirm = (reason) => {
+    if (reason) {
+      setSectionReasons(prev => ({
+        ...prev,
+        [dialogData.sectionName]: reason
+      }));
+    }
+    setMandatoryDialogOpen(false);
+    if (pendingNavigation) {
+      setActiveAssessmentTab(pendingNavigation);
+      setPendingNavigation(null);
+    }
+  };
+
+  const handleDialogCancel = () => {
+    setMandatoryDialogOpen(false);
+    setPendingNavigation(null);
+  };
 
   return (
     <div className="p-6 md:p-10">
@@ -151,7 +215,7 @@ export default function ScoringTool() {
                 <ManagementGovernance 
                   data={managementGovernanceData}
                   onDataChange={setManagementGovernanceData}
-                  onNext={() => setActiveAssessmentTab("energy")}
+                  onNext={() => handleNavigationWithCheck(managementGovernanceData, mgSections, "Management & Governance", "energy")}
                 />
               </TabsContent>
 
@@ -159,7 +223,7 @@ export default function ScoringTool() {
                 <EnergyCarbonManagement 
                   data={energyCarbonData}
                   onDataChange={setEnergyCarbonData}
-                  onNext={() => setActiveAssessmentTab("water")}
+                  onNext={() => handleNavigationWithCheck(energyCarbonData, ecSections, "Energy & Carbon Management", "water")}
                 />
               </TabsContent>
 
@@ -167,7 +231,7 @@ export default function ScoringTool() {
                 <WaterManagement 
                   data={waterManagementData}
                   onDataChange={setWaterManagementData}
-                  onNext={() => setActiveAssessmentTab("materials")}
+                  onNext={() => handleNavigationWithCheck(waterManagementData, wmSections, "Water Management", "materials")}
                 />
               </TabsContent>
 
@@ -175,7 +239,7 @@ export default function ScoringTool() {
                 <MaterialsResourceEfficiency 
                   data={materialsResourceData}
                   onDataChange={setMaterialsResourceData}
-                  onNext={() => setActiveAssessmentTab("biodiversity")}
+                  onNext={() => handleNavigationWithCheck(materialsResourceData, mrSections, "Materials & Resource Efficiency", "biodiversity")}
                 />
               </TabsContent>
 
@@ -183,7 +247,7 @@ export default function ScoringTool() {
                 <BiodiversityEcosystem 
                   data={biodiversityEcosystemData}
                   onDataChange={setBiodiversityEcosystemData}
-                  onNext={() => setActiveAssessmentTab("transport")}
+                  onNext={() => handleNavigationWithCheck(biodiversityEcosystemData, beSections, "Biodiversity & Ecosystem", "transport")}
                 />
               </TabsContent>
 
@@ -191,7 +255,7 @@ export default function ScoringTool() {
                 <TransportMobility 
                   data={transportMobilityData}
                   onDataChange={setTransportMobilityData}
-                  onNext={() => setActiveAssessmentTab("social")}
+                  onNext={() => handleNavigationWithCheck(transportMobilityData, tmSections, "Transport & Mobility", "social")}
                 />
               </TabsContent>
 
@@ -199,7 +263,7 @@ export default function ScoringTool() {
                 <SocialImpactWellbeing 
                   data={socialImpactData}
                   onDataChange={setSocialImpactData}
-                  onNext={() => setActiveAssessmentTab("innovation")}
+                  onNext={() => handleNavigationWithCheck(socialImpactData, siSections, "Social Impact & Wellbeing", "innovation")}
                 />
               </TabsContent>
 
@@ -207,12 +271,22 @@ export default function ScoringTool() {
                 <InnovationTechnology 
                   data={innovationTechnologyData}
                   onDataChange={setInnovationTechnologyData}
-                  onNext={() => setActiveAssessmentTab("summary")}
+                  onNext={() => handleNavigationWithCheck(innovationTechnologyData, itSections, "Innovation & Technology", "summary")}
                 />
               </TabsContent>
             </Tabs>
           </TabsContent>
         </Tabs>
+
+        <MandatoryCheckDialog
+          open={mandatoryDialogOpen}
+          onOpenChange={setMandatoryDialogOpen}
+          onConfirm={handleDialogConfirm}
+          onCancel={handleDialogCancel}
+          missingMandatory={dialogData.missingMandatory}
+          currentScore={dialogData.currentScore}
+          sectionName={dialogData.sectionName}
+        />
       </div>
     </div>
   );
