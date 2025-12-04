@@ -322,8 +322,9 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
             </TableHeader>
             <TableBody>
               {section.items.map((item) => {
-                const priority = priorities[item.id];
+                const priority = priorities[item.id] || item.defaultPriority;
                 const response = responses[item.id] || "";
+                const priorityData = priorityScores[priority] || priorityScores[2];
                 
                 return (
                   <TableRow key={item.id} className="hover:bg-emerald-50/30">
@@ -338,8 +339,8 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-1">
-                        <Badge className={`${priorityScores[priority].color} border text-xs`}>
-                          {priority} - {priorityScores[priority].label}
+                        <Badge className={`${priorityData.color} border text-xs`}>
+                          {priority} - {priorityData.label}
                         </Badge>
                         <Lock className="w-3 h-3 text-gray-300" />
                       </div>
