@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Info, ArrowRight } from "lucide-react";
+import { Info, ArrowRight, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const priorityScores = {
@@ -25,6 +24,11 @@ const priorityScores = {
   2: { label: "Best Practice", score: 0.6, color: "bg-blue-100 text-blue-800 border-blue-200" },
   3: { label: "Stretch Goal", score: 0.3, color: "bg-green-100 text-green-800 border-green-200" }
 };
+
+// Mandatory items (Priority 1) = 40% of total score
+// Best Practice (Priority 2) + Stretch Goal (Priority 3) = 60% of total score
+const MANDATORY_WEIGHT = 40;
+const NON_MANDATORY_WEIGHT = 60;
 
 export const assessmentSections = {
   material_selection: {
@@ -35,7 +39,7 @@ export const assessmentSections = {
         item: "Project resources strategy",
         description: "Prepare and implement a project resources strategy in line with guidance and covering aspects including energy, water, materials sourcing, reuse & recycling and wastes management.",
         actions: "Monitor and report on waste generation and resource. Targets for material reuse and recycling during design and construction. Use WRAP's Net Waste Tool or similar for baseline and tracking.",
-        defaultPriority: 1
+        defaultPriority: 2
       },
       {
         id: "supporting_resource_efficiency",
@@ -45,18 +49,25 @@ export const assessmentSections = {
         defaultPriority: 2
       },
       {
-        id: "embodied_carbon_materials",
+        id: "embodied_carbon_materials_basic",
+        item: "Embodied Carbon of Materials",
+        description: "Measure and reduce embodied carbon associated with material production and transport.",
+        actions: "Conduct basic life cycle assessment / consider low-carbon materials. Identify opportunities and discuss with client.",
+        defaultPriority: 1
+      },
+      {
+        id: "embodied_carbon_materials_lca",
         item: "Embodied Carbon of Materials",
         description: "Measure and reduce embodied carbon associated with material production and transport.",
         actions: "Conduct Life Cycle Assessment (LCA); select low-carbon materials; apply PAS 2080 methodology; use recycled/reused components.",
-        defaultPriority: 1
+        defaultPriority: 2
       },
       {
         id: "policies_targets_efficiency",
         item: "Policies and targets for resource efficiency",
         description: "Use materials effectively, reduce waste, use water efficiently, use energy efficiently, reduce carbon emissions.",
         actions: "Material waste and water use targets.",
-        defaultPriority: 1
+        defaultPriority: 2
       },
       {
         id: "material_efficiency_plan",
@@ -84,14 +95,14 @@ export const assessmentSections = {
         item: "Responsible sourcing",
         description: "Consider the chain of custody of the material and the environmental credentials of the product supplier, including certifications for timber and other environmental certifications.",
         actions: "Require Environmental certifications. Check chain of custody for critical materials to ensure sustainability. Apply BES 6001 or ISO 20400 in supply chain management.",
-        defaultPriority: 1
+        defaultPriority: 2
       },
       {
         id: "fabrication_process",
         item: "Fabrication process",
         description: "Consideration should be given to how the structure will be constructed to ensure that construction waste is minimised.",
         actions: "Low-waste fabrication process.",
-        defaultPriority: 2
+        defaultPriority: 3
       }
     ]
   },
@@ -108,7 +119,7 @@ export const assessmentSections = {
       {
         id: "permitting_waste",
         item: "Permitting for waste treated or used on site",
-        description: "Permits, licenses an exemptions have been obtained for waste that has been treated on site or for waste transported to site.",
+        description: "Permits, licenses and exemptions have been obtained for waste that has been treated on site or for waste transported to site.",
         actions: "Secure permits that support sustainable on-site treatment or reuse of waste. Design processes to reuse materials on-site where possible",
         defaultPriority: 1
       },
@@ -124,7 +135,7 @@ export const assessmentSections = {
         item: "Site waste management planning",
         description: "A site waste management plan has been prepared. Targets and key performance indicators for waste reduction and recovery have been met.",
         actions: "Targets for recycling, reuse and waste prevention. Circular economy measures.",
-        defaultPriority: 1
+        defaultPriority: 2
       },
       {
         id: "clearance_vegetation",
@@ -167,11 +178,18 @@ export const assessmentSections = {
         defaultPriority: 2
       },
       {
+        id: "waste_hierarchy",
+        item: "Waste Hierarchy",
+        description: "The carrying out of material/waste management in line with the 'Waste Hierarchy' has been promoted during the design process. Opportunities for waste prevention and material reuse have been explored and availed of, where feasible. Waste reuse, recovery and recycling have been promoted. Disposal of waste to landfill has been avoided, wherever possible.",
+        actions: "Consideration of circular economy principles in design.",
+        defaultPriority: 2
+      },
+      {
         id: "circular_design_principles",
         item: "Circular Economy Design Principles",
         description: "Integrate design strategies to retain material value and enable reuse, remanufacture, and recycling.",
-        actions: "Avoid composite or difficult-to-dismantle materials; specify reusable formwork or modular elements; prepare deconstruction plan.",
-        defaultPriority: 2
+        actions: "Consideration of circular economy principles in design. e.g. Avoid composite or difficult-to-dismantle materials; specify reusable formwork or modular elements; prepare deconstruction plan.",
+        defaultPriority: 1
       },
       {
         id: "design_deconstruction",
@@ -240,7 +258,7 @@ export const assessmentSections = {
         id: "reuse_topsoil",
         item: "Re-use of topsoil",
         description: "Top-soil has been re used beneficially as topsoil on site or on a different site within a reasonable distance.",
-        actions: "Strip and stockpile topsoil to preserve quality,",
+        actions: "Strip and stockpile topsoil to preserve quality",
         defaultPriority: 2
       },
       {
@@ -291,24 +309,31 @@ export const assessmentSections = {
     title: "Embodied Carbon",
     items: [
       {
+        id: "embodied_carbon_consideration",
+        item: "Embodied Carbon",
+        description: "Embodied Carbon has been considered at all project stages with reduction measures identified and where possible implemented.",
+        actions: "Consideration of embodied carbon in design, identification of potential measures to reduce embodied carbon.",
+        defaultPriority: 1
+      },
+      {
         id: "whole_life_assessment",
         item: "Whole life carbon assessment",
         description: "A whole life carbon assessment has been filled out in the design stage and conclusions have been drawn.",
         actions: "LCA's for carbon assessment.",
-        defaultPriority: 1
+        defaultPriority: 2
       },
       {
         id: "carbon_management",
         item: "Carbon management",
         description: "A carbon management approach has been adopted during the strategy, design or construction of the project that conforms with PAS 2080.",
         actions: "Carbon reduction targets, Carbon management plan.",
-        defaultPriority: 1
+        defaultPriority: 2
       },
       {
         id: "certification_carbon",
         item: "Certification of carbon management",
         description: "The carbon management process adopted during the strategy, design and construction of the project has been independently third-party certified as fully conforming with PAS 2080.",
-        actions: "Maintain records of carbon reduction for certifications,.",
+        actions: "Maintain records of carbon reduction for certifications.",
         defaultPriority: 2
       },
       {
@@ -316,7 +341,7 @@ export const assessmentSections = {
         item: "Achieving carbon reduction targets",
         description: "The project has achieved its carbon emission reduction targets identified in the carbon management process.",
         actions: "Track and report performance against set targets.",
-        defaultPriority: 1
+        defaultPriority: 2
       }
     ]
   }
@@ -346,20 +371,48 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
   });
 
   useEffect(() => {
-    let sumActualScores = 0;
-    let sumPriorityScores = 0;
+    // Count mandatory and non-mandatory items (excluding N/A)
+    let mandatoryTotal = 0;
+    let mandatoryYes = 0;
+    let nonMandatoryTotal = 0;
+    let nonMandatoryYes = 0;
     
     section.items.forEach(item => {
       if (responses[item.id] !== "not_applicable") {
-        sumPriorityScores += priorityScores[priorities[item.id]].score;
-        
-        if (responses[item.id] === "yes") {
-          sumActualScores += priorityScores[priorities[item.id]].score;
+        if (priorities[item.id] === 1) {
+          mandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            mandatoryYes++;
+          }
+        } else {
+          nonMandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            nonMandatoryYes++;
+          }
         }
       }
     });
     
-    const totalScore = sumPriorityScores === 0 ? 0 : (sumActualScores / sumPriorityScores) * 100;
+    // Calculate score: Mandatory = 40%, Non-Mandatory = 60%
+    let totalScore = 0;
+    
+    if (mandatoryTotal > 0) {
+      totalScore += (mandatoryYes / mandatoryTotal) * MANDATORY_WEIGHT;
+    }
+    
+    if (nonMandatoryTotal > 0) {
+      totalScore += (nonMandatoryYes / nonMandatoryTotal) * NON_MANDATORY_WEIGHT;
+    }
+    
+    // If only mandatory items exist (no non-mandatory), scale to 100%
+    if (mandatoryTotal > 0 && nonMandatoryTotal === 0) {
+      totalScore = (mandatoryYes / mandatoryTotal) * 100;
+    }
+    
+    // If only non-mandatory items exist (no mandatory), scale to 100%
+    if (mandatoryTotal === 0 && nonMandatoryTotal > 0) {
+      totalScore = (nonMandatoryYes / nonMandatoryTotal) * 100;
+    }
 
     onDataChange(prev => ({
       ...prev,
@@ -376,37 +429,40 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
     }));
   };
 
-  const handlePriorityChange = (itemId, priority) => {
-    setPriorities(prev => ({
-      ...prev,
-      [itemId]: parseInt(priority)
-    }));
-  };
-
-  const calculateScore = (itemId) => {
-    if (responses[itemId] === "yes") {
-      return priorityScores[priorities[itemId]].score;
-    }
-    return 0;
-  };
-
   const calculateTotal = () => {
-    let sumActualScores = 0;
-    let sumPriorityScores = 0;
+    let mandatoryTotal = 0;
+    let mandatoryYes = 0;
+    let nonMandatoryTotal = 0;
+    let nonMandatoryYes = 0;
     
     section.items.forEach(item => {
       if (responses[item.id] !== "not_applicable") {
-        sumPriorityScores += priorityScores[priorities[item.id]].score;
-        
-        if (responses[item.id] === "yes") {
-          sumActualScores += priorityScores[priorities[item.id]].score;
+        if (priorities[item.id] === 1) {
+          mandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            mandatoryYes++;
+          }
+        } else {
+          nonMandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            nonMandatoryYes++;
+          }
         }
       }
     });
     
-    if (sumPriorityScores === 0) return "0.00";
+    let totalScore = 0;
     
-    return ((sumActualScores / sumPriorityScores) * 100).toFixed(2);
+    if (mandatoryTotal > 0 && nonMandatoryTotal > 0) {
+      totalScore = (mandatoryYes / mandatoryTotal) * MANDATORY_WEIGHT + 
+                   (nonMandatoryYes / nonMandatoryTotal) * NON_MANDATORY_WEIGHT;
+    } else if (mandatoryTotal > 0) {
+      totalScore = (mandatoryYes / mandatoryTotal) * 100;
+    } else if (nonMandatoryTotal > 0) {
+      totalScore = (nonMandatoryYes / nonMandatoryTotal) * 100;
+    }
+    
+    return totalScore.toFixed(2);
   };
 
   return (
@@ -427,16 +483,21 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                 <TableHead className="w-32">Item</TableHead>
                 <TableHead className="w-1/4">Description</TableHead>
                 <TableHead className="w-1/3">Actions</TableHead>
-                <TableHead className="text-center w-40">Priority</TableHead>
+                <TableHead className="text-center w-40">
+                  <div className="flex items-center justify-center gap-1">
+                    Priority
+                    <Lock className="w-3 h-3 text-gray-400" />
+                  </div>
+                </TableHead>
                 <TableHead className="text-center w-32">Response</TableHead>
                 <TableHead className="text-center w-24">Score</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {section.items.map((item) => {
-                const score = calculateScore(item.id);
-                const priority = priorities[item.id];
-                const response = responses[item.id] || ""; 
+                const priority = priorities[item.id] || item.defaultPriority;
+                const response = responses[item.id] || "";
+                const priorityData = priorityScores[priority] || priorityScores[2];
 
                 return (
                   <TableRow key={item.id} className="hover:bg-emerald-50/30">
@@ -450,37 +511,12 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                       {item.actions}
                     </TableCell>
                     <TableCell className="text-center">
-                      <Select
-                        value={priority.toString()}
-                        onValueChange={(value) => handlePriorityChange(item.id, value)}
-                      >
-                        <SelectTrigger className="w-full border-emerald-200">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-red-100 text-red-800 border border-red-200 text-xs">
-                                1 - Mandatory
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="2">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-blue-100 text-blue-800 border border-blue-200 text-xs">
-                                2 - Best Practice
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="3">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-green-100 text-green-800 border border-green-200 text-xs">
-                                3 - Stretch Goal
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center justify-center gap-1">
+                        <Badge className={`${priorityData.color} border text-xs`}>
+                          {priority} - {priorityData.label}
+                        </Badge>
+                        <Lock className="w-3 h-3 text-gray-300" />
+                      </div>
                     </TableCell>
                     <TableCell className="text-center">
                       <Select
@@ -508,7 +544,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                               : "border-gray-300 text-gray-500"
                         }
                       >
-                        {response === "not_applicable" ? "N/A" : score.toFixed(1)}
+                        {response === "not_applicable" ? "N/A" : response === "yes" ? "✓" : "-"}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -561,7 +597,7 @@ export default function MaterialsResourceEfficiency({ data, onDataChange, onNext
               </div>
             </div>
             <p className="text-sm text-gray-700 mt-2">
-              <strong>Note:</strong> Items marked as "Not Applicable" are excluded from the total score calculation.
+              <strong>Note:</strong> Mandatory items (Priority 1) constitute 40% of the subcategory score. Best Practice and Stretch Goal items make up the remaining 60%. Items marked as "Not Applicable" are excluded from calculations. Priority values are locked.
             </p>
           </div>
         </div>
