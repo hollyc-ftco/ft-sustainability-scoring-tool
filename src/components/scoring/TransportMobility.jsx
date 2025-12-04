@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Info, ArrowRight } from "lucide-react";
+import { Info, ArrowRight, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const priorityScores = {
@@ -26,36 +25,41 @@ const priorityScores = {
   3: { label: "Stretch Goal", score: 0.3, color: "bg-green-100 text-green-800 border-green-200" }
 };
 
+// Mandatory items (Priority 1) = 40% of total score
+// Best Practice (Priority 2) + Stretch Goal (Priority 3) = 60% of total score
+const MANDATORY_WEIGHT = 40;
+const NON_MANDATORY_WEIGHT = 60;
+
 export const assessmentSections = {
   transport_options: {
     title: "Sustainable Transport Options",
     items: [
       {
-        id: "transport_integration",
-        item: "Conduct transport integration assessment",
+        id: "relationship_transport_network",
+        item: "Relationship to the transport network",
         description: "In the case of a transport project, the project provides improved levels of service and extends to all modes in a way that delivers improved integration. In the case of a non-transport project, the site has been selected because the project does not require new transport infrastructure or mainly makes use of public transport systems.",
-        actions: "Select sites with proximity to public transport. Optimise connectivity to reduce need for new road infrastructure. Use Accessibility & Integration Scoring (e.g. PTAL or similar). Map journey times to key services (schools, shops, jobs) by sustainable modes.",
-        defaultPriority: 1
+        actions: "Conduct transport integration assessment. Select sites with proximity to public transport. Optimise connectivity to reduce need for new road infrastructure. Use Accessibility & Integration Scoring (e.g. PTAL or similar). Map journey times to key services (schools, shops, jobs) by sustainable modes.",
+        defaultPriority: 2
       },
       {
-        id: "pedestrian_cyclist_routes",
-        item: "Design segregated pedestrian/cycle routes",
+        id: "access_pedestrians_cyclists",
+        item: "Access for pedestrians and cyclists",
         description: "There has been a consideration given to the ability of pedestrians and cyclists to pass through the site on dedicated paths and to establish links with existing and proposed routes to local services.",
-        actions: "Ensure safe crossings and continuity with local paths. Include secure cycle storage and rest facilities. Provide secure, covered cycle parking and showers at key access nodes. Ensure safe paths to nearby schools and community areas.",
+        actions: "Design segregated pedestrian/cycle routes. Ensure safe crossings and continuity with local paths. Include secure cycle storage and rest facilities. Provide secure, covered cycle parking and showers at key access nodes. Ensure safe paths to nearby schools and community areas.",
         defaultPriority: 1
       },
       {
-        id: "dmurs_hierarchy",
-        item: "Apply DMURS hierarchy (pedestrians > cyclists > public transport > cars)",
+        id: "active_travel_prioritisation",
+        item: "Active travel prioritisation",
         description: "In the case of a transport project, design has been carried out in accordance with the guidelines given by DMURS, prioritising pedestrians, cyclists and public transport over drivers.",
-        actions: "Minimise vehicle carriageway widths. Provide shared spaces and priority crossings. Ensure compliance with TII's Rural Cycleway Design guidance (for regional roads). Include raised crossings and reduced vehicle speeds (<30km/h) in shared zones.",
+        actions: "Apply DMURS hierarchy (pedestrians > cyclists > public transport > cars). Minimise vehicle carriageway widths. Provide shared spaces and priority crossings. Ensure compliance with TII's Rural Cycleway Design guidance (for regional roads). Include raised crossings and reduced vehicle speeds (<30km/h) in shared zones.",
         defaultPriority: 1
       },
       {
-        id: "transport_needs_analysis",
-        item: "Undertake a transport needs analysis to justify existing capacity",
+        id: "need_additional_infrastructure",
+        item: "Need for additional transport infrastructure",
         description: "The project does not require the provision of, or increase the need for additional transport infrastructure.",
-        actions: "Promote modal shift to reduce new infrastructure demand. Use mobility hubs or shared mobility options where feasible",
+        actions: "Undertake a transport needs analysis to justify existing capacity. Promote modal shift to reduce new infrastructure demand. Use mobility hubs or shared mobility options where feasible.",
         defaultPriority: 2
       },
       {
@@ -80,24 +84,24 @@ export const assessmentSections = {
         defaultPriority: 2
       },
       {
-        id: "smart_signals",
-        item: "Use smart signals or traffic-calming measures to improve flow and safety",
+        id: "enhanced_operational_outcomes",
+        item: "Enhanced operational transport outcomes",
         description: "Designers have worked beyond the standards to deliver enhanced operational transport outcomes.",
-        actions: "Implement real-time travel info systems. Design for reduced travel times and congestion",
+        actions: "Use smart signals or traffic-calming measures to improve flow and safety. Implement real-time travel info systems. Design for reduced travel times and congestion.",
         defaultPriority: 2
       },
       {
-        id: "flood_resistant_design",
-        item: "Incorporate flood-resistant designs and diversion routes",
+        id: "resilience",
+        item: "Resilience",
         description: "The resilience and recovery of the transport network has been considered during the design process.",
-        actions: "Design with materials and layouts that recover quickly after disruption. Stress-test the network using climate scenarios. Perform risk assessments using TII climate adaptation datasets. Provide alternative access during high-risk events (e.g. flood bypass routes).",
+        actions: "Incorporate flood-resistant designs and diversion routes. Design with materials and layouts that recover quickly after disruption. Stress-test the network using climate scenarios. Perform risk assessments using TII climate adaptation datasets. Provide alternative access during high-risk events (e.g. flood bypass routes).",
         defaultPriority: 2
       },
       {
         id: "adaptability",
-        item: "Allow for future expansion of cycle/public transport lanes",
+        item: "Adaptability",
         description: "The design delivers a transport network with improved ability to accommodate future change.",
-        actions: "Integrate ducting/conduits for future smart infrastructure. Include modular/upgradeable infrastructure where feasible.",
+        actions: "Allow for future expansion of cycle/public transport lanes. Integrate ducting/conduits for future smart infrastructure. Include modular/upgradeable infrastructure where feasible.",
         defaultPriority: 2
       },
       {
@@ -105,14 +109,14 @@ export const assessmentSections = {
         item: "Regenerative Mobility Corridors",
         description: "Transport infrastructure that doubles as ecological and community revitalisation corridors.",
         actions: "Combine walking/cycling routes with pollinator strips, food forests, and natural play areas.",
-        defaultPriority: 3
+        defaultPriority: 2
       },
       {
         id: "low_impact_access",
         item: "Low-Impact Access Integration",
         description: "Design for access that minimises ecosystem disturbance while enhancing human-nature connection.",
         actions: "Elevated walkways, boardwalks, and sensory nature trails that reduce habitat fragmentation.",
-        defaultPriority: 3
+        defaultPriority: 2
       }
     ]
   },
@@ -121,70 +125,63 @@ export const assessmentSections = {
     items: [
       {
         id: "transport_effects_completed",
-        item: "Assess and mitigate severance, noise, air quality and congestion",
+        item: "Transport effects of the completed project",
         description: "The project team has considered and incorporated measures that reduce relevant, transport related impacts of the completed project on the local community.",
-        actions: "Provide improved signage, crossings, and drop-off zones. Use traffic modelling to assess community impacts.",
+        actions: "Assess and mitigate severance, noise, air quality and congestion. Provide improved signage, crossings, and drop-off zones. Use traffic modelling to assess community impacts.",
         defaultPriority: 1
       },
       {
         id: "community_consultation",
-        item: "Conduct public consultation events",
+        item: "Community consultation on the design objectives",
         description: "The community affected by the project has been involved in specifying the design objectives.",
-        actions: "Engage specific user groups (e.g. mobility-impaired, cyclists). Reflect outcomes in final design documentation.",
+        actions: "Conduct public consultation events. Engage specific user groups (e.g. mobility-impaired, cyclists). Reflect outcomes in final design documentation.",
         defaultPriority: 2
       },
       {
-        id: "walking_cycling_infrastructure",
-        item: "Include continuous, safe walking/cycling infrastructure",
+        id: "performance_non_motorized",
+        item: "Performance for non-motorized users",
         description: "The project team has provided measures that improve the level of performance for non-motorised users.",
-        actions: "Prioritise pedestrian journey quality (shade, seating, crossings). Conduct walkability audits.",
-        defaultPriority: 1
+        actions: "Include continuous, safe walking/cycling infrastructure. Prioritise pedestrian journey quality (shade, seating, crossings). Conduct walkability audits.",
+        defaultPriority: 2
       },
       {
-        id: "universal_accessibility",
-        item: "Design to universal accessibility standards (e.g. tactile paving, gradients)",
+        id: "inclusion",
+        item: "Inclusion",
         description: "Consideration was given to accommodating children, elderly people, people with disabilities, buggies, etc. to use the new infrastructure.",
-        actions: "Provide rest points and visual cues. Ensure access to all transport modes for all users. Audit all infrastructure for compliance with universal design standards. Include tactile paving, audio signals, level access, and wide pathways.",
-        defaultPriority: 1
+        actions: "Design to universal accessibility standards (e.g. tactile paving, gradients). Provide rest points and visual cues. Ensure access to all transport modes for all users. Audit all infrastructure for compliance with universal design standards. Include tactile paving, audio signals, level access, and wide pathways.",
+        defaultPriority: 2
       }
     ]
   },
   construction_logistics: {
-    title: "Transportation Carbon Impact",
+    title: "Construction Logistics",
     items: [
       {
-        id: "ctmp",
-        item: "Develop Construction Traffic Management Plan (CTMP)",
-        description: "Construction traffic movements have been reviewed by the project team prior to the construction stage commencing.",
-        actions: "Schedule deliveries outside peak hours. Use route restrictions and monitoring systems",
+        id: "planning_construction_traffic",
+        item: "Planning construction traffic movements",
+        description: "Construction traffic movements have been considered by the project team prior to the construction stage commencing.",
+        actions: "Consider Construction Traffic Management.",
         defaultPriority: 1
       },
       {
         id: "transport_effects_construction",
-        item: "Use VMS signage and community noticeboards",
+        item: "Transport effects of construction activities",
         description: "The project team has incorporated measures that deliver improved performance on ease of use of signs and other communications, reductions of available parking spaces, reduced congestion, reducing severance.",
-        actions: "Temporarily reallocate parking and pedestrian zones. Manage peak hour activity to reduce congestion",
+        actions: "Use VMS signage and community noticeboards. Temporarily reallocate parking and pedestrian zones. Manage peak hour activity to reduce congestion.",
         defaultPriority: 2
       },
       {
-        id: "vulnerable_road_users",
-        item: "Implement CLOCS or equivalent standards",
-        description: "The project team has incorporated measures that improve safety for vulnerable road users.",
-        actions: "Use trained banksmen, 360-degree cameras, and vehicle signage. Design temporary crossings and protection zones",
-        defaultPriority: 1
-      },
-      {
-        id: "sustainable_transport_routes",
-        item: "Explore use of nearby rail/water freight options",
-        description: "The project team has considered possible use of other, more sustainable transport routes, such as rail and water for the movement of construction materials/ waste.",
-        actions: "Maximise backhauling and material consolidation. Reduce on-site storage by just-in-time deliveries",
+        id: "movement_construction_materials",
+        item: "Movement of construction materials",
+        description: "The project team has considered possible use of other, more sustainable transport routes, such as rail and water for the movement of construction materials/waste.",
+        actions: "Explore use of nearby rail/water freight options. Maximise backhauling and material consolidation. Reduce on-site storage by just-in-time deliveries.",
         defaultPriority: 2
       },
       {
-        id: "workforce_travel_plan",
-        item: "Develop workforce travel plan with carpooling, cycling incentives, shuttle services",
-        description: "There is a travel plan aimed at an appropriate balance of effectiveness for the travellers, and at at minimising adverse environmental and social impacts associated with the travel involved.",
-        actions: "Provide secure bike parking and facilities on-site. Encourage public transport through subsidised passes",
+        id: "workforce_travel_planning",
+        item: "Workforce travel planning",
+        description: "There is a travel plan aimed at an appropriate balance of effectiveness for the travellers, and at minimising adverse environmental and social impacts associated with the travel involved.",
+        actions: "Develop workforce travel plan with carpooling, cycling incentives, shuttle services. Provide secure bike parking and facilities on-site. Encourage public transport through subsidised passes.",
         defaultPriority: 2
       }
     ]
@@ -215,20 +212,48 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
   });
 
   useEffect(() => {
-    let sumActualScores = 0;
-    let sumPriorityScores = 0;
+    // Count mandatory and non-mandatory items (excluding N/A)
+    let mandatoryTotal = 0;
+    let mandatoryYes = 0;
+    let nonMandatoryTotal = 0;
+    let nonMandatoryYes = 0;
     
     section.items.forEach(item => {
       if (responses[item.id] !== "not_applicable") {
-        sumPriorityScores += priorityScores[priorities[item.id]].score;
-        
-        if (responses[item.id] === "yes") {
-          sumActualScores += priorityScores[priorities[item.id]].score;
+        if (priorities[item.id] === 1) {
+          mandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            mandatoryYes++;
+          }
+        } else {
+          nonMandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            nonMandatoryYes++;
+          }
         }
       }
     });
     
-    const totalScore = sumPriorityScores === 0 ? 0 : (sumActualScores / sumPriorityScores) * 100;
+    // Calculate score: Mandatory = 40%, Non-Mandatory = 60%
+    let totalScore = 0;
+    
+    if (mandatoryTotal > 0) {
+      totalScore += (mandatoryYes / mandatoryTotal) * MANDATORY_WEIGHT;
+    }
+    
+    if (nonMandatoryTotal > 0) {
+      totalScore += (nonMandatoryYes / nonMandatoryTotal) * NON_MANDATORY_WEIGHT;
+    }
+    
+    // If only mandatory items exist (no non-mandatory), scale to 100%
+    if (mandatoryTotal > 0 && nonMandatoryTotal === 0) {
+      totalScore = (mandatoryYes / mandatoryTotal) * 100;
+    }
+    
+    // If only non-mandatory items exist (no mandatory), scale to 100%
+    if (mandatoryTotal === 0 && nonMandatoryTotal > 0) {
+      totalScore = (nonMandatoryYes / nonMandatoryTotal) * 100;
+    }
 
     onDataChange(prev => ({
       ...prev,
@@ -245,38 +270,40 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
     }));
   };
 
-  const handlePriorityChange = (itemId, priority) => {
-    setPriorities(prev => ({
-      ...prev,
-      [itemId]: parseInt(priority)
-    }));
-  };
-
-  const calculateScore = (itemId) => {
-    if (responses[itemId] === "yes") {
-      return priorityScores[priorities[itemId]].score;
-    }
-    // If response is "no" or empty, score is 0. If "not_applicable", it's handled by total calculation.
-    return 0; 
-  };
-
   const calculateTotal = () => {
-    let sumActualScores = 0;
-    let sumPriorityScores = 0;
+    let mandatoryTotal = 0;
+    let mandatoryYes = 0;
+    let nonMandatoryTotal = 0;
+    let nonMandatoryYes = 0;
     
     section.items.forEach(item => {
-      if (responses[item.id] !== "not_applicable") { // Only consider items that are not "not_applicable" for the denominator
-        sumPriorityScores += priorityScores[priorities[item.id]].score;
-        
-        if (responses[item.id] === "yes") { // Only count "yes" responses for the numerator
-          sumActualScores += priorityScores[priorities[item.id]].score;
+      if (responses[item.id] !== "not_applicable") {
+        if (priorities[item.id] === 1) {
+          mandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            mandatoryYes++;
+          }
+        } else {
+          nonMandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            nonMandatoryYes++;
+          }
         }
       }
     });
     
-    if (sumPriorityScores === 0) return "0.00";
+    let totalScore = 0;
     
-    return ((sumActualScores / sumPriorityScores) * 100).toFixed(2);
+    if (mandatoryTotal > 0 && nonMandatoryTotal > 0) {
+      totalScore = (mandatoryYes / mandatoryTotal) * MANDATORY_WEIGHT + 
+                   (nonMandatoryYes / nonMandatoryTotal) * NON_MANDATORY_WEIGHT;
+    } else if (mandatoryTotal > 0) {
+      totalScore = (mandatoryYes / mandatoryTotal) * 100;
+    } else if (nonMandatoryTotal > 0) {
+      totalScore = (nonMandatoryYes / nonMandatoryTotal) * 100;
+    }
+    
+    return totalScore.toFixed(2);
   };
 
   return (
@@ -297,16 +324,21 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                 <TableHead className="w-32">Item</TableHead>
                 <TableHead className="w-1/4">Description</TableHead>
                 <TableHead className="w-1/3">Actions</TableHead>
-                <TableHead className="text-center w-40">Priority</TableHead>
+                <TableHead className="text-center w-40">
+                  <div className="flex items-center justify-center gap-1">
+                    Priority
+                    <Lock className="w-3 h-3 text-gray-400" />
+                  </div>
+                </TableHead>
                 <TableHead className="text-center w-32">Response</TableHead>
                 <TableHead className="text-center w-24">Score</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {section.items.map((item) => {
-                const score = calculateScore(item.id);
-                const priority = priorities[item.id];
+                const priority = priorities[item.id] || item.defaultPriority;
                 const response = responses[item.id] || "";
+                const priorityData = priorityScores[priority] || priorityScores[2];
                 
                 return (
                   <TableRow key={item.id} className="hover:bg-emerald-50/30">
@@ -320,37 +352,12 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                       {item.actions}
                     </TableCell>
                     <TableCell className="text-center">
-                      <Select
-                        value={priority.toString()}
-                        onValueChange={(value) => handlePriorityChange(item.id, value)}
-                      >
-                        <SelectTrigger className="w-full border-emerald-200">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-red-100 text-red-800 border border-red-200 text-xs">
-                                1 - Mandatory
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="2">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-blue-100 text-blue-800 border border-blue-200 text-xs">
-                                2 - Best Practice
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="3">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-green-100 text-green-800 border border-green-200 text-xs">
-                                3 - Stretch Goal
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center justify-center gap-1">
+                        <Badge className={`${priorityData.color} border text-xs`}>
+                          {priority} - {priorityData.label}
+                        </Badge>
+                        <Lock className="w-3 h-3 text-gray-300" />
+                      </div>
                     </TableCell>
                     <TableCell className="text-center">
                       <Select
@@ -372,7 +379,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                         variant={response === "yes" ? "default" : "outline"}
                         className={response === "yes" ? "bg-emerald-600 text-white" : response === "not_applicable" ? "border-gray-300 text-gray-400" : "border-gray-300 text-gray-500"}
                       >
-                        {response === "not_applicable" ? "N/A" : score.toFixed(1)}
+                        {response === "not_applicable" ? "N/A" : response === "yes" ? "✓" : "-"}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -425,7 +432,7 @@ export default function TransportMobility({ data, onDataChange, onNext }) {
               </div>
             </div>
             <p className="text-sm text-gray-700 mt-2">
-              <strong>Note:</strong> Items marked as "Not Applicable" are excluded from the total score calculation.
+              <strong>Note:</strong> Mandatory items (Priority 1) constitute 40% of the subcategory score. Best Practice and Stretch Goal items make up the remaining 60%. Items marked as "Not Applicable" are excluded from calculations. Priority values are locked.
             </p>
           </div>
         </div>
