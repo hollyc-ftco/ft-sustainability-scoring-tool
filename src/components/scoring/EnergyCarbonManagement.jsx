@@ -198,20 +198,48 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
   });
 
   useEffect(() => {
-    let sumActualScores = 0;
-    let sumPriorityScores = 0;
+    // Count mandatory and non-mandatory items (excluding N/A)
+    let mandatoryTotal = 0;
+    let mandatoryYes = 0;
+    let nonMandatoryTotal = 0;
+    let nonMandatoryYes = 0;
     
     section.items.forEach(item => {
       if (responses[item.id] !== "not_applicable") {
-        sumPriorityScores += priorityScores[priorities[item.id]].score;
-        
-        if (responses[item.id] === "yes") {
-          sumActualScores += priorityScores[priorities[item.id]].score;
+        if (priorities[item.id] === 1) {
+          mandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            mandatoryYes++;
+          }
+        } else {
+          nonMandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            nonMandatoryYes++;
+          }
         }
       }
     });
     
-    const totalScore = sumPriorityScores === 0 ? 0 : (sumActualScores / sumPriorityScores) * 100;
+    // Calculate score: Mandatory = 40%, Non-Mandatory = 60%
+    let totalScore = 0;
+    
+    if (mandatoryTotal > 0) {
+      totalScore += (mandatoryYes / mandatoryTotal) * MANDATORY_WEIGHT;
+    }
+    
+    if (nonMandatoryTotal > 0) {
+      totalScore += (nonMandatoryYes / nonMandatoryTotal) * NON_MANDATORY_WEIGHT;
+    }
+    
+    // If only mandatory items exist (no non-mandatory), scale to 100%
+    if (mandatoryTotal > 0 && nonMandatoryTotal === 0) {
+      totalScore = (mandatoryYes / mandatoryTotal) * 100;
+    }
+    
+    // If only non-mandatory items exist (no mandatory), scale to 100%
+    if (mandatoryTotal === 0 && nonMandatoryTotal > 0) {
+      totalScore = (nonMandatoryYes / nonMandatoryTotal) * 100;
+    }
 
     onDataChange(prev => ({
       ...prev,
@@ -219,7 +247,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
       priorities: { ...prev.priorities, [sectionId]: priorities },
       scores: { ...prev.scores, [sectionId]: totalScore }
     }));
-  }, [responses, priorities, section.items, sectionId, onDataChange]); // Added onDataChange, section.items, sectionId to dependency array for useEffect hook
+  }, [responses, priorities, section.items, sectionId, onDataChange]);
 
   const handleResponseChange = (itemId, value) => {
     setResponses(prev => ({
