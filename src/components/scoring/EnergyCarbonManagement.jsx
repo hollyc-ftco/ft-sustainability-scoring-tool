@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,14 +16,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Info, ArrowRight } from "lucide-react";
+import { Info, ArrowRight, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const priorityScores = {
-  1: { label: "Mandatory", score: 1, color: "bg-red-100 text-red-800 border-red-200" },
-  2: { label: "Best Practice", score: 0.6, color: "bg-blue-100 text-blue-800 border-blue-200" },
-  3: { label: "Stretch Goal", score: 0.3, color: "bg-green-100 text-green-800 border-green-200" }
+  1: { label: "Mandatory", color: "bg-red-100 text-red-800 border-red-200" },
+  2: { label: "Best Practice", color: "bg-blue-100 text-blue-800 border-blue-200" },
+  3: { label: "Stretch Goal", color: "bg-green-100 text-green-800 border-green-200" }
 };
+
+// Mandatory items (Priority 1) = 40% of total score
+// Best Practice (Priority 2) + Stretch Goal (Priority 3) = 60% of total score
+const MANDATORY_WEIGHT = 40;
+const NON_MANDATORY_WEIGHT = 60;
 
 export const assessmentSections = {
   energy_reduction: {
@@ -33,21 +37,21 @@ export const assessmentSections = {
       {
         id: "energy_carbon_operation",
         item: "Energy and carbon emissions reduction for operation",
-        description: "Has the design considered options for reducing both the carbon emissions and the energy consumption of the project during operation? Have measures been implemented to achieve reductions?",
+        description: "Energy and carbon emissions reduction for operation",
         actions: "Incorporate renewable energy sources. Use high-efficiency lighting (LEDs) and low-energy HVAC systems. Implement passive design strategies. Install energy monitoring systems for ongoing performance tracking.",
-        defaultPriority: 1
+        defaultPriority: 2
       },
       {
         id: "energy_construction_design",
         item: "Energy consumption during construction - consideration during design",
-        description: "Identify opportunities and implement measures to reduce the energy consumption of the project during construction phase. Devise strategy to monitor these measures.",
+        description: "Energy consumption during construction - consideration during design",
         actions: "Develop a CEMP with reduction targets. Choose construction methods that minimise energy use on site. Include energy performance as a selection criterion in contractor procurement. Monitor site energy use with sub-meters and adjust practices accordingly.",
-        defaultPriority: 2
+        defaultPriority: 1
       },
       {
         id: "construction_plant",
         item: "Construction plant",
-        description: "The selection of the construction plant has been influenced by consideration of energy efficiency and carbon emissions. The equipment has been maintained to maximise fuel efficiency and minimise carbon emissions.",
+        description: "Construction plant",
         actions: "Ensure regular maintenance on vehicles and minimise idling in the plant.",
         defaultPriority: 2
       }
@@ -59,49 +63,51 @@ export const assessmentSections = {
       {
         id: "whole_life_carbon",
         item: "Whole Life Carbon Assessment",
-        description: "Assess carbon across the full life cycle of the asset, including embodied, operational, maintenance and end-of-life emissions.",
+        description: "Whole Life Carbon Assessment",
         actions: "Conduct Life Cycle Assessment (LCA) using EN 15978 or similar; report embodied carbon using PAS 2080 framework; iterate design based on carbon hotspots.",
-        defaultPriority: 1
+        defaultPriority: 2
       },
       {
         id: "carbon_benchmarking",
         item: "Carbon Benchmarking & Target-Setting",
-        description: "Use baselines and targets to drive carbon reductions.",
+        description: "Carbon Benchmarking & Target-Setting",
         actions: "Set carbon intensity targets (e.g. tCO₂e/km or per m²); use project carbon budgets and monitor performance through design and construction.",
-        defaultPriority: 2
+        defaultPriority: 3
       },
       {
         id: "circular_energy_design",
         item: "Circular Energy Design",
-        description: "Design infrastructure to support future energy recovery or flexibility.",
+        description: "Circular Energy Design",
         actions: "Allow for decentralised energy sources, energy sharing infrastructure (e.g. smart grids), or reuse of heat (e.g. from data centres).",
-        defaultPriority: 3
+        defaultPriority: 2
+      },
+      {
+        id: "renewable_low_carbon_options",
+        item: "Renewable/low-carbon/zero-carbon energy options",
+        description: "Renewable/low-carbon/zero-carbon energy options",
+        actions: "Consideration given to inclusion of renewable / low-carbon / zero-carbon energy options and other carbon reduction measures in design. To be considered at kick-off meetings.",
+        defaultPriority: 1
       },
       {
         id: "zero_carbon_roadmap",
         item: "Zero Carbon Roadmap",
-        description: "Plan for transition to net-zero.",
+        description: "Zero Carbon Roadmap",
         actions: "Develop project-specific net-zero pathways including residual carbon offsetting strategy; integrate with organisational carbon goals.",
-        defaultPriority: 2
-      }
-    ]
-  },
-  renewable_energy: {
-    title: "Renewable Energy Integration",
-    items: [
+        defaultPriority: 1
+      },
       {
         id: "renewable_operational",
         item: "Renewable/low-carbon/zero-carbon energy options within operational phase",
         description: "Explore opportunities and implement measures to reduce the operational carbon footprint of the project.",
         actions: "Integrate solar panels, PV arrays ground-source heat pumps.",
-        defaultPriority: 1
+        defaultPriority: 2
       },
       {
         id: "renewable_construction",
         item: "Renewable/low-carbon/zero-carbon energy options during construction",
-        description: "Energy from renewable/low-carbon/zero-carbon resources has been considered and a percentage of savings from the considerations has been implemented.",
+        description: "Renewable/low-carbon/zero-carbon energy options during construction",
         actions: "Use battery powered or hybrid construction equipment. Source electricity from renewable providers.",
-        defaultPriority: 2
+        defaultPriority: 3
       }
     ]
   },
@@ -111,14 +117,14 @@ export const assessmentSections = {
       {
         id: "emissions_reduction_no_storage",
         item: "Emissions reduction without storage",
-        description: "Filter, capture or break down greenhouse gases when emitted, preventing them to reach the atmosphere.",
+        description: "Emissions reduction without storage",
         actions: "Replace high-emission fuels with certified low-carbon alternatives. Implement low-emission zones for supplier deliveries.",
-        defaultPriority: 2
+        defaultPriority: 3
       },
       {
         id: "emissions_reduction_short_storage",
         item: "Emissions reduction with short-term storage",
-        description: "Avoid damage to ecosystems, minimise habitat destruction and tree-clearing.",
+        description: "Emissions reduction with short-term storage",
         actions: "Employ temporary green infrastructure.",
         defaultPriority: 2
       },
@@ -132,30 +138,37 @@ export const assessmentSections = {
       {
         id: "carbon_removal_short_storage",
         item: "Carbon removal with short-term storage",
-        description: "Consider and implement reforestation, soil carbon enhancement and ecosystem restoration practices as part of project scope.",
+        description: "Carbon removal with short-term storage",
         actions: "Plant trees and shrubs to capture CO2. Improve soil in plant to store carbon.",
         defaultPriority: 2
       },
       {
         id: "carbon_removal_long_storage",
         item: "Carbon removal with long-term storage",
-        description: "Explore options to implement long-term carbon storage through innovative technologies, including DACCS, BECCS, mineralisation, etc.",
+        description: "Carbon removal with long-term storage",
         actions: "Use natural materials to store Carbon. Implement reforestation projects with long-term protection.",
         defaultPriority: 3
       },
       {
         id: "net_positive_energy",
         item: "Net Positive Energy Infrastructure",
-        description: "Generate more renewable energy than the project consumes over its lifecycle.",
+        description: "Net Positive Energy Infrastructure",
         actions: "Integrate solar/wind with battery storage and feed-in agreements.",
-        defaultPriority: 3
+        defaultPriority: 2
       },
       {
         id: "carbon_sequestration",
         item: "Carbon Sequestration Integration",
-        description: "Embed carbon-sequestering landscapes or structures into the project.",
+        description: "Carbon Sequestration Integration",
         actions: "Biochar in soils, algae facades, afforestation, regenerative groundworks using composted soils.",
         defaultPriority: 3
+      },
+      {
+        id: "carbon_offsetting_general",
+        item: "Carbon Offsetting",
+        description: "Carbon Offsetting",
+        actions: "Identify opportunities for Carbon reduction / offsetting on project and discuss with client where potential identified.",
+        defaultPriority: 1
       }
     ]
   }
