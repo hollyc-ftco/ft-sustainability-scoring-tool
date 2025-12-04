@@ -356,7 +356,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {section.items.map((item) => {
+              {[...section.items].sort((a, b) => a.defaultPriority - b.defaultPriority).map((item) => {
                 const priority = priorities[item.id] || item.defaultPriority;
                 const response = responses[item.id] || "";
                 const priorityData = priorityScores[priority] || priorityScores[2];
