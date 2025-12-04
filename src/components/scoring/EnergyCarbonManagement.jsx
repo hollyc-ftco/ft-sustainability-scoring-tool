@@ -322,7 +322,6 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
             </TableHeader>
             <TableBody>
               {section.items.map((item) => {
-                const score = calculateScore(item.id);
                 const priority = priorities[item.id];
                 const response = responses[item.id] || "";
                 
@@ -338,37 +337,12 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                       {item.actions}
                     </TableCell>
                     <TableCell className="text-center">
-                      <Select
-                        value={priority.toString()}
-                        onValueChange={(value) => handlePriorityChange(item.id, value)}
-                      >
-                        <SelectTrigger className="w-full border-emerald-200">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-red-100 text-red-800 border border-red-200 text-xs">
-                                1 - Mandatory
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="2">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-blue-100 text-blue-800 border border-blue-200 text-xs">
-                                2 - Best Practice
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="3">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-green-100 text-green-800 border border-green-200 text-xs">
-                                3 - Stretch Goal
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center justify-center gap-1">
+                        <Badge className={`${priorityScores[priority].color} border text-xs`}>
+                          {priority} - {priorityScores[priority].label}
+                        </Badge>
+                        <Lock className="w-3 h-3 text-gray-300" />
+                      </div>
                     </TableCell>
                     <TableCell className="text-center">
                       <Select
@@ -390,7 +364,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                         variant={response === "yes" ? "default" : "outline"}
                         className={response === "yes" ? "bg-emerald-600 text-white" : response === "not_applicable" ? "border-gray-300 text-gray-400" : "border-gray-300 text-gray-500"}
                       >
-                        {response === "not_applicable" ? "N/A" : score.toFixed(1)}
+                        {response === "not_applicable" ? "N/A" : response === "yes" ? "✓" : "-"}
                       </Badge>
                     </TableCell>
                   </TableRow>
