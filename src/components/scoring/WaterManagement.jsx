@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Info, ArrowRight, Lock } from "lucide-react";
+import { Info, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const priorityScores = {
@@ -24,11 +25,6 @@ const priorityScores = {
   2: { label: "Best Practice", score: 0.6, color: "bg-blue-100 text-blue-800 border-blue-200" },
   3: { label: "Stretch Goal", score: 0.3, color: "bg-green-100 text-green-800 border-green-200" }
 };
-
-// Mandatory items (Priority 1) = 40% of total score
-// Best Practice (Priority 2) + Stretch Goal (Priority 3) = 60% of total score
-const MANDATORY_WEIGHT = 40;
-const NON_MANDATORY_WEIGHT = 60;
 
 export const assessmentSections = {
   water_efficiency: {
@@ -53,13 +49,6 @@ export const assessmentSections = {
         item: "Water Quality Management",
         description: "Address runoff pollution risk from the project to protect nearby watercourses and groundwater.",
         actions: "Design SuDS with treatment stages (e.g. swales, detention basins, reed beds). Include pollution control measures in CEMP.",
-        defaultPriority: 2
-      },
-      {
-        id: "water_efficiency_design",
-        item: "Water Efficiency",
-        description: "Consider water efficiency, embodied water and water saving design during design.",
-        actions: "Consider water efficiency, embodied water and water saving design during design.",
         defaultPriority: 1
       },
       {
@@ -74,14 +63,14 @@ export const assessmentSections = {
         item: "Drought Resilience",
         description: "Assess and plan for future water scarcity impacts on asset operation.",
         actions: "Use WRAP and UKWIR guidance to model future supply-demand risk; include high-resilience fixtures and landscaping choices.",
-        defaultPriority: 2
+        defaultPriority: 3
       },
       {
         id: "water_consumption_operation",
         item: "Water consumption in operation",
         description: "The potential impacts on water resources of the operation and maintenance of the completed project have been considered and measures for water conservation and water use reduction have been included in the design and incorporated in the works.",
         actions: "Low-flow taps, dual-flush toilets, water-efficient appliances",
-        defaultPriority: 2
+        defaultPriority: 1
       },
       {
         id: "water_consumption_construction_client",
@@ -113,7 +102,7 @@ export const assessmentSections = {
         id: "identify_resilience",
         item: "Identify resilience requirements",
         description: "Before the end of strategy stage, resilience requirements have been identified based on a current risk assessment for the project and consultation with relevant experts.",
-        actions: "Minimum requirements. Flood risk assessment. Refer to floodinfo.ie. Business dependencies. Resilience requirements.",
+        actions: "Minimum requirements. Flood risk assessment. Refer to floodinfo.ie. Business dependencies. Resilience requirements. Dependencies",
         defaultPriority: 1
       },
       {
@@ -142,7 +131,7 @@ export const assessmentSections = {
         item: "Flood risk assessment",
         description: "The run-off, flood risk and potential increased flood risk elsewhere as a result of the completed works have been assessed over their expected working life, and appropriate flood management measures have been included in the design.",
         actions: "Consider upstream, downstream, local and regional influences: discharge, flow speed, turbulence, flood risk, erosion, cross-section changes, infiltration & evaporation rate changes",
-        defaultPriority: 2
+        defaultPriority: 1
       },
       {
         id: "flood_risk_enhancements",
@@ -182,7 +171,7 @@ export const assessmentSections = {
         item: "Preventing pollution in operation",
         description: "Measures have been incorporated to prevent pollution of groundwater, freshwater or the sea during operation and maintenance.",
         actions: "Avoid pollutants and contaminants. Use filtration: engineered or natural, physical and chemical",
-        defaultPriority: 2
+        defaultPriority: 1
       },
       {
         id: "control_impacts_completed",
@@ -203,14 +192,14 @@ export const assessmentSections = {
         item: "Control of impacts on the water environment during construction",
         description: "A plan has been implemented to control the impacts of the project on the water environment during construction.",
         actions: "Waste management. Use of natural materials. Avoiding contaminating materials. Site inspector",
-        defaultPriority: 2
+        defaultPriority: 1
       },
       {
         id: "preventing_pollution_construction",
         item: "Preventing pollution during construction",
         description: "Measures have been taken to prevent the pollution of groundwater, freshwater or the sea during construction.",
         actions: "Waste management plan. Use of natural materials. Avoiding contaminating materials",
-        defaultPriority: 2
+        defaultPriority: 1
       },
       {
         id: "protecting_water_features",
@@ -222,7 +211,7 @@ export const assessmentSections = {
       {
         id: "monitoring_water_quality_construction",
         item: "Monitoring water quality during construction",
-        description: "If the works could affect a body of ground or surface waters, the quality of the water body has been monitored before and during construction in accordance with the regime identified as appropriate in the risk assessment.",
+        description: "If the works could affect a body of ground or surface waters, the quality of the water has been monitored during construction.",
         actions: "Regular water quality tests",
         defaultPriority: 2
       }
@@ -250,7 +239,7 @@ export const assessmentSections = {
         item: "Quality",
         description: "Design preventing and treating pollution to ensure that clean water is available as soon as possible to provide amenity and biodiversity benefits within the development, as well as protecting watercourses, groundwater and the sea.",
         actions: "Filtration ponds, planting",
-        defaultPriority: 2
+        defaultPriority: 1
       },
       {
         id: "biodiversity",
@@ -308,49 +297,22 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
   });
 
   useEffect(() => {
-    // Count mandatory and non-mandatory items (excluding N/A)
-    let mandatoryTotal = 0;
-    let mandatoryYes = 0;
-    let nonMandatoryTotal = 0;
-    let nonMandatoryYes = 0;
+    let sumActualScores = 0;
+    let sumPriorityScores = 0;
     
     section.items.forEach(item => {
-      const priority = priorities[item.id] || item.defaultPriority;
+      // Only include items that are not explicitly 'not_applicable' in the denominator
       if (responses[item.id] !== "not_applicable") {
-        if (priority === 1) {
-          mandatoryTotal++;
-          if (responses[item.id] === "yes") {
-            mandatoryYes++;
-          }
-        } else {
-          nonMandatoryTotal++;
-          if (responses[item.id] === "yes") {
-            nonMandatoryYes++;
-          }
+        sumPriorityScores += priorityScores[priorities[item.id]].score;
+        
+        // Only add to actual score if response is 'yes'
+        if (responses[item.id] === "yes") {
+          sumActualScores += priorityScores[priorities[item.id]].score;
         }
       }
     });
     
-    // Calculate score: Mandatory = 40%, Non-Mandatory = 60%
-    let totalScore = 0;
-    
-    if (mandatoryTotal > 0) {
-      totalScore += (mandatoryYes / mandatoryTotal) * MANDATORY_WEIGHT;
-    }
-    
-    if (nonMandatoryTotal > 0) {
-      totalScore += (nonMandatoryYes / nonMandatoryTotal) * NON_MANDATORY_WEIGHT;
-    }
-    
-    // If only mandatory items exist (no non-mandatory), scale to 100%
-    if (mandatoryTotal > 0 && nonMandatoryTotal === 0) {
-      totalScore = (mandatoryYes / mandatoryTotal) * 100;
-    }
-    
-    // If only non-mandatory items exist (no mandatory), scale to 100%
-    if (mandatoryTotal === 0 && nonMandatoryTotal > 0) {
-      totalScore = (nonMandatoryYes / nonMandatoryTotal) * 100;
-    }
+    const totalScore = sumPriorityScores === 0 ? 0 : (sumActualScores / sumPriorityScores) * 100;
 
     onDataChange(prev => ({
       ...prev,
@@ -358,7 +320,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
       priorities: { ...prev.priorities, [sectionId]: priorities },
       scores: { ...prev.scores, [sectionId]: totalScore }
     }));
-  }, [responses, priorities, section.items, sectionId, onDataChange]);
+  }, [responses, priorities, section, sectionId, onDataChange]);
 
   const handleResponseChange = (itemId, value) => {
     setResponses(prev => ({
@@ -367,41 +329,39 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
     }));
   };
 
+  const handlePriorityChange = (itemId, priority) => {
+    setPriorities(prev => ({
+      ...prev,
+      [itemId]: parseInt(priority)
+    }));
+  };
+
+  const calculateScore = (itemId) => {
+    if (responses[itemId] === "yes") {
+      return priorityScores[priorities[itemId]].score;
+    }
+    return 0;
+  };
+
   const calculateTotal = () => {
-    let mandatoryTotal = 0;
-    let mandatoryYes = 0;
-    let nonMandatoryTotal = 0;
-    let nonMandatoryYes = 0;
+    let sumActualScores = 0;
+    let sumPriorityScores = 0;
     
     section.items.forEach(item => {
-      const priority = priorities[item.id] || item.defaultPriority;
+      // Only include items that are not explicitly 'not_applicable' in the denominator
       if (responses[item.id] !== "not_applicable") {
-        if (priority === 1) {
-          mandatoryTotal++;
-          if (responses[item.id] === "yes") {
-            mandatoryYes++;
-          }
-        } else {
-          nonMandatoryTotal++;
-          if (responses[item.id] === "yes") {
-            nonMandatoryYes++;
-          }
+        sumPriorityScores += priorityScores[priorities[item.id]].score;
+        
+        // Only add to actual score if response is 'yes'
+        if (responses[item.id] === "yes") {
+          sumActualScores += priorityScores[priorities[item.id]].score;
         }
       }
     });
     
-    let totalScore = 0;
+    if (sumPriorityScores === 0) return "0.00";
     
-    if (mandatoryTotal > 0 && nonMandatoryTotal > 0) {
-      totalScore = (mandatoryYes / mandatoryTotal) * MANDATORY_WEIGHT + 
-                   (nonMandatoryYes / nonMandatoryTotal) * NON_MANDATORY_WEIGHT;
-    } else if (mandatoryTotal > 0) {
-      totalScore = (mandatoryYes / mandatoryTotal) * 100;
-    } else if (nonMandatoryTotal > 0) {
-      totalScore = (nonMandatoryYes / nonMandatoryTotal) * 100;
-    }
-    
-    return totalScore.toFixed(2);
+    return ((sumActualScores / sumPriorityScores) * 100).toFixed(2);
   };
 
   return (
@@ -422,21 +382,16 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                 <TableHead className="w-32">Item</TableHead>
                 <TableHead className="w-1/4">Description</TableHead>
                 <TableHead className="w-1/3">Actions</TableHead>
-                <TableHead className="text-center w-40">
-                  <div className="flex items-center justify-center gap-1">
-                    Priority
-                    <Lock className="w-3 h-3 text-gray-400" />
-                  </div>
-                </TableHead>
+                <TableHead className="text-center w-40">Priority</TableHead>
                 <TableHead className="text-center w-32">Response</TableHead>
                 <TableHead className="text-center w-24">Score</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {section.items.map((item) => {
-                const priority = priorities[item.id] || item.defaultPriority;
+                const score = calculateScore(item.id);
+                const priority = priorities[item.id];
                 const response = responses[item.id] || "";
-                const priorityData = priorityScores[priority] || priorityScores[2];
                 
                 return (
                   <TableRow key={item.id} className="hover:bg-emerald-50/30">
@@ -450,12 +405,37 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                       {item.actions}
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Badge className={`${priorityData.color} border text-xs`}>
-                          {priority} - {priorityData.label}
-                        </Badge>
-                        <Lock className="w-3 h-3 text-gray-300" />
-                      </div>
+                      <Select
+                        value={priority.toString()}
+                        onValueChange={(value) => handlePriorityChange(item.id, value)}
+                      >
+                        <SelectTrigger className="w-full border-emerald-200">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-red-100 text-red-800 border border-red-200 text-xs">
+                                1 - Mandatory
+                              </Badge>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="2">
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-blue-100 text-blue-800 border border-blue-200 text-xs">
+                                2 - Best Practice
+                              </Badge>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="3">
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-green-100 text-green-800 border border-green-200 text-xs">
+                                3 - Stretch Goal
+                              </Badge>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell className="text-center">
                       <Select
@@ -477,7 +457,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                         variant={response === "yes" ? "default" : "outline"}
                         className={response === "yes" ? "bg-emerald-600 text-white" : response === "not_applicable" ? "border-gray-300 text-gray-400" : "border-gray-300 text-gray-500"}
                       >
-                        {response === "not_applicable" ? "N/A" : response === "yes" ? "✓" : "-"}
+                        {response === "not_applicable" ? "N/A" : score.toFixed(1)}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -530,7 +510,7 @@ export default function WaterManagement({ data, onDataChange, onNext }) {
               </div>
             </div>
             <p className="text-sm text-gray-700 mt-2">
-              <strong>Note:</strong> Mandatory items (Priority 1) constitute 40% of the subcategory score. Best Practice and Stretch Goal items make up the remaining 60%. Items marked as "Not Applicable" are excluded from calculations. Priority values are locked.
+              <strong>Note:</strong> Items marked as "Not Applicable" are excluded from the total score calculation.
             </p>
           </div>
         </div>
