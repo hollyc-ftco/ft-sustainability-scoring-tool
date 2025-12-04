@@ -453,20 +453,48 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
   });
 
   useEffect(() => {
-    let sumActualScores = 0;
-    let sumPriorityScores = 0;
+    // Count mandatory and non-mandatory items (excluding N/A)
+    let mandatoryTotal = 0;
+    let mandatoryYes = 0;
+    let nonMandatoryTotal = 0;
+    let nonMandatoryYes = 0;
     
     section.items.forEach(item => {
       if (responses[item.id] !== "not_applicable") {
-        sumPriorityScores += priorityScores[priorities[item.id]].score;
-        
-        if (responses[item.id] === "yes") {
-          sumActualScores += priorityScores[priorities[item.id]].score;
+        if (priorities[item.id] === 1) {
+          mandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            mandatoryYes++;
+          }
+        } else {
+          nonMandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            nonMandatoryYes++;
+          }
         }
       }
     });
     
-    const totalScore = sumPriorityScores === 0 ? 0 : (sumActualScores / sumPriorityScores) * 100;
+    // Calculate score: Mandatory = 40%, Non-Mandatory = 60%
+    let totalScore = 0;
+    
+    if (mandatoryTotal > 0) {
+      totalScore += (mandatoryYes / mandatoryTotal) * MANDATORY_WEIGHT;
+    }
+    
+    if (nonMandatoryTotal > 0) {
+      totalScore += (nonMandatoryYes / nonMandatoryTotal) * NON_MANDATORY_WEIGHT;
+    }
+    
+    // If only mandatory items exist (no non-mandatory), scale to 100%
+    if (mandatoryTotal > 0 && nonMandatoryTotal === 0) {
+      totalScore = (mandatoryYes / mandatoryTotal) * 100;
+    }
+    
+    // If only non-mandatory items exist (no mandatory), scale to 100%
+    if (mandatoryTotal === 0 && nonMandatoryTotal > 0) {
+      totalScore = (nonMandatoryYes / nonMandatoryTotal) * 100;
+    }
 
     onDataChange(prev => ({
       ...prev,
@@ -483,37 +511,40 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
     }));
   };
 
-  const handlePriorityChange = (itemId, priority) => {
-    setPriorities(prev => ({
-      ...prev,
-      [itemId]: parseInt(priority)
-    }));
-  };
-
-  const calculateScore = (itemId) => {
-    if (responses[itemId] === "yes") {
-      return priorityScores[priorities[itemId]].score;
-    }
-    return 0;
-  };
-
   const calculateTotal = () => {
-    let sumActualScores = 0;
-    let sumPriorityScores = 0;
+    let mandatoryTotal = 0;
+    let mandatoryYes = 0;
+    let nonMandatoryTotal = 0;
+    let nonMandatoryYes = 0;
     
     section.items.forEach(item => {
       if (responses[item.id] !== "not_applicable") {
-        sumPriorityScores += priorityScores[priorities[item.id]].score;
-        
-        if (responses[item.id] === "yes") {
-          sumActualScores += priorityScores[priorities[item.id]].score;
+        if (priorities[item.id] === 1) {
+          mandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            mandatoryYes++;
+          }
+        } else {
+          nonMandatoryTotal++;
+          if (responses[item.id] === "yes") {
+            nonMandatoryYes++;
+          }
         }
       }
     });
     
-    if (sumPriorityScores === 0) return "0.00";
+    let totalScore = 0;
     
-    return ((sumActualScores / sumPriorityScores) * 100).toFixed(2);
+    if (mandatoryTotal > 0 && nonMandatoryTotal > 0) {
+      totalScore = (mandatoryYes / mandatoryTotal) * MANDATORY_WEIGHT + 
+                   (nonMandatoryYes / nonMandatoryTotal) * NON_MANDATORY_WEIGHT;
+    } else if (mandatoryTotal > 0) {
+      totalScore = (mandatoryYes / mandatoryTotal) * 100;
+    } else if (nonMandatoryTotal > 0) {
+      totalScore = (nonMandatoryYes / nonMandatoryTotal) * 100;
+    }
+    
+    return totalScore.toFixed(2);
   };
 
   return (
@@ -534,16 +565,21 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                 <TableHead className="w-32">Item</TableHead>
                 <TableHead className="w-1/4">Description</TableHead>
                 <TableHead className="w-1/3">Actions</TableHead>
-                <TableHead className="text-center w-40">Priority</TableHead>
+                <TableHead className="text-center w-40">
+                  <div className="flex items-center justify-center gap-1">
+                    Priority
+                    <Lock className="w-3 h-3 text-gray-400" />
+                  </div>
+                </TableHead>
                 <TableHead className="text-center w-32">Response</TableHead>
                 <TableHead className="text-center w-24">Score</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {section.items.map((item) => {
-                const score = calculateScore(item.id);
-                const priority = priorities[item.id];
-                const response = responses[item.id] || ""; // Default to empty string for unselected
+                const priority = priorities[item.id] || item.defaultPriority;
+                const response = responses[item.id] || "";
+                const priorityData = priorityScores[priority] || priorityScores[2];
                 
                 return (
                   <TableRow key={item.id} className="hover:bg-emerald-50/30">
@@ -557,37 +593,12 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                       {item.actions}
                     </TableCell>
                     <TableCell className="text-center">
-                      <Select
-                        value={priority.toString()}
-                        onValueChange={(value) => handlePriorityChange(item.id, value)}
-                      >
-                        <SelectTrigger className="w-full border-emerald-200">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-red-100 text-red-800 border border-red-200 text-xs">
-                                1 - Mandatory
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="2">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-blue-100 text-blue-800 border border-blue-200 text-xs">
-                                2 - Best Practice
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="3">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-green-100 text-green-800 border border-green-200 text-xs">
-                                3 - Stretch Goal
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center justify-center gap-1">
+                        <Badge className={`${priorityData.color} border text-xs`}>
+                          {priority} - {priorityData.label}
+                        </Badge>
+                        <Lock className="w-3 h-3 text-gray-300" />
+                      </div>
                     </TableCell>
                     <TableCell className="text-center">
                       <Select
@@ -609,7 +620,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                         variant={response === "yes" ? "default" : "outline"}
                         className={response === "yes" ? "bg-emerald-600 text-white" : response === "not_applicable" ? "border-gray-300 text-gray-400" : "border-gray-300 text-gray-500"}
                       >
-                        {response === "not_applicable" ? "N/A" : score.toFixed(1)}
+                        {response === "not_applicable" ? "N/A" : response === "yes" ? "✓" : "-"}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -662,7 +673,7 @@ export default function SocialImpactWellbeing({ data, onDataChange, onNext }) {
               </div>
             </div>
             <p className="text-sm text-gray-700 mt-2">
-              <strong>Note:</strong> Items marked as "Not Applicable" are excluded from the total score calculation.
+              <strong>Note:</strong> Mandatory items (Priority 1) constitute 40% of the subcategory score. Best Practice and Stretch Goal items make up the remaining 60%. Items marked as "Not Applicable" are excluded from calculations. Priority values are locked.
             </p>
           </div>
         </div>
