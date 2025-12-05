@@ -503,6 +503,28 @@ function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, on
 
                 return (
                   <TableRow key={item.id} className="hover:bg-emerald-50/30">
+                    {isAdmin && (
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onEditItem(sectionId, item)}
+                            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onDeleteItem(sectionId, item.id)}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
                     <TableCell className="font-semibold text-emerald-700">
                       {item.item}
                     </TableCell>
