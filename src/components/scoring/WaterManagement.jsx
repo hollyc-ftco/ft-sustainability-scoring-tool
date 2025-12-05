@@ -285,7 +285,7 @@ export const assessmentSections = {
   }
 };
 
-function AssessmentSection({ section, sectionId, data, onDataChange }) {
+function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, onEditItem, onAddItem, onDeleteItem }) {
   const [responses, setResponses] = useState(() => {
     if (data.responses[sectionId]) {
       return data.responses[sectionId];
