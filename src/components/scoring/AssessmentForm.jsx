@@ -514,37 +514,25 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
           )}
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="projectNumber">Project Number</Label>
+              <Label htmlFor="projectNumber" className="text-gray-500">Project Number</Label>
               <Input
                 id="projectNumber"
-                placeholder="Enter project number"
+                placeholder="Auto-populated from assessment"
                 value={projectNumber}
-                onChange={(e) => setProjectNumber(e.target.value)}
-                className="border-emerald-200 focus:border-emerald-500"
+                readOnly
+                disabled
+                className="border-gray-200 bg-gray-50 text-gray-600"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="projectStage">Project Stage</Label>
-              <Select value={projectStage} onValueChange={handleProjectStageChange}>
-                <SelectTrigger className="border-emerald-200 focus:border-emerald-500">
-                  <SelectValue placeholder="Select project stage" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Tender">Tender</SelectItem>
-                  <SelectItem 
-                    value="Active"
-                    disabled={!canSelectActive()}
-                  >
-                    Active {!canSelectActive() && "(Requires Tender assessment)"}
-                  </SelectItem>
-                  <SelectItem value="Complete">Complete</SelectItem>
-                </SelectContent>
-              </Select>
-              {projectStage === "Tender" && tenderExists() && (
-                <p className="text-xs text-amber-600 mt-1">
-                  Warning: A Tender assessment already exists for this project number
-                </p>
-              )}
+              <Label htmlFor="projectStage" className="text-gray-500">Project Stage</Label>
+              <Input
+                id="projectStage"
+                value={projectStage}
+                readOnly
+                disabled
+                className="border-gray-200 bg-gray-50 text-gray-600"
+              />
               {projectNumber && (
                 <p className="text-xs text-blue-600 mt-1">
                   Reference: {generateReference(projectStage)}
@@ -552,49 +540,55 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="projectName">Project Name</Label>
+              <Label htmlFor="projectName" className="text-gray-500">Project Name</Label>
               <Input
                 id="projectName"
-                placeholder="Enter project name"
+                placeholder="Auto-populated from assessment"
                 value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
-                className="border-emerald-200 focus:border-emerald-500"
+                readOnly
+                disabled
+                className="border-gray-200 bg-gray-50 text-gray-600"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="projectOwner">Project Owner</Label>
+              <Label htmlFor="projectOwner" className="text-gray-500">Project Owner</Label>
               <Input
                 id="projectOwner"
-                placeholder="Enter project owner"
+                placeholder="Auto-populated from assessment"
                 value={projectOwner}
-                onChange={(e) => setProjectOwner(e.target.value)}
-                className="border-emerald-200 focus:border-emerald-500"
+                readOnly
+                disabled
+                className="border-gray-200 bg-gray-50 text-gray-600"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="department">Department</Label>
-              <Select value={department} onValueChange={setDepartment}>
-                <SelectTrigger className="border-emerald-200 focus:border-emerald-500">
-                  <SelectValue placeholder="Select department" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Circular Economy & Environment">Circular Economy & Environment</SelectItem>
-                  <SelectItem value="Energy and Planning">Energy and Planning</SelectItem>
-                  <SelectItem value="Sustainable Infrastructure">Sustainable Infrastructure</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="department" className="text-gray-500">Department</Label>
+              <Input
+                id="department"
+                placeholder="Auto-populated from assessment"
+                value={department}
+                readOnly
+                disabled
+                className="border-gray-200 bg-gray-50 text-gray-600"
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="createdByName">Created By</Label>
+              <Label htmlFor="createdByName" className="text-gray-500">Created By</Label>
               <Input
                 id="createdByName"
-                placeholder="Enter your name"
+                placeholder="Auto-populated from assessment"
                 value={createdByName}
-                onChange={(e) => setCreatedByName(e.target.value)}
-                className="border-emerald-200 focus:border-emerald-500"
+                readOnly
+                disabled
+                className="border-gray-200 bg-gray-50 text-gray-600"
               />
             </div>
           </div>
+          {!assessmentStarted && (
+            <p className="text-sm text-gray-500 mt-4 text-center italic">
+              Click "Start Assessment" to enter project information
+            </p>
+          )}
         </CardContent>
       </Card>
 
