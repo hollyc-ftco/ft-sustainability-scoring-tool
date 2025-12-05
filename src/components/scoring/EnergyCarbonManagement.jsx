@@ -16,8 +16,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Info, ArrowRight, Lock } from "lucide-react";
+import { Info, ArrowRight, Lock, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import AdminItemEditor from "./AdminItemEditor";
 
 const priorityScores = {
   1: { label: "Mandatory", color: "bg-red-100 text-red-800 border-red-200" },
