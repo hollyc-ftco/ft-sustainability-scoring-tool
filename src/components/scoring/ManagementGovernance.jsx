@@ -175,8 +175,8 @@ export const assessmentSections = {
       },
       {
         id: "coordination",
-        item: "Co-ordination of environmental and social aspects",
-        description: "A member of the project team was appointed as responsible for co-ordinating the management of the environmental and social aspects of the project.",
+        item: "Coordination of environmental and social aspects",
+        description: "A member of the project team was appointed as responsible for coordinating the management of the environmental and social aspects of the project.",
         actions: "For large projects have an individual whose sole responsibility is environmental and social co-ordination. For smaller projects designate an individual whose responsibilities will include environmental and social co-ordination.",
         defaultPriority: 2
       },
