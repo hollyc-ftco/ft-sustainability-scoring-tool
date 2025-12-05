@@ -14,10 +14,14 @@ import TransportMobility, { assessmentSections as tmSections } from "../componen
 import SocialImpactWellbeing, { assessmentSections as siSections } from "../components/scoring/SocialImpactWellbeing";
 import InnovationTechnology, { assessmentSections as itSections } from "../components/scoring/InnovationTechnology";
 import MandatoryCheckDialog from "../components/scoring/MandatoryCheckDialog";
+import ProjectInfoDialog from "../components/scoring/ProjectInfoDialog";
 
 export default function ScoringTool() {
   const [activeAssessmentTab, setActiveAssessmentTab] = useState("summary");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [projectInfoDialogOpen, setProjectInfoDialogOpen] = useState(false);
+  const [projectInfo, setProjectInfo] = useState(null);
+  const [assessmentStarted, setAssessmentStarted] = useState(false);
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -142,6 +146,13 @@ export default function ScoringTool() {
     setPendingNavigation(null);
   };
 
+  const handleStartAssessment = (info) => {
+    setProjectInfo(info);
+    setAssessmentStarted(true);
+    setProjectInfoDialogOpen(false);
+    setActiveAssessmentTab("management");
+  };
+
   return (
     <div className="p-6 md:p-10">
       <div className="max-w-7xl mx-auto">
@@ -222,6 +233,9 @@ export default function ScoringTool() {
                   transportMobilityData={transportMobilityData}
                   socialImpactData={socialImpactData}
                   innovationTechnologyData={innovationTechnologyData}
+                  projectInfo={projectInfo}
+                  assessmentStarted={assessmentStarted}
+                  onStartAssessment={() => setProjectInfoDialogOpen(true)}
                 />
               </TabsContent>
 
@@ -308,6 +322,12 @@ export default function ScoringTool() {
           missingMandatory={dialogData.missingMandatory}
           currentScore={dialogData.currentScore}
           sectionName={dialogData.sectionName}
+        />
+
+        <ProjectInfoDialog
+          open={projectInfoDialogOpen}
+          onOpenChange={setProjectInfoDialogOpen}
+          onStartAssessment={handleStartAssessment}
         />
       </div>
     </div>

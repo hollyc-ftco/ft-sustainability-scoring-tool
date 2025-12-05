@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
@@ -8,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, Calculator, Printer, Plus } from "lucide-react";
+import { Save, Calculator, Printer, Plus, Play } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -128,18 +127,30 @@ const assessmentCategories = [
   }
 ];
 
-export default function AssessmentForm({ managementGovernanceData, energyCarbonData, waterManagementData, materialsResourceData, biodiversityEcosystemData, transportMobilityData, socialImpactData, innovationTechnologyData }) {
+export default function AssessmentForm({ managementGovernanceData, energyCarbonData, waterManagementData, materialsResourceData, biodiversityEcosystemData, transportMobilityData, socialImpactData, innovationTechnologyData, projectInfo, assessmentStarted, onStartAssessment }) {
   const queryClient = useQueryClient();
   const [projectNumber, setProjectNumber] = useState("");
   const [projectName, setProjectName] = useState("");
   const [projectOwner, setProjectOwner] = useState("");
-  const [department, setDepartment] = useState(""); // New state for department
+  const [department, setDepartment] = useState("");
   const [createdByName, setCreatedByName] = useState("");
   const [projectStage, setProjectStage] = useState("Tender");
   const [scores, setScores] = useState({});
   const [comments, setComments] = useState({});
   const [showSummary, setShowSummary] = useState(false);
   const [validationError, setValidationError] = useState("");
+
+  // Auto-populate project info from dialog
+  useEffect(() => {
+    if (projectInfo) {
+      setProjectNumber(projectInfo.projectNumber || "");
+      setProjectName(projectInfo.projectName || "");
+      setProjectOwner(projectInfo.projectOwner || "");
+      setDepartment(projectInfo.department || "");
+      setCreatedByName(projectInfo.createdByName || "");
+      setProjectStage(projectInfo.projectStage || "Tender");
+    }
+  }, [projectInfo]);
 
   // Fetch all projects to check for existing assessments
   const { data: allProjects = [] } = useQuery({
@@ -461,6 +472,38 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
       setValidationError("");
     }
   };
+
+  // Show Start Assessment button if assessment hasn't started
+  if (!assessmentStarted) {
+    return (
+      <div className="space-y-6">
+        <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
+          <CardContent className="py-16">
+            <div className="text-center space-y-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <Play className="w-10 h-10 text-white ml-1" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Start New Assessment</h2>
+                <p className="text-gray-600 max-w-md mx-auto">
+                  Begin a sustainability assessment by entering your project information. 
+                  You'll be guided through each category to evaluate your project.
+                </p>
+              </div>
+              <Button
+                onClick={onStartAssessment}
+                className="bg-emerald-600 hover:bg-emerald-700 text-lg px-8 py-6"
+                size="lg"
+              >
+                <Play className="w-5 h-5 mr-2" />
+                Start Assessment
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
