@@ -442,7 +442,57 @@ function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, on
   );
 }
 
-export default function TransportMobility({ data, onDataChange, onNext }) {
+export default function TransportMobility({ data, onDataChange, onNext, isAdmin = false, customSections, onUpdateSections }) {
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editingSectionId, setEditingSectionId] = useState(null);
+  const [isNewItem, setIsNewItem] = useState(false);
+
+  const sections = customSections || assessmentSections;
+
+  const handleEditItem = (sectionId, item) => {
+    setEditingSectionId(sectionId);
+    setEditingItem(item);
+    setIsNewItem(false);
+    setEditorOpen(true);
+  };
+
+  const handleAddItem = (sectionId) => {
+    setEditingSectionId(sectionId);
+    setEditingItem(null);
+    setIsNewItem(true);
+    setEditorOpen(true);
+  };
+
+  const handleDeleteItem = (sectionId, itemId) => {
+    if (!onUpdateSections) return;
+    const updatedSections = { ...sections };
+    updatedSections[sectionId] = {
+      ...updatedSections[sectionId],
+      items: updatedSections[sectionId].items.filter(item => item.id !== itemId)
+    };
+    onUpdateSections(updatedSections);
+  };
+
+  const handleSaveItem = (savedItem) => {
+    if (!onUpdateSections) return;
+    const updatedSections = { ...sections };
+    if (isNewItem) {
+      updatedSections[editingSectionId] = {
+        ...updatedSections[editingSectionId],
+        items: [...updatedSections[editingSectionId].items, savedItem]
+      };
+    } else {
+      updatedSections[editingSectionId] = {
+        ...updatedSections[editingSectionId],
+        items: updatedSections[editingSectionId].items.map(item => 
+          item.id === savedItem.id ? savedItem : item
+        )
+      };
+    }
+    onUpdateSections(updatedSections);
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
@@ -471,19 +521,23 @@ export default function TransportMobility({ data, onDataChange, onNext }) {
               </div>
             </div>
             <p className="text-sm text-gray-700 mt-2">
-              <strong>Note:</strong> Mandatory items (Priority 1) constitute 40% of the subcategory score. Best Practice and Stretch Goal items make up the remaining 60%. Items marked as "Not Applicable" are excluded from calculations. Priority values are locked.
+              <strong>Note:</strong> Mandatory items (Priority 1) constitute 40% of the subcategory score. Best Practice and Stretch Goal items make up the remaining 60%. Items marked as "Not Applicable" are excluded from calculations. {!isAdmin && "Priority values are locked."}
             </p>
           </div>
         </div>
       </div>
 
-      {Object.entries(assessmentSections).map(([sectionId, section]) => (
+      {Object.entries(sections).map(([sectionId, section]) => (
         <AssessmentSection 
           key={sectionId} 
           section={section} 
           sectionId={sectionId}
           data={data}
           onDataChange={onDataChange}
+          isAdmin={isAdmin}
+          onEditItem={handleEditItem}
+          onAddItem={handleAddItem}
+          onDeleteItem={handleDeleteItem}
         />
       ))}
 
@@ -497,6 +551,14 @@ export default function TransportMobility({ data, onDataChange, onNext }) {
           <ArrowRight className="w-5 h-5 ml-2" />
         </Button>
       </div>
+
+      <AdminItemEditor
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+        item={editingItem}
+        onSave={handleSaveItem}
+        isNew={isNewItem}
+      />
     </div>
   );
 }
