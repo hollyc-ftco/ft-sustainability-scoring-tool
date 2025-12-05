@@ -539,7 +539,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, on
                         <Badge className={`${priorityData.color} border text-xs`}>
                           {priority} - {priorityData.label}
                         </Badge>
-                        <Lock className="w-3 h-3 text-gray-300" />
+                        {!isAdmin && <Lock className="w-3 h-3 text-gray-300" />}
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
