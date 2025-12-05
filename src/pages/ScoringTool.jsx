@@ -239,6 +239,7 @@ export default function ScoringTool() {
                   data={energyCarbonData}
                   onDataChange={setEnergyCarbonData}
                   onNext={() => handleNavigationWithCheck(energyCarbonData, ecSections, "Energy & Carbon Management", "water")}
+                  isAdmin={isAdmin}
                 />
               </TabsContent>
 
@@ -247,6 +248,7 @@ export default function ScoringTool() {
                   data={waterManagementData}
                   onDataChange={setWaterManagementData}
                   onNext={() => handleNavigationWithCheck(waterManagementData, wmSections, "Water Management", "materials")}
+                  isAdmin={isAdmin}
                 />
               </TabsContent>
 
@@ -255,6 +257,7 @@ export default function ScoringTool() {
                   data={materialsResourceData}
                   onDataChange={setMaterialsResourceData}
                   onNext={() => handleNavigationWithCheck(materialsResourceData, mrSections, "Materials & Resource Efficiency", "biodiversity")}
+                  isAdmin={isAdmin}
                 />
               </TabsContent>
 
@@ -263,6 +266,7 @@ export default function ScoringTool() {
                   data={biodiversityEcosystemData}
                   onDataChange={setBiodiversityEcosystemData}
                   onNext={() => handleNavigationWithCheck(biodiversityEcosystemData, beSections, "Biodiversity & Ecosystem", "transport")}
+                  isAdmin={isAdmin}
                 />
               </TabsContent>
 
@@ -271,6 +275,7 @@ export default function ScoringTool() {
                   data={transportMobilityData}
                   onDataChange={setTransportMobilityData}
                   onNext={() => handleNavigationWithCheck(transportMobilityData, tmSections, "Transport & Mobility", "social")}
+                  isAdmin={isAdmin}
                 />
               </TabsContent>
 
@@ -279,6 +284,7 @@ export default function ScoringTool() {
                   data={socialImpactData}
                   onDataChange={setSocialImpactData}
                   onNext={() => handleNavigationWithCheck(socialImpactData, siSections, "Social Impact & Wellbeing", "innovation")}
+                  isAdmin={isAdmin}
                 />
               </TabsContent>
 
@@ -287,6 +293,7 @@ export default function ScoringTool() {
                   data={innovationTechnologyData}
                   onDataChange={setInnovationTechnologyData}
                   onNext={() => handleNavigationWithCheck(innovationTechnologyData, itSections, "Innovation & Technology", "summary")}
+                  isAdmin={isAdmin}
                 />
               </TabsContent>
             </Tabs>
