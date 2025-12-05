@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RatingScale from "../components/scoring/RatingScale";
@@ -16,6 +17,19 @@ import MandatoryCheckDialog from "../components/scoring/MandatoryCheckDialog";
 
 export default function ScoringTool() {
   const [activeAssessmentTab, setActiveAssessmentTab] = useState("summary");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const user = await base44.auth.me();
+        setIsAdmin(user?.role === 'admin');
+      } catch {
+        setIsAdmin(false);
+      }
+    };
+    checkAdmin();
+  }, []);
   
   const [managementGovernanceData, setManagementGovernanceData] = useState({
     responses: {},
@@ -216,6 +230,7 @@ export default function ScoringTool() {
                   data={managementGovernanceData}
                   onDataChange={setManagementGovernanceData}
                   onNext={() => handleNavigationWithCheck(managementGovernanceData, mgSections, "Management & Governance", "energy")}
+                  isAdmin={isAdmin}
                 />
               </TabsContent>
 
