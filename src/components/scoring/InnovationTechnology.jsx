@@ -343,13 +343,14 @@ function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, on
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">
+                {isAdmin && <TableHead className="w-20">Edit</TableHead>}
                 <TableHead className="w-32">Item</TableHead>
                 <TableHead className="w-1/4">Description</TableHead>
                 <TableHead className="w-1/3">Actions</TableHead>
                 <TableHead className="text-center w-40">
                   <div className="flex items-center justify-center gap-1">
                     Priority
-                    <Lock className="w-3 h-3 text-gray-400" />
+                    {!isAdmin && <Lock className="w-3 h-3 text-gray-400" />}
                   </div>
                 </TableHead>
                 <TableHead className="text-center w-32">Response</TableHead>
