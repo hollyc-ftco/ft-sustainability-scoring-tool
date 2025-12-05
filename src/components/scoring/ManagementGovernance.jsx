@@ -17,7 +17,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Info, ArrowRight, Lock } from "lucide-react";
+import { Info, ArrowRight, Lock, Pencil, Plus, Trash2 } from "lucide-react";
+import AdminItemEditor from "./AdminItemEditor";
 
 const priorityScores = {
   1: { label: "Mandatory", color: "bg-red-100 text-red-800 border-red-200" },
@@ -326,7 +327,7 @@ export const assessmentSections = {
   }
 };
 
-function AssessmentSection({ section, sectionId, data, onDataChange }) {
+function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, onEditItem, onAddItem, onDeleteItem }) {
   const [responses, setResponses] = useState(() => {
     if (data.responses[sectionId]) {
       return data.responses[sectionId];
@@ -461,13 +462,14 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">
+                {isAdmin && <TableHead className="w-20">Edit</TableHead>}
                 <TableHead className="w-32">Item</TableHead>
                 <TableHead className="w-1/4">Description</TableHead>
                 <TableHead className="w-1/3">Actions</TableHead>
                 <TableHead className="text-center w-40">
                   <div className="flex items-center justify-center gap-1">
                     Priority
-                    <Lock className="w-3 h-3 text-gray-400" />
+                    {!isAdmin && <Lock className="w-3 h-3 text-gray-400" />}
                   </div>
                 </TableHead>
                 <TableHead className="text-center w-32">Response</TableHead>
@@ -481,6 +483,28 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                 
                 return (
                   <TableRow key={item.id} className="hover:bg-emerald-50/30">
+                    {isAdmin && (
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onEditItem(sectionId, item)}
+                            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onDeleteItem(sectionId, item.id)}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
                     <TableCell className="font-semibold text-emerald-700">
                       {item.item}
                     </TableCell>
@@ -495,7 +519,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                         <Badge className={`${priorityScores[priority].color} border text-xs`}>
                           {priority} - {priorityScores[priority].label}
                         </Badge>
-                        <Lock className="w-3 h-3 text-gray-300" />
+                        {!isAdmin && <Lock className="w-3 h-3 text-gray-300" />}
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
@@ -524,8 +548,23 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
                   </TableRow>
                 );
               })}
+              {isAdmin && (
+                <TableRow className="bg-blue-50">
+                  <TableCell colSpan={isAdmin ? 7 : 6}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onAddItem(sectionId)}
+                      className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add New Item
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )}
               <TableRow className="bg-emerald-50 font-semibold">
-                <TableCell colSpan={5} className="text-right text-lg">
+                <TableCell colSpan={isAdmin ? 6 : 5} className="text-right text-lg">
                   TOTAL
                 </TableCell>
                 <TableCell className="text-center">
@@ -542,7 +581,57 @@ function AssessmentSection({ section, sectionId, data, onDataChange }) {
   );
 }
 
-export default function ManagementGovernance({ data, onDataChange, onNext }) {
+export default function ManagementGovernance({ data, onDataChange, onNext, isAdmin = false, customSections, onUpdateSections }) {
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editingSectionId, setEditingSectionId] = useState(null);
+  const [isNewItem, setIsNewItem] = useState(false);
+
+  const sections = customSections || assessmentSections;
+
+  const handleEditItem = (sectionId, item) => {
+    setEditingSectionId(sectionId);
+    setEditingItem(item);
+    setIsNewItem(false);
+    setEditorOpen(true);
+  };
+
+  const handleAddItem = (sectionId) => {
+    setEditingSectionId(sectionId);
+    setEditingItem(null);
+    setIsNewItem(true);
+    setEditorOpen(true);
+  };
+
+  const handleDeleteItem = (sectionId, itemId) => {
+    if (!onUpdateSections) return;
+    const updatedSections = { ...sections };
+    updatedSections[sectionId] = {
+      ...updatedSections[sectionId],
+      items: updatedSections[sectionId].items.filter(item => item.id !== itemId)
+    };
+    onUpdateSections(updatedSections);
+  };
+
+  const handleSaveItem = (savedItem) => {
+    if (!onUpdateSections) return;
+    const updatedSections = { ...sections };
+    if (isNewItem) {
+      updatedSections[editingSectionId] = {
+        ...updatedSections[editingSectionId],
+        items: [...updatedSections[editingSectionId].items, savedItem]
+      };
+    } else {
+      updatedSections[editingSectionId] = {
+        ...updatedSections[editingSectionId],
+        items: updatedSections[editingSectionId].items.map(item => 
+          item.id === savedItem.id ? savedItem : item
+        )
+      };
+    }
+    onUpdateSections(updatedSections);
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
@@ -571,19 +660,23 @@ export default function ManagementGovernance({ data, onDataChange, onNext }) {
               </div>
             </div>
             <p className="text-sm text-gray-700 mt-2">
-              <strong>Note:</strong> Mandatory items (Priority 1) constitute 40% of the subcategory score. Best Practice and Stretch Goal items make up the remaining 60%. Items marked as "Not Applicable" are excluded from calculations. Priority values are locked.
+              <strong>Note:</strong> Mandatory items (Priority 1) constitute 40% of the subcategory score. Best Practice and Stretch Goal items make up the remaining 60%. Items marked as "Not Applicable" are excluded from calculations. {!isAdmin && "Priority values are locked."}
             </p>
           </div>
         </div>
       </div>
 
-      {Object.entries(assessmentSections).map(([sectionId, section]) => (
+      {Object.entries(sections).map(([sectionId, section]) => (
         <AssessmentSection 
           key={sectionId} 
           section={section} 
           sectionId={sectionId}
           data={data}
           onDataChange={onDataChange}
+          isAdmin={isAdmin}
+          onEditItem={handleEditItem}
+          onAddItem={handleAddItem}
+          onDeleteItem={handleDeleteItem}
         />
       ))}
 
@@ -597,6 +690,14 @@ export default function ManagementGovernance({ data, onDataChange, onNext }) {
           <ArrowRight className="w-5 h-5 ml-2" />
         </Button>
       </div>
+
+      <AdminItemEditor
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+        item={editingItem}
+        onSave={handleSaveItem}
+        isNew={isNewItem}
+      />
     </div>
   );
 }
