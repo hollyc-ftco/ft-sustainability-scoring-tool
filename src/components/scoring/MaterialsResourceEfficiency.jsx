@@ -574,8 +574,23 @@ function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, on
                   </TableRow>
                 );
               })}
+              {isAdmin && (
+                <TableRow className="bg-blue-50">
+                  <TableCell colSpan={isAdmin ? 7 : 6}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onAddItem(sectionId)}
+                      className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add New Item
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )}
               <TableRow className="bg-emerald-50 font-semibold">
-                <TableCell colSpan={5} className="text-right text-lg">
+                <TableCell colSpan={isAdmin ? 6 : 5} className="text-right text-lg">
                   TOTAL
                 </TableCell>
                 <TableCell className="text-center">
