@@ -473,44 +473,19 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
     }
   };
 
-  // Show Start Assessment button if assessment hasn't started
-  if (!assessmentStarted) {
-    return (
-      <div className="space-y-6">
-        <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
-          <CardContent className="py-16">
-            <div className="text-center space-y-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto shadow-lg">
-                <Play className="w-10 h-10 text-white ml-1" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Start New Assessment</h2>
-                <p className="text-gray-600 max-w-md mx-auto">
-                  Begin a sustainability assessment by entering your project information. 
-                  You'll be guided through each category to evaluate your project.
-                </p>
-              </div>
-              <Button
-                onClick={onStartAssessment}
-                className="bg-emerald-600 hover:bg-emerald-700 text-lg px-8 py-6"
-                size="lg"
-              >
-                <Play className="w-5 h-5 mr-2" />
-                Start Assessment
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <Card className="border-emerald-100 bg-white/60 backdrop-blur-sm">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-2xl">Project Information</CardTitle>
           <div className="flex gap-3">
+            <Button
+              onClick={onStartAssessment}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              <Play className="w-4 h-4 mr-2" />
+              Start Assessment
+            </Button>
             <Button
               onClick={handleCreateNew}
               variant="outline"
