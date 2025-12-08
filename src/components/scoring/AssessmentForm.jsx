@@ -440,20 +440,60 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
       project_number: projectNumber,
       project_name: projectName,
       project_owner: projectOwner,
-      department: department, // Added department
+      department: department,
       created_by_name: createdByName,
       project_stage: projectStage,
       status: "completed",
       total_score: parseFloat(calculateTotalScore()),
       category_comments: comments,
-      management_governance: scores.management_governance || {},
-      energy_carbon: scores.energy_carbon || {},
-      water_management: scores.water_management || {},
-      materials_resources: scores.materials_resources || {},
-      biodiversity_ecosystem: scores.biodiversity_ecosystem || {},
-      transport_mobility: scores.transport_mobility || {},
-      social_impact: scores.social_impact || {},
-      innovation_technology: scores.innovation_technology || {}
+      management_governance: {
+        ...(scores.management_governance || {}),
+        responses: managementGovernanceData?.responses || {},
+        priorities: managementGovernanceData?.priorities || {},
+        scores: managementGovernanceData?.scores || {}
+      },
+      energy_carbon: {
+        ...(scores.energy_carbon || {}),
+        responses: energyCarbonData?.responses || {},
+        priorities: energyCarbonData?.priorities || {},
+        scores: energyCarbonData?.scores || {}
+      },
+      water_management: {
+        ...(scores.water_management || {}),
+        responses: waterManagementData?.responses || {},
+        priorities: waterManagementData?.priorities || {},
+        scores: waterManagementData?.scores || {}
+      },
+      materials_resources: {
+        ...(scores.materials_resources || {}),
+        responses: materialsResourceData?.responses || {},
+        priorities: materialsResourceData?.priorities || {},
+        scores: materialsResourceData?.scores || {}
+      },
+      biodiversity_ecosystem: {
+        ...(scores.biodiversity_ecosystem || {}),
+        responses: biodiversityEcosystemData?.responses || {},
+        priorities: biodiversityEcosystemData?.priorities || {},
+        scores: biodiversityEcosystemData?.scores || {}
+      },
+      transport_mobility: {
+        ...(scores.transport_mobility || {}),
+        responses: transportMobilityData?.responses || {},
+        priorities: transportMobilityData?.priorities || {},
+        scores: transportMobilityData?.scores || {}
+      },
+      social_impact: {
+        ...(scores.social_impact || {}),
+        responses: socialImpactData?.responses || {},
+        priorities: socialImpactData?.priorities || {},
+        scores: socialImpactData?.scores || {}
+      },
+      innovation_technology: {
+        ...(scores.innovation_technology || {}),
+        responses: innovationTechnologyData?.responses || {},
+        priorities: innovationTechnologyData?.priorities || {},
+        scores: innovationTechnologyData?.scores || {}
+      }
     };
 
     saveProjectMutation.mutate(projectData);
