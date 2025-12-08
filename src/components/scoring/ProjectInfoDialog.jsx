@@ -194,7 +194,7 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
                 id="dialogProjectNumber"
                 placeholder="Enter project number"
                 value={projectNumber}
-                onChange={(e) => setProjectNumber(e.target.value)}
+                onChange={(e) => setProjectNumber(e.target.value.toUpperCase())}
                 className="border-emerald-200 focus:border-emerald-500"
               />
             </div>
@@ -225,8 +225,9 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
               placeholder="Enter project name"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value.toUpperCase())}
-              className="border-emerald-200 focus:border-emerald-500"
+              className={`border-emerald-200 focus:border-emerald-500 ${isExistingProject ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               disabled={isExistingProject}
+              readOnly={isExistingProject}
             />
           </div>
           
@@ -237,8 +238,9 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
               placeholder="Enter project owner"
               value={projectOwner}
               onChange={(e) => setProjectOwner(e.target.value)}
-              className="border-emerald-200 focus:border-emerald-500"
+              className={`border-emerald-200 focus:border-emerald-500 ${isExistingProject ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               disabled={isExistingProject}
+              readOnly={isExistingProject}
             />
           </div>
           
@@ -246,7 +248,7 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
             <div className="space-y-2">
               <Label htmlFor="dialogDepartment">Department</Label>
               <Select value={department} onValueChange={setDepartment} disabled={isExistingProject}>
-                <SelectTrigger className="border-emerald-200 focus:border-emerald-500">
+                <SelectTrigger className={`border-emerald-200 focus:border-emerald-500 ${isExistingProject ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}`}>
                   <SelectValue placeholder="Select department" />
                 </SelectTrigger>
                 <SelectContent>
