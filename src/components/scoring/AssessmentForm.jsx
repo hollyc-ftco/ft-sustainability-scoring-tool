@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, Calculator, Printer, Plus, Play } from "lucide-react";
+import { Save, Calculator, Printer, Plus, Play, MessageSquare } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -15,6 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import CategoryAssessment from "./CategoryAssessment";
 import AssessmentSummary from "./AssessmentSummary";
 
@@ -139,6 +147,9 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
   const [comments, setComments] = useState({});
   const [showSummary, setShowSummary] = useState(false);
   const [validationError, setValidationError] = useState("");
+  const [showCommentDialog, setShowCommentDialog] = useState(false);
+  const [additionalComment, setAdditionalComment] = useState("");
+  const [savedProjectId, setSavedProjectId] = useState(null);
 
   // Auto-populate project info from dialog
   useEffect(() => {
@@ -353,11 +364,36 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
 
   const saveProjectMutation = useMutation({
     mutationFn: (projectData) => base44.entities.Project.create(projectData),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
-      alert("Project assessment saved successfully!");
+      setSavedProjectId(data.id);
+      setShowCommentDialog(true);
     }
   });
+
+  const updateCommentMutation = useMutation({
+    mutationFn: ({ id, comment }) => base44.entities.Project.update(id, { additional_comment: comment }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      alert("Assessment saved successfully!");
+      setShowCommentDialog(false);
+      setAdditionalComment("");
+      setSavedProjectId(null);
+    }
+  });
+
+  const handleSaveComment = () => {
+    if (additionalComment.trim() && savedProjectId) {
+      updateCommentMutation.mutate({ id: savedProjectId, comment: additionalComment });
+    }
+  };
+
+  const handleSkipComment = () => {
+    alert("Assessment saved successfully!");
+    setShowCommentDialog(false);
+    setAdditionalComment("");
+    setSavedProjectId(null);
+  };
 
   const handleScoreChange = (categoryId, subCategoryId, value) => {
     // Don't allow manual changes to auto-populated categories
@@ -709,6 +745,47 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
           comments={comments}
         />
       )}
+
+      <Dialog open={showCommentDialog} onOpenChange={setShowCommentDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-emerald-600" />
+              Add Additional Comment
+            </DialogTitle>
+            <DialogDescription>
+              Would you like to add any additional comments or notes for this assessment?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <Textarea
+              placeholder="Enter your comments here (optional)..."
+              value={additionalComment}
+              onChange={(e) => setAdditionalComment(e.target.value)}
+              className="min-h-[120px] border-emerald-200 focus:border-emerald-500"
+            />
+          </div>
+          
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={handleSkipComment}
+              className="border-gray-300"
+            >
+              Skip
+            </Button>
+            <Button
+              onClick={handleSaveComment}
+              disabled={!additionalComment.trim() || updateCommentMutation.isPending}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {updateCommentMutation.isPending ? "Saving..." : "Save Comment"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
