@@ -35,13 +35,18 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
     queryFn: () => base44.entities.Project.list(),
   });
 
-  // Get latest assessment on dialog open
+  // Get latest COMPLETED assessment on dialog open
   useEffect(() => {
     if (open && allProjects.length > 0) {
-      const sorted = [...allProjects].sort((a, b) => 
-        new Date(b.created_date) - new Date(a.created_date)
-      );
-      setLatestAssessment(sorted[0]);
+      const completed = allProjects.filter(p => p.status === 'completed');
+      if (completed.length > 0) {
+        const sorted = [...completed].sort((a, b) => 
+          new Date(b.created_date) - new Date(a.created_date)
+        );
+        setLatestAssessment(sorted[0]);
+      } else {
+        setLatestAssessment(null);
+      }
     }
   }, [open, allProjects]);
 
