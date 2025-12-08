@@ -70,6 +70,13 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
     );
   };
 
+  const completeExists = () => {
+    if (!projectNumber) return false;
+    return allProjects.some(
+      p => p.project_number === projectNumber && p.project_stage === "Complete"
+    );
+  };
+
   const generateReference = (stage) => {
     if (!projectNumber) return "";
     
@@ -93,6 +100,11 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
       return;
     }
     
+    if (value === "Complete" && completeExists()) {
+      setValidationError("Only one Complete assessment is allowed per project number.");
+      return;
+    }
+    
     setProjectStage(value);
   };
 
@@ -104,6 +116,11 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
 
     if (projectStage === "Tender" && tenderExists()) {
       setValidationError("Only one Tender assessment is allowed per project number.");
+      return;
+    }
+
+    if (projectStage === "Complete" && completeExists()) {
+      setValidationError("Only one Complete assessment is allowed per project number.");
       return;
     }
 
