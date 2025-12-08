@@ -29,6 +29,7 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
   const [createdByName, setCreatedByName] = useState("");
   const [projectStage, setProjectStage] = useState("Tender");
   const [validationError, setValidationError] = useState("");
+  const [isExistingProject, setIsExistingProject] = useState(false);
 
   const { data: allProjects = [] } = useQuery({
     queryKey: ['projects'],
@@ -58,16 +59,15 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
       );
       
       if (existingProject) {
-        if (existingProject.project_name && !projectName) {
-          setProjectName(existingProject.project_name);
-        }
-        if (existingProject.project_owner && !projectOwner) {
-          setProjectOwner(existingProject.project_owner);
-        }
-        if (existingProject.department && !department) {
-          setDepartment(existingProject.department);
-        }
+        setProjectName(existingProject.project_name || "");
+        setProjectOwner(existingProject.project_owner || "");
+        setDepartment(existingProject.department || "");
+        setIsExistingProject(true);
+      } else {
+        setIsExistingProject(false);
       }
+    } else {
+      setIsExistingProject(false);
     }
   }, [projectNumber, allProjects]);
 
@@ -169,6 +169,7 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
     setCreatedByName("");
     setProjectStage("Tender");
     setValidationError("");
+    setIsExistingProject(false);
     onOpenChange(false);
   };
 
@@ -225,6 +226,7 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
               value={projectName}
               onChange={(e) => setProjectName(e.target.value.toUpperCase())}
               className="border-emerald-200 focus:border-emerald-500"
+              disabled={isExistingProject}
             />
           </div>
           
@@ -236,13 +238,14 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
               value={projectOwner}
               onChange={(e) => setProjectOwner(e.target.value)}
               className="border-emerald-200 focus:border-emerald-500"
+              disabled={isExistingProject}
             />
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="dialogDepartment">Department</Label>
-              <Select value={department} onValueChange={setDepartment}>
+              <Select value={department} onValueChange={setDepartment} disabled={isExistingProject}>
                 <SelectTrigger className="border-emerald-200 focus:border-emerald-500">
                   <SelectValue placeholder="Select department" />
                 </SelectTrigger>
