@@ -378,6 +378,11 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
   };
 
   const handleCommentChange = (categoryId, value) => {
+    // Limit to 200 words
+    const wordCount = value.trim().split(/\s+/).filter(word => word.length > 0).length;
+    if (wordCount > 200) {
+      return; // Don't update if exceeds 200 words
+    }
     setComments(prev => ({
       ...prev,
       [categoryId]: value
@@ -613,10 +618,13 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
               <div className="space-y-2">
                 <Label htmlFor={`comment-${category.id}`} className="text-sm font-medium text-gray-700">
                   Comments for {category.name}
+                  <span className="text-xs text-gray-500 ml-2">
+                    ({(comments[category.id] || "").trim().split(/\s+/).filter(word => word.length > 0).length}/200 words)
+                  </span>
                 </Label>
                 <Textarea
                   id={`comment-${category.id}`}
-                  placeholder="Add any comments or notes for this category..."
+                  placeholder="Add any comments or notes for this category (max 200 words)..."
                   value={comments[category.id] || ""}
                   onChange={(e) => handleCommentChange(category.id, e.target.value)}
                   className="border-emerald-200 focus:border-emerald-500 min-h-[80px]"

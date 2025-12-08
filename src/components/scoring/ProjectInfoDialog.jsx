@@ -23,6 +23,7 @@ import { ArrowRight } from "lucide-react";
 export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessment }) {
   const [projectNumber, setProjectNumber] = useState("");
   const [projectName, setProjectName] = useState("");
+  const [latestAssessment, setLatestAssessment] = useState(null);
   const [projectOwner, setProjectOwner] = useState("");
   const [department, setDepartment] = useState("");
   const [createdByName, setCreatedByName] = useState("");
@@ -33,6 +34,16 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
     queryKey: ['projects'],
     queryFn: () => base44.entities.Project.list(),
   });
+
+  // Get latest assessment on dialog open
+  useEffect(() => {
+    if (open && allProjects.length > 0) {
+      const sorted = [...allProjects].sort((a, b) => 
+        new Date(b.created_date) - new Date(a.created_date)
+      );
+      setLatestAssessment(sorted[0]);
+    }
+  }, [open, allProjects]);
 
   // Auto-fill project details when project number changes
   useEffect(() => {
@@ -126,12 +137,13 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
 
     onStartAssessment({
       projectNumber,
-      projectName,
+      projectName: projectName.toUpperCase(),
       projectOwner,
       department,
       createdByName,
       projectStage,
-      reference: generateReference(projectStage)
+      reference: generateReference(projectStage),
+      latestAssessment
     });
     
     // Reset form
@@ -206,7 +218,7 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
               id="dialogProjectName"
               placeholder="Enter project name"
               value={projectName}
-              onChange={(e) => setProjectName(e.target.value)}
+              onChange={(e) => setProjectName(e.target.value.toUpperCase())}
               className="border-emerald-200 focus:border-emerald-500"
             />
           </div>
