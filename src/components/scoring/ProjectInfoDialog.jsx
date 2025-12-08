@@ -88,11 +88,6 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
   const handleProjectStageChange = (value) => {
     setValidationError("");
     
-    if (value === "Active" && !canSelectActive()) {
-      setValidationError("Active stage is only allowed if there is an existing Tender assessment for this project number.");
-      return;
-    }
-    
     if (value === "Tender" && tenderExists()) {
       setValidationError("Only one Tender assessment is allowed per project number.");
       return;
@@ -104,11 +99,6 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
   const handleStart = () => {
     if (!projectNumber || !projectName || !projectOwner) {
       setValidationError("Please enter project number, project name and owner");
-      return;
-    }
-
-    if (projectStage === "Active" && !canSelectActive()) {
-      setValidationError("Active stage is only allowed if there is an existing Tender assessment for this project number.");
       return;
     }
 
@@ -181,12 +171,7 @@ export default function ProjectInfoDialog({ open, onOpenChange, onStartAssessmen
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Tender">Tender</SelectItem>
-                  <SelectItem 
-                    value="Active"
-                    disabled={!canSelectActive()}
-                  >
-                    Active {!canSelectActive() && "(Requires Tender)"}
-                  </SelectItem>
+                  <SelectItem value="Active">Active</SelectItem>
                   <SelectItem value="Complete">Complete</SelectItem>
                 </SelectContent>
               </Select>
