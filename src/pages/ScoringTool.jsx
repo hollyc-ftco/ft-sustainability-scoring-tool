@@ -124,6 +124,7 @@ export default function ScoringTool() {
       setMandatoryDialogOpen(true);
     } else {
       setActiveAssessmentTab(nextTab);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [checkMandatoryRequirements]);
 
@@ -138,6 +139,7 @@ export default function ScoringTool() {
     if (pendingNavigation) {
       setActiveAssessmentTab(pendingNavigation);
       setPendingNavigation(null);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -151,6 +153,67 @@ export default function ScoringTool() {
     setAssessmentStarted(true);
     setProjectInfoDialogOpen(false);
     setActiveAssessmentTab("management");
+    
+    // Populate from latest assessment if available
+    if (info.latestAssessment) {
+      const latest = info.latestAssessment;
+      if (latest.management_governance) {
+        setManagementGovernanceData(prev => ({
+          ...prev,
+          responses: latest.management_governance.responses || prev.responses,
+          priorities: latest.management_governance.priorities || prev.priorities
+        }));
+      }
+      if (latest.energy_carbon) {
+        setEnergyCarbonData(prev => ({
+          ...prev,
+          responses: latest.energy_carbon.responses || prev.responses,
+          priorities: latest.energy_carbon.priorities || prev.priorities
+        }));
+      }
+      if (latest.water_management) {
+        setWaterManagementData(prev => ({
+          ...prev,
+          responses: latest.water_management.responses || prev.responses,
+          priorities: latest.water_management.priorities || prev.priorities
+        }));
+      }
+      if (latest.materials_resources) {
+        setMaterialsResourceData(prev => ({
+          ...prev,
+          responses: latest.materials_resources.responses || prev.responses,
+          priorities: latest.materials_resources.priorities || prev.priorities
+        }));
+      }
+      if (latest.biodiversity_ecosystem) {
+        setBiodiversityEcosystemData(prev => ({
+          ...prev,
+          responses: latest.biodiversity_ecosystem.responses || prev.responses,
+          priorities: latest.biodiversity_ecosystem.priorities || prev.priorities
+        }));
+      }
+      if (latest.transport_mobility) {
+        setTransportMobilityData(prev => ({
+          ...prev,
+          responses: latest.transport_mobility.responses || prev.responses,
+          priorities: latest.transport_mobility.priorities || prev.priorities
+        }));
+      }
+      if (latest.social_impact) {
+        setSocialImpactData(prev => ({
+          ...prev,
+          responses: latest.social_impact.responses || prev.responses,
+          priorities: latest.social_impact.priorities || prev.priorities
+        }));
+      }
+      if (latest.innovation_technology) {
+        setInnovationTechnologyData(prev => ({
+          ...prev,
+          responses: latest.innovation_technology.responses || prev.responses,
+          priorities: latest.innovation_technology.priorities || prev.priorities
+        }));
+      }
+    }
   };
 
   return (
