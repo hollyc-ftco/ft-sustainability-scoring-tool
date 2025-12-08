@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -95,12 +94,67 @@ export default function EditProject() {
       setProjectNumber(project.project_number || "");
       setProjectName(project.project_name || "");
       setProjectOwner(project.project_owner || "");
-      setDepartment(project.department || ""); // Load department
+      setDepartment(project.department || "");
       setCreatedByName(project.created_by_name || "");
       setProjectStage(project.project_stage || "Tender");
       
-      // Note: You would need to store the detailed responses/priorities data in the Project entity
-      // to fully restore the assessment state. For now, we'll only load the scores.
+      // Load existing assessment data
+      if (project.management_governance) {
+        setManagementGovernanceData({
+          responses: project.management_governance.responses || {},
+          priorities: project.management_governance.priorities || {},
+          scores: project.management_governance.scores || {}
+        });
+      }
+      if (project.energy_carbon) {
+        setEnergyCarbonData({
+          responses: project.energy_carbon.responses || {},
+          priorities: project.energy_carbon.priorities || {},
+          scores: project.energy_carbon.scores || {}
+        });
+      }
+      if (project.water_management) {
+        setWaterManagementData({
+          responses: project.water_management.responses || {},
+          priorities: project.water_management.priorities || {},
+          scores: project.water_management.scores || {}
+        });
+      }
+      if (project.materials_resources) {
+        setMaterialsResourceData({
+          responses: project.materials_resources.responses || {},
+          priorities: project.materials_resources.priorities || {},
+          scores: project.materials_resources.scores || {}
+        });
+      }
+      if (project.biodiversity_ecosystem) {
+        setBiodiversityEcosystemData({
+          responses: project.biodiversity_ecosystem.responses || {},
+          priorities: project.biodiversity_ecosystem.priorities || {},
+          scores: project.biodiversity_ecosystem.scores || {}
+        });
+      }
+      if (project.transport_mobility) {
+        setTransportMobilityData({
+          responses: project.transport_mobility.responses || {},
+          priorities: project.transport_mobility.priorities || {},
+          scores: project.transport_mobility.scores || {}
+        });
+      }
+      if (project.social_impact) {
+        setSocialImpactData({
+          responses: project.social_impact.responses || {},
+          priorities: project.social_impact.priorities || {},
+          scores: project.social_impact.scores || {}
+        });
+      }
+      if (project.innovation_technology) {
+        setInnovationTechnologyData({
+          responses: project.innovation_technology.responses || {},
+          priorities: project.innovation_technology.priorities || {},
+          scores: project.innovation_technology.scores || {}
+        });
+      }
     }
   }, [project]);
 
@@ -190,11 +244,58 @@ export default function EditProject() {
       project_number: projectNumber,
       project_name: projectName,
       project_owner: projectOwner,
-      department: department, // Included department in projectData
+      department: department,
       created_by_name: createdByName,
       project_stage: projectStage,
       total_score: totalScore,
-      ...scores
+      management_governance: {
+        ...scores.management_governance,
+        responses: managementGovernanceData.responses,
+        priorities: managementGovernanceData.priorities,
+        scores: managementGovernanceData.scores
+      },
+      energy_carbon: {
+        ...scores.energy_carbon,
+        responses: energyCarbonData.responses,
+        priorities: energyCarbonData.priorities,
+        scores: energyCarbonData.scores
+      },
+      water_management: {
+        ...scores.water_management,
+        responses: waterManagementData.responses,
+        priorities: waterManagementData.priorities,
+        scores: waterManagementData.scores
+      },
+      materials_resources: {
+        ...scores.materials_resources,
+        responses: materialsResourceData.responses,
+        priorities: materialsResourceData.priorities,
+        scores: materialsResourceData.scores
+      },
+      biodiversity_ecosystem: {
+        ...scores.biodiversity_ecosystem,
+        responses: biodiversityEcosystemData.responses,
+        priorities: biodiversityEcosystemData.priorities,
+        scores: biodiversityEcosystemData.scores
+      },
+      transport_mobility: {
+        ...scores.transport_mobility,
+        responses: transportMobilityData.responses,
+        priorities: transportMobilityData.priorities,
+        scores: transportMobilityData.scores
+      },
+      social_impact: {
+        ...scores.social_impact,
+        responses: socialImpactData.responses,
+        priorities: socialImpactData.priorities,
+        scores: socialImpactData.scores
+      },
+      innovation_technology: {
+        ...scores.innovation_technology,
+        responses: innovationTechnologyData.responses,
+        priorities: innovationTechnologyData.priorities,
+        scores: innovationTechnologyData.scores
+      }
     };
 
     updateProjectMutation.mutate({ id: projectId, data: projectData });
