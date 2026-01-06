@@ -122,7 +122,7 @@ export const assessmentSections = {
         item: "Permitting for waste treated or used on site",
         description: "Permits, licenses and exemptions have been obtained for waste that has been treated on site or for waste transported to site.",
         actions: "Secure permits that support sustainable on-site treatment or reuse of waste. Design processes to reuse materials on-site where possible",
-        defaultPriority: 1
+        defaultPriority: 2
       },
       {
         id: "hazardous_waste",
