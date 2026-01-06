@@ -163,7 +163,7 @@ export const assessmentSections = {
         id: "support_benefits_contracts",
         item: "Support environmental benefits in contracts",
         description: "Include actions to support the results of the environmental impacts and benefits assessments within relevant contract documentation.",
-        actions: "Include and emphasise EIA results in contracts. Attempt to influence the project proceed in the most sustainable way. Prioritise contractors with a focus on sustainability.",
+        actions: "Include and emphasise EIA results and sustainability in contract documents. Prioritise contractors with a focus on sustainability both in their systems and methodologies.",
         defaultPriority: 2
       },
       {
