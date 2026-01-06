@@ -306,8 +306,15 @@ export default function ScoringTool() {
                 <ManagementGovernance 
                   data={managementGovernanceData}
                   onDataChange={setManagementGovernanceData}
-                  onNext={() => handleNavigationWithCheck(managementGovernanceData, mgSections, "Management & Governance", "energy")}
+                  onNext={() => handleNavigationWithCheck(managementGovernanceData, managementGovernanceData.customSections || mgSections, "Management & Governance", "energy")}
                   isAdmin={isAdmin}
+                  customSections={managementGovernanceData.customSections}
+                  onUpdateSections={(updatedSections) => {
+                    setManagementGovernanceData(prev => ({
+                      ...prev,
+                      customSections: updatedSections
+                    }));
+                  }}
                 />
               </TabsContent>
 
@@ -315,8 +322,15 @@ export default function ScoringTool() {
                 <EnergyCarbonManagement 
                   data={energyCarbonData}
                   onDataChange={setEnergyCarbonData}
-                  onNext={() => handleNavigationWithCheck(energyCarbonData, ecSections, "Energy & Carbon Management", "water")}
+                  onNext={() => handleNavigationWithCheck(energyCarbonData, energyCarbonData.customSections || ecSections, "Energy & Carbon Management", "water")}
                   isAdmin={isAdmin}
+                  customSections={energyCarbonData.customSections}
+                  onUpdateSections={(updatedSections) => {
+                    setEnergyCarbonData(prev => ({
+                      ...prev,
+                      customSections: updatedSections
+                    }));
+                  }}
                 />
               </TabsContent>
 
@@ -324,8 +338,15 @@ export default function ScoringTool() {
                 <WaterManagement 
                   data={waterManagementData}
                   onDataChange={setWaterManagementData}
-                  onNext={() => handleNavigationWithCheck(waterManagementData, wmSections, "Water Management", "materials")}
+                  onNext={() => handleNavigationWithCheck(waterManagementData, waterManagementData.customSections || wmSections, "Water Management", "materials")}
                   isAdmin={isAdmin}
+                  customSections={waterManagementData.customSections}
+                  onUpdateSections={(updatedSections) => {
+                    setWaterManagementData(prev => ({
+                      ...prev,
+                      customSections: updatedSections
+                    }));
+                  }}
                 />
               </TabsContent>
 
@@ -333,8 +354,15 @@ export default function ScoringTool() {
                 <MaterialsResourceEfficiency 
                   data={materialsResourceData}
                   onDataChange={setMaterialsResourceData}
-                  onNext={() => handleNavigationWithCheck(materialsResourceData, mrSections, "Materials & Resource Efficiency", "biodiversity")}
+                  onNext={() => handleNavigationWithCheck(materialsResourceData, materialsResourceData.customSections || mrSections, "Materials & Resource Efficiency", "biodiversity")}
                   isAdmin={isAdmin}
+                  customSections={materialsResourceData.customSections}
+                  onUpdateSections={(updatedSections) => {
+                    setMaterialsResourceData(prev => ({
+                      ...prev,
+                      customSections: updatedSections
+                    }));
+                  }}
                 />
               </TabsContent>
 
@@ -342,8 +370,15 @@ export default function ScoringTool() {
                 <BiodiversityEcosystem 
                   data={biodiversityEcosystemData}
                   onDataChange={setBiodiversityEcosystemData}
-                  onNext={() => handleNavigationWithCheck(biodiversityEcosystemData, beSections, "Biodiversity & Ecosystem", "transport")}
+                  onNext={() => handleNavigationWithCheck(biodiversityEcosystemData, biodiversityEcosystemData.customSections || beSections, "Biodiversity & Ecosystem", "transport")}
                   isAdmin={isAdmin}
+                  customSections={biodiversityEcosystemData.customSections}
+                  onUpdateSections={(updatedSections) => {
+                    setBiodiversityEcosystemData(prev => ({
+                      ...prev,
+                      customSections: updatedSections
+                    }));
+                  }}
                 />
               </TabsContent>
 
@@ -351,8 +386,15 @@ export default function ScoringTool() {
                 <TransportMobility 
                   data={transportMobilityData}
                   onDataChange={setTransportMobilityData}
-                  onNext={() => handleNavigationWithCheck(transportMobilityData, tmSections, "Transport & Mobility", "social")}
+                  onNext={() => handleNavigationWithCheck(transportMobilityData, transportMobilityData.customSections || tmSections, "Transport & Mobility", "social")}
                   isAdmin={isAdmin}
+                  customSections={transportMobilityData.customSections}
+                  onUpdateSections={(updatedSections) => {
+                    setTransportMobilityData(prev => ({
+                      ...prev,
+                      customSections: updatedSections
+                    }));
+                  }}
                 />
               </TabsContent>
 
@@ -360,8 +402,15 @@ export default function ScoringTool() {
                 <SocialImpactWellbeing 
                   data={socialImpactData}
                   onDataChange={setSocialImpactData}
-                  onNext={() => handleNavigationWithCheck(socialImpactData, siSections, "Social Impact & Wellbeing", "innovation")}
+                  onNext={() => handleNavigationWithCheck(socialImpactData, socialImpactData.customSections || siSections, "Social Impact & Wellbeing", "innovation")}
                   isAdmin={isAdmin}
+                  customSections={socialImpactData.customSections}
+                  onUpdateSections={(updatedSections) => {
+                    setSocialImpactData(prev => ({
+                      ...prev,
+                      customSections: updatedSections
+                    }));
+                  }}
                 />
               </TabsContent>
 
@@ -369,8 +418,15 @@ export default function ScoringTool() {
                 <InnovationTechnology 
                   data={innovationTechnologyData}
                   onDataChange={setInnovationTechnologyData}
-                  onNext={() => handleNavigationWithCheck(innovationTechnologyData, itSections, "Innovation & Technology", "summary")}
+                  onNext={() => handleNavigationWithCheck(innovationTechnologyData, innovationTechnologyData.customSections || itSections, "Innovation & Technology", "summary")}
                   isAdmin={isAdmin}
+                  customSections={innovationTechnologyData.customSections}
+                  onUpdateSections={(updatedSections) => {
+                    setInnovationTechnologyData(prev => ({
+                      ...prev,
+                      customSections: updatedSections
+                    }));
+                  }}
                 />
               </TabsContent>
             </Tabs>
