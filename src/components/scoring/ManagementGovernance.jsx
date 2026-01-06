@@ -157,7 +157,7 @@ export const assessmentSections = {
         item: "Implement environmental enhancements",
         description: "Deliver environmental enhancements, mitigation and compensation.",
         actions: "Reduce emissions, water use, waste. Avoid soil and water contamination. Adopt appropriate waste management practices. Avoid disruptions in biodiversity. Plant vegetation, prioritising native species. Implement green, natural solutions: SuDS, ponds, planted verges, green spaces. Provide additional ways to promote biodiversity: insect hotels, bee pastures, nesting boxes, etc.",
-        defaultPriority: 2
+        defaultPriority: 1
       },
       {
         id: "support_benefits_contracts",
