@@ -469,7 +469,7 @@ export default function EditProject() {
 
           <TabsContent value="management">
             <ManagementGovernance 
-              key={projectId}
+              key={`${projectId}-${JSON.stringify(managementGovernanceData.responses)}`}
               data={managementGovernanceData}
               onDataChange={setManagementGovernanceData}
               onNext={() => setCurrentTab("energy")}
@@ -478,7 +478,7 @@ export default function EditProject() {
 
           <TabsContent value="energy">
             <EnergyCarbonManagement 
-              key={projectId}
+              key={`${projectId}-${JSON.stringify(energyCarbonData.responses)}`}
               data={energyCarbonData}
               onDataChange={setEnergyCarbonData}
               onNext={() => setCurrentTab("water")}
@@ -487,7 +487,7 @@ export default function EditProject() {
 
           <TabsContent value="water">
             <WaterManagement 
-              key={projectId}
+              key={`${projectId}-${JSON.stringify(waterManagementData.responses)}`}
               data={waterManagementData}
               onDataChange={setWaterManagementData}
               onNext={() => setCurrentTab("materials")}
@@ -496,7 +496,7 @@ export default function EditProject() {
 
           <TabsContent value="materials">
             <MaterialsResourceEfficiency 
-              key={projectId}
+              key={`${projectId}-${JSON.stringify(materialsResourceData.responses)}`}
               data={materialsResourceData}
               onDataChange={setMaterialsResourceData}
               onNext={() => setCurrentTab("biodiversity")}
@@ -505,7 +505,7 @@ export default function EditProject() {
 
           <TabsContent value="biodiversity">
             <BiodiversityEcosystem 
-              key={projectId}
+              key={`${projectId}-${JSON.stringify(biodiversityEcosystemData.responses)}`}
               data={biodiversityEcosystemData}
               onDataChange={setBiodiversityEcosystemData}
               onNext={() => setCurrentTab("transport")}
@@ -514,7 +514,7 @@ export default function EditProject() {
 
           <TabsContent value="transport">
             <TransportMobility 
-              key={projectId}
+              key={`${projectId}-${JSON.stringify(transportMobilityData.responses)}`}
               data={transportMobilityData}
               onDataChange={setTransportMobilityData}
               onNext={() => setCurrentTab("social")}
@@ -523,7 +523,7 @@ export default function EditProject() {
 
           <TabsContent value="social">
             <SocialImpactWellbeing 
-              key={projectId}
+              key={`${projectId}-${JSON.stringify(socialImpactData.responses)}`}
               data={socialImpactData}
               onDataChange={setSocialImpactData}
               onNext={() => setCurrentTab("innovation")}
@@ -532,7 +532,7 @@ export default function EditProject() {
 
           <TabsContent value="innovation">
             <InnovationTechnology 
-              key={projectId}
+              key={`${projectId}-${JSON.stringify(innovationTechnologyData.responses)}`}
               data={innovationTechnologyData}
               onDataChange={setInnovationTechnologyData}
               onNext={() => {}}
