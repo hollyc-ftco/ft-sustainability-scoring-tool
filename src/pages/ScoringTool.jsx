@@ -150,7 +150,6 @@ export default function ScoringTool() {
 
   const handleStartAssessment = (info) => {
     setProjectInfo(info);
-    setAssessmentStarted(true);
     setProjectInfoDialogOpen(false);
     setActiveAssessmentTab("management");
     
@@ -222,6 +221,9 @@ export default function ScoringTool() {
         });
       }
     }
+    
+    // Set assessment started after data is loaded
+    setAssessmentStarted(true);
   };
 
   return (
@@ -312,6 +314,7 @@ export default function ScoringTool() {
 
               <TabsContent value="management">
                 <ManagementGovernance 
+                  key={projectInfo?.reference || "new"}
                   data={managementGovernanceData}
                   onDataChange={setManagementGovernanceData}
                   onNext={() => handleNavigationWithCheck(managementGovernanceData, managementGovernanceData.customSections || mgSections, "Management & Governance", "energy")}
@@ -328,6 +331,7 @@ export default function ScoringTool() {
 
               <TabsContent value="energy">
                 <EnergyCarbonManagement 
+                  key={projectInfo?.reference || "new"}
                   data={energyCarbonData}
                   onDataChange={setEnergyCarbonData}
                   onNext={() => handleNavigationWithCheck(energyCarbonData, energyCarbonData.customSections || ecSections, "Energy & Carbon Management", "water")}
@@ -344,6 +348,7 @@ export default function ScoringTool() {
 
               <TabsContent value="water">
                 <WaterManagement 
+                  key={projectInfo?.reference || "new"}
                   data={waterManagementData}
                   onDataChange={setWaterManagementData}
                   onNext={() => handleNavigationWithCheck(waterManagementData, waterManagementData.customSections || wmSections, "Water Management", "materials")}
@@ -360,6 +365,7 @@ export default function ScoringTool() {
 
               <TabsContent value="materials">
                 <MaterialsResourceEfficiency 
+                  key={projectInfo?.reference || "new"}
                   data={materialsResourceData}
                   onDataChange={setMaterialsResourceData}
                   onNext={() => handleNavigationWithCheck(materialsResourceData, materialsResourceData.customSections || mrSections, "Materials & Resource Efficiency", "biodiversity")}
@@ -376,6 +382,7 @@ export default function ScoringTool() {
 
               <TabsContent value="biodiversity">
                 <BiodiversityEcosystem 
+                  key={projectInfo?.reference || "new"}
                   data={biodiversityEcosystemData}
                   onDataChange={setBiodiversityEcosystemData}
                   onNext={() => handleNavigationWithCheck(biodiversityEcosystemData, biodiversityEcosystemData.customSections || beSections, "Biodiversity & Ecosystem", "transport")}
@@ -392,6 +399,7 @@ export default function ScoringTool() {
 
               <TabsContent value="transport">
                 <TransportMobility 
+                  key={projectInfo?.reference || "new"}
                   data={transportMobilityData}
                   onDataChange={setTransportMobilityData}
                   onNext={() => handleNavigationWithCheck(transportMobilityData, transportMobilityData.customSections || tmSections, "Transport & Mobility", "social")}
@@ -408,6 +416,7 @@ export default function ScoringTool() {
 
               <TabsContent value="social">
                 <SocialImpactWellbeing 
+                  key={projectInfo?.reference || "new"}
                   data={socialImpactData}
                   onDataChange={setSocialImpactData}
                   onNext={() => handleNavigationWithCheck(socialImpactData, socialImpactData.customSections || siSections, "Social Impact & Wellbeing", "innovation")}
@@ -424,6 +433,7 @@ export default function ScoringTool() {
 
               <TabsContent value="innovation">
                 <InnovationTechnology 
+                  key={projectInfo?.reference || "new"}
                   data={innovationTechnologyData}
                   onDataChange={setInnovationTechnologyData}
                   onNext={() => handleNavigationWithCheck(innovationTechnologyData, innovationTechnologyData.customSections || itSections, "Innovation & Technology", "summary")}
