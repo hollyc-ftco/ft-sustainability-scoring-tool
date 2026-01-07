@@ -233,15 +233,30 @@ function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, on
     return initial;
   });
 
-  // Update state when data prop changes (for loading existing assessments)
+  // Initialize or update state when data changes
   useEffect(() => {
-    if (data.responses[sectionId]) {
+    if (data.responses[sectionId] && Object.keys(data.responses[sectionId]).length > 0) {
       setResponses(data.responses[sectionId]);
+    } else {
+      const initial = {};
+      section.items.forEach(item => {
+        initial[item.id] = "no";
+      });
+      setResponses(initial);
     }
-    if (data.priorities[sectionId]) {
+  }, [data.responses, sectionId, section.items]);
+
+  useEffect(() => {
+    if (data.priorities[sectionId] && Object.keys(data.priorities[sectionId]).length > 0) {
       setPriorities(data.priorities[sectionId]);
+    } else {
+      const initial = {};
+      section.items.forEach(item => {
+        initial[item.id] = item.defaultPriority;
+      });
+      setPriorities(initial);
     }
-  }, [data.responses, data.priorities, sectionId]);
+  }, [data.priorities, sectionId, section.items]);
 
   useEffect(() => {
     // Count mandatory and non-mandatory items (excluding N/A)
