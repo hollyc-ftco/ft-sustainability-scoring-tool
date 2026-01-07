@@ -478,6 +478,7 @@ export default function EditProject() {
 
           <TabsContent value="management">
             <ManagementGovernance 
+              key={projectId}
               data={managementGovernanceData}
               onDataChange={setManagementGovernanceData}
               onNext={() => setCurrentTab("energy")}
@@ -486,6 +487,7 @@ export default function EditProject() {
 
           <TabsContent value="energy">
             <EnergyCarbonManagement 
+              key={projectId}
               data={energyCarbonData}
               onDataChange={setEnergyCarbonData}
               onNext={() => setCurrentTab("water")}
@@ -494,6 +496,7 @@ export default function EditProject() {
 
           <TabsContent value="water">
             <WaterManagement 
+              key={projectId}
               data={waterManagementData}
               onDataChange={setWaterManagementData}
               onNext={() => setCurrentTab("materials")}
@@ -502,6 +505,7 @@ export default function EditProject() {
 
           <TabsContent value="materials">
             <MaterialsResourceEfficiency 
+              key={projectId}
               data={materialsResourceData}
               onDataChange={setMaterialsResourceData}
               onNext={() => setCurrentTab("biodiversity")}
@@ -510,6 +514,7 @@ export default function EditProject() {
 
           <TabsContent value="biodiversity">
             <BiodiversityEcosystem 
+              key={projectId}
               data={biodiversityEcosystemData}
               onDataChange={setBiodiversityEcosystemData}
               onNext={() => setCurrentTab("transport")}
@@ -518,6 +523,7 @@ export default function EditProject() {
 
           <TabsContent value="transport">
             <TransportMobility 
+              key={projectId}
               data={transportMobilityData}
               onDataChange={setTransportMobilityData}
               onNext={() => setCurrentTab("social")}
@@ -526,6 +532,7 @@ export default function EditProject() {
 
           <TabsContent value="social">
             <SocialImpactWellbeing 
+              key={projectId}
               data={socialImpactData}
               onDataChange={setSocialImpactData}
               onNext={() => setCurrentTab("innovation")}
@@ -534,6 +541,7 @@ export default function EditProject() {
 
           <TabsContent value="innovation">
             <InnovationTechnology 
+              key={projectId}
               data={innovationTechnologyData}
               onDataChange={setInnovationTechnologyData}
               onNext={() => {}}
