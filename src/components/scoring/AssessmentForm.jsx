@@ -63,10 +63,9 @@ const assessmentCategories = [
     name: "Energy and Carbon Management",
     weight: 20,
     subCategories: [
-      { id: "energy_reduction", name: "Energy Use Reduction", description: "Measures to reduce overall energy consumption", weight: 25 },
-      { id: "carbon_emissions", name: "Carbon Emissions", description: "Tracking and reducing carbon emissions", weight: 20 },
-      { id: "renewable_energy", name: "Renewable Energy Integration", description: "Integration of renewable energy sources", weight: 25 },
-      { id: "carbon_offsetting", name: "Carbon Offsetting", description: "Carbon offset programs and initiatives", weight: 30 }
+      { id: "energy_reduction", name: "Energy Use Reduction", description: "Measures to reduce overall energy consumption", weight: 33.33 },
+      { id: "carbon_emissions", name: "Carbon Emissions", description: "Tracking and reducing carbon emissions", weight: 33.33 },
+      { id: "carbon_offsetting", name: "Carbon Offsetting", description: "Carbon offset programs and initiatives", weight: 33.33 }
     ]
   },
   {
@@ -267,7 +266,6 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
         energy_carbon: {
           energy_reduction: energyCarbonData.scores.energy_reduction || 0,
           carbon_emissions: energyCarbonData.scores.carbon_emissions || 0,
-          renewable_energy: energyCarbonData.scores.renewable_energy || 0,
           carbon_offsetting: energyCarbonData.scores.carbon_offsetting || 0
         }
       }));

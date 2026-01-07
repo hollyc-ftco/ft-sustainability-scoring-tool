@@ -191,7 +191,6 @@ export default function EditProject() {
       energy_carbon: {
         energy_reduction: energyCarbonData.scores.energy_reduction || 0,
         carbon_emissions: energyCarbonData.scores.carbon_emissions || 0,
-        renewable_energy: energyCarbonData.scores.renewable_energy || 0,
         carbon_offsetting: energyCarbonData.scores.carbon_offsetting || 0
       },
       water_management: {
