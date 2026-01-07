@@ -79,6 +79,8 @@ export default function EditProject() {
     scores: {}
   });
 
+  const [currentTab, setCurrentTab] = useState("management");
+
   const { data: project, isLoading } = useQuery({
     queryKey: ['project', projectId],
     queryFn: async () => {
@@ -446,7 +448,7 @@ export default function EditProject() {
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="management" className="space-y-6">
+        <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-6">
           <TabsList className="bg-white border border-emerald-100 flex-wrap">
             <TabsTrigger value="management" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700">
               Management & Governance
@@ -478,7 +480,7 @@ export default function EditProject() {
             <ManagementGovernance 
               data={managementGovernanceData}
               onDataChange={setManagementGovernanceData}
-              onNext={() => {}}
+              onNext={() => setCurrentTab("energy")}
             />
           </TabsContent>
 
@@ -486,7 +488,7 @@ export default function EditProject() {
             <EnergyCarbonManagement 
               data={energyCarbonData}
               onDataChange={setEnergyCarbonData}
-              onNext={() => {}}
+              onNext={() => setCurrentTab("water")}
             />
           </TabsContent>
 
@@ -494,7 +496,7 @@ export default function EditProject() {
             <WaterManagement 
               data={waterManagementData}
               onDataChange={setWaterManagementData}
-              onNext={() => {}}
+              onNext={() => setCurrentTab("materials")}
             />
           </TabsContent>
 
@@ -502,7 +504,7 @@ export default function EditProject() {
             <MaterialsResourceEfficiency 
               data={materialsResourceData}
               onDataChange={setMaterialsResourceData}
-              onNext={() => {}}
+              onNext={() => setCurrentTab("biodiversity")}
             />
           </TabsContent>
 
@@ -510,7 +512,7 @@ export default function EditProject() {
             <BiodiversityEcosystem 
               data={biodiversityEcosystemData}
               onDataChange={setBiodiversityEcosystemData}
-              onNext={() => {}}
+              onNext={() => setCurrentTab("transport")}
             />
           </TabsContent>
 
@@ -518,7 +520,7 @@ export default function EditProject() {
             <TransportMobility 
               data={transportMobilityData}
               onDataChange={setTransportMobilityData}
-              onNext={() => {}}
+              onNext={() => setCurrentTab("social")}
             />
           </TabsContent>
 
@@ -526,7 +528,7 @@ export default function EditProject() {
             <SocialImpactWellbeing 
               data={socialImpactData}
               onDataChange={setSocialImpactData}
-              onNext={() => {}}
+              onNext={() => setCurrentTab("innovation")}
             />
           </TabsContent>
 
