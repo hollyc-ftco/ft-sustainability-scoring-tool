@@ -100,71 +100,62 @@ export default function EditProject() {
       setCreatedByName(project.created_by_name || "");
       setProjectStage(project.project_stage || "Tender");
       
-      // Load existing assessment data
-      if (project.management_governance) {
-        setManagementGovernanceData({
-          responses: project.management_governance.responses || {},
-          priorities: project.management_governance.priorities || {},
-          scores: project.management_governance.scores || {},
-          customSections: project.management_governance.customSections || undefined
-        });
-      }
-      if (project.energy_carbon) {
-        setEnergyCarbonData({
-          responses: project.energy_carbon.responses || {},
-          priorities: project.energy_carbon.priorities || {},
-          scores: project.energy_carbon.scores || {},
-          customSections: project.energy_carbon.customSections || undefined
-        });
-      }
-      if (project.water_management) {
-        setWaterManagementData({
-          responses: project.water_management.responses || {},
-          priorities: project.water_management.priorities || {},
-          scores: project.water_management.scores || {},
-          customSections: project.water_management.customSections || undefined
-        });
-      }
-      if (project.materials_resources) {
-        setMaterialsResourceData({
-          responses: project.materials_resources.responses || {},
-          priorities: project.materials_resources.priorities || {},
-          scores: project.materials_resources.scores || {},
-          customSections: project.materials_resources.customSections || undefined
-        });
-      }
-      if (project.biodiversity_ecosystem) {
-        setBiodiversityEcosystemData({
-          responses: project.biodiversity_ecosystem.responses || {},
-          priorities: project.biodiversity_ecosystem.priorities || {},
-          scores: project.biodiversity_ecosystem.scores || {},
-          customSections: project.biodiversity_ecosystem.customSections || undefined
-        });
-      }
-      if (project.transport_mobility) {
-        setTransportMobilityData({
-          responses: project.transport_mobility.responses || {},
-          priorities: project.transport_mobility.priorities || {},
-          scores: project.transport_mobility.scores || {},
-          customSections: project.transport_mobility.customSections || undefined
-        });
-      }
-      if (project.social_impact) {
-        setSocialImpactData({
-          responses: project.social_impact.responses || {},
-          priorities: project.social_impact.priorities || {},
-          scores: project.social_impact.scores || {},
-          customSections: project.social_impact.customSections || undefined
-        });
-      }
-      if (project.innovation_technology) {
-        setInnovationTechnologyData({
-          responses: project.innovation_technology.responses || {},
-          priorities: project.innovation_technology.priorities || {},
-          scores: project.innovation_technology.scores || {},
-          customSections: project.innovation_technology.customSections || undefined
-        });
-      }
+      // Load existing assessment data - force complete state reset
+      setManagementGovernanceData({
+        responses: project.management_governance?.responses || {},
+        priorities: project.management_governance?.priorities || {},
+        scores: project.management_governance?.scores || {},
+        customSections: project.management_governance?.customSections || undefined
+      });
+      
+      setEnergyCarbonData({
+        responses: project.energy_carbon?.responses || {},
+        priorities: project.energy_carbon?.priorities || {},
+        scores: project.energy_carbon?.scores || {},
+        customSections: project.energy_carbon?.customSections || undefined
+      });
+      
+      setWaterManagementData({
+        responses: project.water_management?.responses || {},
+        priorities: project.water_management?.priorities || {},
+        scores: project.water_management?.scores || {},
+        customSections: project.water_management?.customSections || undefined
+      });
+      
+      setMaterialsResourceData({
+        responses: project.materials_resources?.responses || {},
+        priorities: project.materials_resources?.priorities || {},
+        scores: project.materials_resources?.scores || {},
+        customSections: project.materials_resources?.customSections || undefined
+      });
+      
+      setBiodiversityEcosystemData({
+        responses: project.biodiversity_ecosystem?.responses || {},
+        priorities: project.biodiversity_ecosystem?.priorities || {},
+        scores: project.biodiversity_ecosystem?.scores || {},
+        customSections: project.biodiversity_ecosystem?.customSections || undefined
+      });
+      
+      setTransportMobilityData({
+        responses: project.transport_mobility?.responses || {},
+        priorities: project.transport_mobility?.priorities || {},
+        scores: project.transport_mobility?.scores || {},
+        customSections: project.transport_mobility?.customSections || undefined
+      });
+      
+      setSocialImpactData({
+        responses: project.social_impact?.responses || {},
+        priorities: project.social_impact?.priorities || {},
+        scores: project.social_impact?.scores || {},
+        customSections: project.social_impact?.customSections || undefined
+      });
+      
+      setInnovationTechnologyData({
+        responses: project.innovation_technology?.responses || {},
+        priorities: project.innovation_technology?.priorities || {},
+        scores: project.innovation_technology?.scores || {},
+        customSections: project.innovation_technology?.customSections || undefined
+      });
     }
   }, [project]);
 
