@@ -310,8 +310,8 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
         biodiversity_ecosystem: {
           biodiversity_preservation: biodiversityEcosystemData.scores.biodiversity_preservation || 0,
           ecological_connectivity: biodiversityEcosystemData.scores.ecological_connectivity || 0,
-          native_species: biodiversityEcosystemData.scores.native_species_planting || 0,
-          sustainable_land: biodiversityEcosystemData.scores.sustainable_land_use || 0
+          native_species_planting: biodiversityEcosystemData.scores.planting || 0,
+          sustainable_land_use: biodiversityEcosystemData.scores.sustainable_land_use || 0
         }
       }));
     }
