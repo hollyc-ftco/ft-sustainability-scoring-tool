@@ -97,8 +97,8 @@ const assessmentCategories = [
     subCategories: [
       { id: "biodiversity_preservation", name: "Biodiversity Preservation", description: "Protection and enhancement of biodiversity", weight: 15 },
       { id: "ecological_connectivity", name: "Ecological Connectivity", description: "Maintaining ecological corridors and connectivity", weight: 45 },
-      { id: "native_species", name: "Native Species Planting", description: "Use of native plant species", weight: 30 },
-      { id: "sustainable_land", name: "Sustainable Land Use", description: "Sustainable land management practices", weight: 10 }
+      { id: "native_species_planting", name: "Native Species Planting", description: "Use of native plant species", weight: 30 },
+      { id: "sustainable_land_use", name: "Sustainable Land Use", description: "Sustainable land management practices", weight: 10 }
     ]
   },
   {
