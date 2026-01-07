@@ -246,7 +246,7 @@ export const assessmentSections = {
     ]
   },
   planting: {
-    title: "Planting",
+    title: "Native Species Planting",
     items: [
       {
         id: "street_design",
