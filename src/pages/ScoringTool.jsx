@@ -158,68 +158,68 @@ export default function ScoringTool() {
     if (info.latestAssessment) {
       const latest = info.latestAssessment;
       if (latest.management_governance) {
-        setManagementGovernanceData(prev => ({
-          ...prev,
-          responses: latest.management_governance.responses || prev.responses,
-          priorities: latest.management_governance.priorities || prev.priorities,
-          customSections: latest.management_governance.customSections || prev.customSections
-        }));
+        setManagementGovernanceData({
+          responses: latest.management_governance.responses || {},
+          priorities: latest.management_governance.priorities || {},
+          scores: latest.management_governance.scores || {},
+          customSections: latest.management_governance.customSections
+        });
       }
       if (latest.energy_carbon) {
-        setEnergyCarbonData(prev => ({
-          ...prev,
-          responses: latest.energy_carbon.responses || prev.responses,
-          priorities: latest.energy_carbon.priorities || prev.priorities,
-          customSections: latest.energy_carbon.customSections || prev.customSections
-        }));
+        setEnergyCarbonData({
+          responses: latest.energy_carbon.responses || {},
+          priorities: latest.energy_carbon.priorities || {},
+          scores: latest.energy_carbon.scores || {},
+          customSections: latest.energy_carbon.customSections
+        });
       }
       if (latest.water_management) {
-        setWaterManagementData(prev => ({
-          ...prev,
-          responses: latest.water_management.responses || prev.responses,
-          priorities: latest.water_management.priorities || prev.priorities,
-          customSections: latest.water_management.customSections || prev.customSections
-        }));
+        setWaterManagementData({
+          responses: latest.water_management.responses || {},
+          priorities: latest.water_management.priorities || {},
+          scores: latest.water_management.scores || {},
+          customSections: latest.water_management.customSections
+        });
       }
       if (latest.materials_resources) {
-        setMaterialsResourceData(prev => ({
-          ...prev,
-          responses: latest.materials_resources.responses || prev.responses,
-          priorities: latest.materials_resources.priorities || prev.priorities,
-          customSections: latest.materials_resources.customSections || prev.customSections
-        }));
+        setMaterialsResourceData({
+          responses: latest.materials_resources.responses || {},
+          priorities: latest.materials_resources.priorities || {},
+          scores: latest.materials_resources.scores || {},
+          customSections: latest.materials_resources.customSections
+        });
       }
       if (latest.biodiversity_ecosystem) {
-        setBiodiversityEcosystemData(prev => ({
-          ...prev,
-          responses: latest.biodiversity_ecosystem.responses || prev.responses,
-          priorities: latest.biodiversity_ecosystem.priorities || prev.priorities,
-          customSections: latest.biodiversity_ecosystem.customSections || prev.customSections
-        }));
+        setBiodiversityEcosystemData({
+          responses: latest.biodiversity_ecosystem.responses || {},
+          priorities: latest.biodiversity_ecosystem.priorities || {},
+          scores: latest.biodiversity_ecosystem.scores || {},
+          customSections: latest.biodiversity_ecosystem.customSections
+        });
       }
       if (latest.transport_mobility) {
-        setTransportMobilityData(prev => ({
-          ...prev,
-          responses: latest.transport_mobility.responses || prev.responses,
-          priorities: latest.transport_mobility.priorities || prev.priorities,
-          customSections: latest.transport_mobility.customSections || prev.customSections
-        }));
+        setTransportMobilityData({
+          responses: latest.transport_mobility.responses || {},
+          priorities: latest.transport_mobility.priorities || {},
+          scores: latest.transport_mobility.scores || {},
+          customSections: latest.transport_mobility.customSections
+        });
       }
       if (latest.social_impact) {
-        setSocialImpactData(prev => ({
-          ...prev,
-          responses: latest.social_impact.responses || prev.responses,
-          priorities: latest.social_impact.priorities || prev.priorities,
-          customSections: latest.social_impact.customSections || prev.customSections
-        }));
+        setSocialImpactData({
+          responses: latest.social_impact.responses || {},
+          priorities: latest.social_impact.priorities || {},
+          scores: latest.social_impact.scores || {},
+          customSections: latest.social_impact.customSections
+        });
       }
       if (latest.innovation_technology) {
-        setInnovationTechnologyData(prev => ({
-          ...prev,
-          responses: latest.innovation_technology.responses || prev.responses,
-          priorities: latest.innovation_technology.priorities || prev.priorities,
-          customSections: latest.innovation_technology.customSections || prev.customSections
-        }));
+        setInnovationTechnologyData({
+          responses: latest.innovation_technology.responses || {},
+          priorities: latest.innovation_technology.priorities || {},
+          scores: latest.innovation_technology.scores || {},
+          customSections: latest.innovation_technology.customSections
+        });
       }
     }
   };
