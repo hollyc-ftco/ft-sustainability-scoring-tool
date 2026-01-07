@@ -478,6 +478,7 @@ export default function EditProject() {
             <ManagementGovernance 
               data={managementGovernanceData}
               onDataChange={setManagementGovernanceData}
+              onNext={() => {}}
             />
           </TabsContent>
 
@@ -485,6 +486,7 @@ export default function EditProject() {
             <EnergyCarbonManagement 
               data={energyCarbonData}
               onDataChange={setEnergyCarbonData}
+              onNext={() => {}}
             />
           </TabsContent>
 
@@ -492,6 +494,7 @@ export default function EditProject() {
             <WaterManagement 
               data={waterManagementData}
               onDataChange={setWaterManagementData}
+              onNext={() => {}}
             />
           </TabsContent>
 
@@ -499,6 +502,7 @@ export default function EditProject() {
             <MaterialsResourceEfficiency 
               data={materialsResourceData}
               onDataChange={setMaterialsResourceData}
+              onNext={() => {}}
             />
           </TabsContent>
 
@@ -506,6 +510,7 @@ export default function EditProject() {
             <BiodiversityEcosystem 
               data={biodiversityEcosystemData}
               onDataChange={setBiodiversityEcosystemData}
+              onNext={() => {}}
             />
           </TabsContent>
 
@@ -513,6 +518,7 @@ export default function EditProject() {
             <TransportMobility 
               data={transportMobilityData}
               onDataChange={setTransportMobilityData}
+              onNext={() => {}}
             />
           </TabsContent>
 
@@ -520,6 +526,7 @@ export default function EditProject() {
             <SocialImpactWellbeing 
               data={socialImpactData}
               onDataChange={setSocialImpactData}
+              onNext={() => {}}
             />
           </TabsContent>
 
@@ -527,6 +534,7 @@ export default function EditProject() {
             <InnovationTechnology 
               data={innovationTechnologyData}
               onDataChange={setInnovationTechnologyData}
+              onNext={() => {}}
             />
           </TabsContent>
         </Tabs>
