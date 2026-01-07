@@ -464,7 +464,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, on
       });
       setResponses(initial);
     }
-  }, [sectionId]);
+  }, [sectionId, data.responses]);
 
   useEffect(() => {
     if (data.priorities[sectionId] && Object.keys(data.priorities[sectionId]).length > 0) {
@@ -476,7 +476,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, on
       });
       setPriorities(initial);
     }
-  }, [sectionId]);
+  }, [sectionId, data.priorities]);
 
   useEffect(() => {
     // Count mandatory and non-mandatory items (excluding N/A)
