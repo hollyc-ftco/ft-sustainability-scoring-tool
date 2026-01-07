@@ -749,6 +749,8 @@ export default function AssessmentForm({ managementGovernanceData, energyCarbonD
           createdByName={createdByName}
           projectStage={projectStage}
           comments={comments}
+          onSave={handleSave}
+          isSaving={saveProjectMutation.isPending}
         />
       )}
 
