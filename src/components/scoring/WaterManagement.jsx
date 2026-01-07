@@ -308,7 +308,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, on
     return initial;
   });
 
-  // Initialize or update state when data changes
+  // Initialize state only once when component mounts or section changes
   useEffect(() => {
     if (data.responses[sectionId] && Object.keys(data.responses[sectionId]).length > 0) {
       setResponses(data.responses[sectionId]);
@@ -319,7 +319,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, on
       });
       setResponses(initial);
     }
-  }, [data.responses, sectionId, section.items]);
+  }, [sectionId]);
 
   useEffect(() => {
     if (data.priorities[sectionId] && Object.keys(data.priorities[sectionId]).length > 0) {
@@ -331,7 +331,7 @@ function AssessmentSection({ section, sectionId, data, onDataChange, isAdmin, on
       });
       setPriorities(initial);
     }
-  }, [data.priorities, sectionId, section.items]);
+  }, [sectionId]);
 
   useEffect(() => {
     // Count mandatory and non-mandatory items (excluding N/A)
