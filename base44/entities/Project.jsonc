@@ -1,0 +1,290 @@
+{
+  "name": "Project",
+  "type": "object",
+  "properties": {
+    "reference": {
+      "type": "string",
+      "description": "Auto-generated reference identifier (e.g., ProjectNumber_A_001)"
+    },
+    "project_number": {
+      "type": "string",
+      "description": "Unique project number identifier"
+    },
+    "project_name": {
+      "type": "string",
+      "description": "Name of the project"
+    },
+    "project_owner": {
+      "type": "string",
+      "description": "Owner of the project"
+    },
+    "department": {
+      "type": "string",
+      "enum": [
+        "Circular Economy & Environment",
+        "Energy and Planning",
+        "Sustainable Infrastructure"
+      ],
+      "description": "Department responsible for the project"
+    },
+    "created_by_name": {
+      "type": "string",
+      "description": "Name of the person who created the assessment"
+    },
+    "project_stage": {
+      "type": "string",
+      "enum": [
+        "Tender",
+        "Active",
+        "Complete"
+      ],
+      "default": "Tender",
+      "description": "Current stage of the project"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "in_progress",
+        "completed"
+      ],
+      "default": "draft",
+      "description": "Status of the assessment"
+    },
+    "additional_comment": {
+      "type": "string",
+      "description": "Additional comments added after saving the assessment"
+    },
+    "category_comments": {
+      "type": "object",
+      "description": "Comments for each category",
+      "properties": {
+        "management_governance": {
+          "type": "string"
+        },
+        "energy_carbon": {
+          "type": "string"
+        },
+        "water_management": {
+          "type": "string"
+        },
+        "materials_resources": {
+          "type": "string"
+        },
+        "biodiversity_ecosystem": {
+          "type": "string"
+        },
+        "transport_mobility": {
+          "type": "string"
+        },
+        "social_impact": {
+          "type": "string"
+        },
+        "innovation_technology": {
+          "type": "string"
+        }
+      }
+    },
+    "management_governance": {
+      "type": "object",
+      "properties": {
+        "sdg_alignment": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "environmental_systems": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "stakeholder_engagement": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "policy_planning": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "energy_carbon": {
+      "type": "object",
+      "properties": {
+        "energy_reduction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "carbon_emissions": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "renewable_energy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "carbon_offsetting": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "water_management": {
+      "type": "object",
+      "properties": {
+        "water_efficiency": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "flood_risk": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "water_quality": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "sustainable_drainage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "materials_resources": {
+      "type": "object",
+      "properties": {
+        "material_selection": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "circular_economy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "waste_management": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "embodied_carbon": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "biodiversity_ecosystem": {
+      "type": "object",
+      "properties": {
+        "biodiversity_preservation": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ecological_connectivity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "native_species": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "sustainable_land": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "transport_mobility": {
+      "type": "object",
+      "properties": {
+        "transport_options": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "mobility_all": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "transport_carbon": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "social_impact": {
+      "type": "object",
+      "properties": {
+        "health_wellbeing": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "community_engagement": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "cultural_heritage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "job_creation": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "innovation_technology": {
+      "type": "object",
+      "properties": {
+        "technology_integration": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "green_infrastructure": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "construction_techniques": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "total_score": {
+      "type": "number",
+      "description": "Total calculated score"
+    }
+  },
+  "required": [
+    "reference",
+    "project_number",
+    "project_name",
+    "project_owner",
+    "project_stage"
+  ]
+}
